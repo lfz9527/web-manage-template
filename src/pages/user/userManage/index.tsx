@@ -157,7 +157,6 @@ export default () => {
       {messageContextHolder}
       <ProTable<GithubIssueItem>
         columns={columns}
-        actionRef={actionRef}
         cardBordered
         request={async (params, sort, filter) => {
           console.log(sort, filter, params);

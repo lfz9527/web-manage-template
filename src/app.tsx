@@ -5,6 +5,7 @@ import { getToken, removeToken, setToken } from '@/utils';
 import { LogoutOutlined } from '@ant-design/icons';
 import { history, RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
 import { Dropdown, MenuProps, message } from 'antd';
+import Logo from './assets/icon/logo.svg';
 
 const loginPath = '/login';
 
@@ -76,7 +77,7 @@ export const layout: RunTimeLayoutConfig = ({
   }
 
   return {
-    logo: 'https://img.alicdn.com/tfs/TB1YHEpwUT1gK0jSZFhXXaAtVXa-28-27.svg',
+    logo: Logo,
     title: '吉韵站群系统后台管理', //左上角Logo后面的名字
     menu: {
       locale: false,

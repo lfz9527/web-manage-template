@@ -9,7 +9,7 @@ export default defineConfig({
   initialState: {},
   request: {},
   layout: {
-    title: '@umijs/max',
+    title: '吉韵站群系统后台管理',
   },
   routes: routes,
   npmClient: 'pnpm',

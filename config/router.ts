@@ -65,6 +65,18 @@ const routes = [
     icon: 'ReconciliationFilled',
     component: '@/pages/advertise/advertiseManage',
   },
+  {
+    name: '品牌管理',
+    path: '/brand',
+    icon: 'InteractionFilled',
+    component: '@/pages/brand/brandManage',
+  },
+  {
+    name: '优惠券管理',
+    path: '/deals',
+    icon: 'MoneyCollectFilled',
+    component: '@/pages/deals/dealsManage',
+  },
   { path: '*', component: '404' },
 ];
 

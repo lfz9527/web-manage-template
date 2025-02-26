@@ -37,6 +37,28 @@ const routes = [
       },
     ],
   },
+  {
+    name: '站群管理',
+    path: '/site',
+    icon: 'ProjectFilled',
+    routes: [
+      {
+        path: '/site/manage',
+        name: '站群管理',
+        component: '@/pages/site/siteManage',
+      },
+      {
+        path: '/site/site-config-key',
+        name: '站群配置项',
+        component: '@/pages/site/siteConfigKey',
+      },
+      {
+        path: '/site/site-config-value',
+        name: '站群配置值',
+        component: '@/pages/site/siteConfigValue',
+      },
+    ],
+  },
   { path: '*', component: '404' },
 ];
 

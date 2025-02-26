@@ -122,6 +122,7 @@ const handleSuccess = ({ code, data, msg }: ResponseData) => {
     history.push('/login');
     throw new Error(msg || 'Login expired');
   } else {
+    message.error(msg || 'request error');
     throw new Error(msg || 'request error');
   }
 };
@@ -133,7 +134,10 @@ export const request: RequestConfig = {
     errorHandler(error: any) {
       message.error(error.message || 'request error');
     },
-    errorThrower() {},
+    errorThrower(error) {
+      console.log(123, error);
+      throw new Error('request error');
+    },
   },
   // 请求拦截
   requestInterceptors: [

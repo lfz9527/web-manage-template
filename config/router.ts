@@ -59,6 +59,12 @@ const routes = [
       },
     ],
   },
+  {
+    name: '广告管理',
+    path: '/advertise',
+    icon: 'ReconciliationFilled',
+    component: '@/pages/advertise/advertiseManage',
+  },
   { path: '*', component: '404' },
 ];
 

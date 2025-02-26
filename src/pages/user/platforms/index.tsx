@@ -125,7 +125,6 @@ export default () => {
       title: '操作',
       valueType: 'option',
       key: 'option',
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       render: (text, record, _, _action) => [
         <a
           key="edit"

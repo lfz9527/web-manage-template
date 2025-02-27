@@ -148,6 +148,8 @@ export default () => {
       title: 'slogan',
       dataIndex: 'slogan',
       search: false,
+      width: 300,
+      ellipsis: true,
     },
     {
       title: '域名',
@@ -168,11 +170,15 @@ export default () => {
       title: 'seo关键词',
       dataIndex: 'seoKeyword',
       search: false,
+      width: 300,
+      ellipsis: true,
     },
     {
       title: 'seo描述',
       dataIndex: 'seoDescription',
       search: false,
+      width: 300,
+      ellipsis: true,
     },
     {
       title: '绑定类目',

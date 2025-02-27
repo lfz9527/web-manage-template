@@ -104,6 +104,7 @@ export const layout: RunTimeLayoutConfig = ({
       // 菜单的样式配置
       sider: {
         //侧边菜单的配置 ，这里具体看文档
+        colorMenuBackground: '#fff',
       },
     },
   };
@@ -120,27 +121,23 @@ const handleSuccess = ({ code, data, msg }: ResponseData) => {
     return data;
   } else if (code === 10402) {
     localStorage.removeItem(AUTO_LOGIN_KEY);
+    message.error({
+      content: msg || '请重新登录',
+      duration: 2,
+    });
     history.push('/login');
-    throw new Error(msg || 'Login expired');
+    throw new Error(msg || '请重新登录');
   } else {
-    message.error(msg || 'request error');
+    message.error({
+      content: msg || 'request error',
+      duration: 2,
+    });
     throw new Error(msg || 'request error');
   }
 };
 
 export const request: RequestConfig = {
   timeout: 1000000,
-  // other axios options you want
-  errorConfig: {
-    errorHandler(error: any) {
-      message.error(error.message || 'request error');
-    },
-    errorThrower(error) {
-      console.log(123, error);
-      throw new Error('request error');
-    },
-  },
-  // 请求拦截
   requestInterceptors: [
     (config: any) => {
       const token = getToken();

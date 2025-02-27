@@ -94,6 +94,18 @@ const routes = [
         component: '@/pages/goods/goodsManage',
       },
       {
+        path: '/goods/goodsManage/create',
+        name: '新增商品',
+        component: '@/pages/goods/goodsManage/update',
+        hideInMenu: true,
+      },
+      {
+        path: '/goods/goodsManage/:id',
+        name: '商品更新',
+        component: '@/pages/goods/goodsManage/update',
+        hideInMenu: true,
+      },
+      {
         path: '/goods/categoryManage',
         name: '分类管理',
         component: '@/pages/goods/categoryManage',

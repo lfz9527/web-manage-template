@@ -6,6 +6,7 @@ import {
   postDealsHotDeals,
   postDealsShelvesDeals,
 } from '@/services/api/deals';
+import { postImageUploadImage } from '@/services/api/image';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';

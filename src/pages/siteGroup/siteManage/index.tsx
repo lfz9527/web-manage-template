@@ -5,7 +5,11 @@ import {
   postWebSiteDeleteWebSite, // 假设存在删除网站信息的服务
   postWebSiteSaveWebSite,
 } from '@/services/api/webSite';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  LoadingOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import {
@@ -13,8 +17,11 @@ import {
   Button,
   Form,
   GetProp,
+  Image,
+  Input,
   message,
   Modal,
+  Upload,
   UploadProps,
 } from 'antd';
 import { useRef, useState } from 'react';
@@ -141,8 +148,6 @@ export default () => {
       title: 'slogan',
       dataIndex: 'slogan',
       search: false,
-      width: 300,
-      ellipsis: true,
     },
     {
       title: '域名',
@@ -163,15 +168,11 @@ export default () => {
       title: 'seo关键词',
       dataIndex: 'seoKeyword',
       search: false,
-      width: 300,
-      ellipsis: true,
     },
     {
       title: 'seo描述',
       dataIndex: 'seoDescription',
       search: false,
-      width: 300,
-      ellipsis: true,
     },
     {
       title: '绑定类目',
@@ -352,7 +353,7 @@ export default () => {
         ]}
       />
 
-      {/* <Modal
+      <Modal
         title={websiteId ? '编辑网站信息' : '新增网站信息'}
         centered
         open={openCreateDialog}
@@ -482,7 +483,7 @@ export default () => {
             </Upload>
           </Form.Item>
         </Form>
-      </Modal> */}
+      </Modal>
 
       {contextHolder}
     </>

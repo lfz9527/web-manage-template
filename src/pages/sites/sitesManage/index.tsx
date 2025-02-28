@@ -5,16 +5,24 @@ import {
   postShopSiteDeleteShopSite,
   postShopSiteEditShopSite,
 } from '@/services/api/shopSite';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  LoadingOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import {
   Avatar,
   Button,
+  DatePicker,
   Form,
   GetProp,
+  Input,
   message,
   Modal,
+  Radio,
+  Upload,
   UploadProps,
 } from 'antd';
 import moment from 'moment';
@@ -120,7 +128,7 @@ const SiteManagementPage = () => {
   const handleEditShopSite = async (id: number) => {
     setShopSiteId(id);
     try {
-      const { data } = await getShopSiteGetShopSiteById({ id });
+      const data = (await getShopSiteGetShopSiteById({ id })) as any;
       const emails = data.emails ? data.emails.split(',') : [];
       const tels = data.tels ? data.tels.split(',') : [];
       form.setFieldsValue({
@@ -377,8 +385,8 @@ const SiteManagementPage = () => {
             count: params.pageSize,
           };
           try {
-            const { data } = await getShopSiteGetShopSiteList(searchParams);
-            const { list = [], total = 0 } = data;
+            const data = await getShopSiteGetShopSiteList(searchParams);
+            const { list = [], total = 0 } = data as any;
             return {
               data: list,
               success: true,
@@ -417,38 +425,34 @@ const SiteManagementPage = () => {
         ]}
       />
 
-      {/* <Modal
-    title={shopSiteId? '编辑站点信息' : '新增站点信息'}
-    centered
-    open={openCreateDialog}
-    onOk={() => form.submit()}
-    okButtonProps={{
-        loading: createLoading
-    }}
-    onCancel={() => setOpenCreateDialog(false)}
-    width={800}
-    afterClose={resetForm}
->
-    <Form
-        form={form}
-        labelCol={{ span: 5 }}
-        onFinish={handleCreateOrUpdateShopSite}
-        labelAlign="left"
-    >
-        <Form.Item<FieldType>
-            label="ID"
-            name="shopSiteId"
-            hidden
+      <Modal
+        title={shopSiteId ? '编辑站点信息' : '新增站点信息'}
+        centered
+        open={openCreateDialog}
+        onOk={() => form.submit()}
+        okButtonProps={{
+          loading: createLoading,
+        }}
+        onCancel={() => setOpenCreateDialog(false)}
+        width={800}
+        afterClose={resetForm}
+      >
+        <Form
+          form={form}
+          labelCol={{ span: 5 }}
+          onFinish={handleCreateOrUpdateShopSite}
+          labelAlign="left"
         >
+          <Form.Item<FieldType> label="ID" name="shopSiteId" hidden>
             <Input />
-        </Form.Item>
-        <Form.Item<FieldType>
+          </Form.Item>
+          <Form.Item<FieldType>
             label="类型"
             name="siteType"
             rules={[{ required: false, message: '请输入类型' }]}
-        >
+          >
             <Input placeholder="请输入类型" />
-        </Form.Item>
+          </Form.Item>
           <Form.Item<FieldType>
             label="Logo"
             name="logoImageId"
@@ -503,153 +507,163 @@ const SiteManagementPage = () => {
               )}
             </Upload>
           </Form.Item>
-        <Form.Item<FieldType>
+          <Form.Item<FieldType>
             label="称呼"
             name="shopSiteTitle"
             rules={[{ required: false, message: '请输入称呼' }]}
-        >
+          >
             <Input placeholder="请输入称呼" />
-        </Form.Item>
-        <Form.Item<FieldType>
+          </Form.Item>
+          <Form.Item<FieldType>
             label="名称"
             name="shopSiteName"
             rules={[{ required: true, message: '请输入名称' }]}
-        >
+          >
             <Input placeholder="请输入名称" />
-        </Form.Item>
-        <Form.Item<FieldType>
+          </Form.Item>
+          <Form.Item<FieldType>
             label="简介"
             name="describe"
             rules={[{ required: false, message: '请输入简介' }]}
-        >
+          >
             <Input.TextArea placeholder="请输入简介" />
-        </Form.Item>
-        <Form.Item<FieldType>
+          </Form.Item>
+          <Form.Item<FieldType>
             label="链接"
             name="link"
             rules={[{ required: true, message: '请输入链接' }]}
-        >
+          >
             <Input placeholder="请输入链接" />
-        </Form.Item>
-        <Form.List name="emails">
+          </Form.Item>
+          <Form.List name="emails">
             {(fields, { add, remove }) => (
-                <>
-                    {fields.map((field) => (
-                        <Form.Item
-                            {...field}
-                            label={fields.length === 1? 'Email' : ''}
-                            rules={[{ required: false, message: '请输入 Email' }]}
-                            key={field.key}
-                        >
-                            <Input
-                                placeholder="请输入 Email"
-                                style={{ width: '90%', marginRight: 8 }}
-                            />
-                            <Button
-                                type="danger"
-                                icon={<DeleteOutlined />}
-                                onClick={() => remove(field.name)}
-                            />
-                        </Form.Item>
-                    ))}
-                    <Form.Item>
-                        <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                            新增一行
-                        </Button>
-                    </Form.Item>
-                </>
+              <>
+                {fields.map((field) => (
+                  <Form.Item
+                    {...field}
+                    label={fields.length === 1 ? 'Email' : ''}
+                    rules={[{ required: false, message: '请输入 Email' }]}
+                    key={field.key}
+                  >
+                    <Input
+                      placeholder="请输入 Email"
+                      style={{ width: '90%', marginRight: 8 }}
+                    />
+                    <Button
+                      type="danger"
+                      icon={<DeleteOutlined />}
+                      onClick={() => remove(field.name)}
+                    />
+                  </Form.Item>
+                ))}
+                <Form.Item>
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    block
+                    icon={<PlusOutlined />}
+                  >
+                    新增一行
+                  </Button>
+                </Form.Item>
+              </>
             )}
-        </Form.List>
-        <Form.List name="tels">
+          </Form.List>
+          <Form.List name="tels">
             {(fields, { add, remove }) => (
-                <>
-                    {fields.map((field) => (
-                        <Form.Item
-                            {...field}
-                            label={fields.length === 1? '电话' : ''}
-                            rules={[{ required: false, message: '请输入电话' }]}
-                            key={field.key}
-                        >
-                            <Input
-                                placeholder="请输入电话"
-                                style={{ width: '90%', marginRight: 8 }}
-                            />
-                            <Button
-                                type="danger"
-                                icon={<DeleteOutlined />}
-                                onClick={() => remove(field.name)}
-                            />
-                        </Form.Item>
-                    ))}
-                    <Form.Item>
-                        <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                            新增一行
-                        </Button>
-                    </Form.Item>
-                </>
+              <>
+                {fields.map((field) => (
+                  <Form.Item
+                    {...field}
+                    label={fields.length === 1 ? '电话' : ''}
+                    rules={[{ required: false, message: '请输入电话' }]}
+                    key={field.key}
+                  >
+                    <Input
+                      placeholder="请输入电话"
+                      style={{ width: '90%', marginRight: 8 }}
+                    />
+                    <Button
+                      type="danger"
+                      icon={<DeleteOutlined />}
+                      onClick={() => remove(field.name)}
+                    />
+                  </Form.Item>
+                ))}
+                <Form.Item>
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    block
+                    icon={<PlusOutlined />}
+                  >
+                    新增一行
+                  </Button>
+                </Form.Item>
+              </>
             )}
-        </Form.List>
-        <Form.Item<FieldType>
+          </Form.List>
+          <Form.Item<FieldType>
             label="年限"
             name="yearOpened"
             rules={[{ required: true, message: '请输入年限' }]}
-        >
+          >
             <Input placeholder="请输入年限" />
-        </Form.Item>
-        <Form.Item<FieldType>
+          </Form.Item>
+          <Form.Item<FieldType>
             label="星级"
             name="starLevel"
             rules={[{ required: true, message: '请输入星级' }]}
-        >
+          >
             <Input placeholder="请输入星级" />
-        </Form.Item>
-        <Form.Item<FieldType>
+          </Form.Item>
+          <Form.Item<FieldType>
             label="上线"
             name="isOnline"
             rules={[{ required: true, message: '请选择上线状态' }]}
-        >
+          >
             <Radio.Group>
-                <Radio value={true}>上线</Radio>
-                <Radio value={false}>下线</Radio>
+              <Radio value={true}>上线</Radio>
+              <Radio value={false}>下线</Radio>
             </Radio.Group>
-        </Form.Item>
-        <Form.Item<FieldType>
+          </Form.Item>
+          <Form.Item<FieldType>
             label="热门"
             name="isHot"
             rules={[{ required: true, message: '请选择是否热门' }]}
-        >
+          >
             <Radio.Group>
-                <Radio value={true}>热门</Radio>
-                <Radio value={false}>非热门</Radio>
+              <Radio value={true}>热门</Radio>
+              <Radio value={false}>非热门</Radio>
             </Radio.Group>
-        </Form.Item>
-        <Form.Item<FieldType>
+          </Form.Item>
+          <Form.Item<FieldType>
             label="状态"
             name="state"
             rules={[{ required: true, message: '请输入状态' }]}
-        >
+          >
             <Input placeholder="请输入状态" />
-        </Form.Item>
-        <Form.Item<FieldType>
+          </Form.Item>
+          <Form.Item<FieldType>
             label="商品数"
             name="goodCount"
             rules={[{ required: true, message: '请输入商品数' }]}
-        >
+          >
             <Input placeholder="请输入商品数" />
-        </Form.Item>
-        <Form.Item<FieldType>
+          </Form.Item>
+          <Form.Item<FieldType>
             label="创建时间"
             name="createTime"
             rules={[{ required: true, message: '请选择创建时间' }]}
-        >
+          >
             <DatePicker
-                showTime={{ format: 'HH:mm:ss' }}
-                format="YYYY-MM-DD HH:mm:ss"
-                placeholder="请选择创建时间"
+              showTime={{ format: 'HH:mm:ss' }}
+              format="YYYY-MM-DD HH:mm:ss"
+              placeholder="请选择创建时间"
             />
-        </Form.Item>
-    </Form>
-</Modal> */}
+          </Form.Item>
+        </Form>
+      </Modal>
       {contextHolder}
     </>
   );

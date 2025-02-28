@@ -1,11 +1,12 @@
 // 运行时配置
 import { AUTO_LOGIN_KEY } from '@/enum';
 import { getUserGetUserForPublic } from '@/services/api/user';
-import { getToken, removeToken, setToken } from '@/utils';
+import { getToken, removeToken } from '@/utils';
 import { LogoutOutlined } from '@ant-design/icons';
 import { history, RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
 import { Dropdown, MenuProps, message } from 'antd';
 import Logo from './assets/icon/logo.svg';
+import { errorConfig } from './requestErrorConfig';
 
 const loginPath = '/login';
 
@@ -20,10 +21,11 @@ const logout = () => {
 export async function getInitialState(): Promise<{
   name: string;
   avatar?: string;
+  refresh?: () => Promise<void>;
 }> {
   const fetchUserInfo = async () => {
     try {
-      const data = await getUserGetUserForPublic({});
+      const { data } = await getUserGetUserForPublic({});
       return data;
     } catch (error) {
       // 清除登录状态并跳转登录页
@@ -54,7 +56,6 @@ export const layout: RunTimeLayoutConfig = ({
   initialState: any;
 }) => {
   //initialState上面登录函数返回的信息
-
   const DropdownItems: MenuProps['items'] = [
     {
       key: 'logout',
@@ -137,38 +138,7 @@ const handleSuccess = ({ code, data, msg }: ResponseData) => {
 };
 
 export const request: RequestConfig = {
-  timeout: 1000000,
-  requestInterceptors: [
-    (config: any) => {
-      const token = getToken();
-      if (token) {
-        config.headers['Authorization'] = 'Bearer ' + token;
-      }
-      return config;
-    },
-    (error: any) => {
-      return error;
-    },
-  ],
-  // 相应拦截
-  responseInterceptors: [
-    (response: any) => {
-      const { status, data, headers } = response;
-      const token = headers['login-token'];
-      if (token) {
-        setToken(token);
-      }
-      switch (status) {
-        case 200:
-          handleSuccess(data);
-          return data;
-        case 404:
-          throw new Error('资源不存在');
-        case 500:
-          throw new Error('服务器错误');
-        default:
-          throw new Error('网络错误');
-      }
-    },
-  ],
+  timeout: parseInt(TIMEOUT),
+  baseURL: BASE_URL,
+  ...errorConfig,
 };

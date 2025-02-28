@@ -1,5 +1,8 @@
 import { AUTO_LOGIN_KEY } from '@/enum';
-import { postUserLoginByUserPwd } from '@/services/api/user';
+import {
+  getUserGetUserForPublic,
+  postUserLoginByUserPwd,
+} from '@/services/api/user';
 import { removeToken } from '@/utils';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import {
@@ -7,7 +10,7 @@ import {
   ProFormCheckbox,
   ProFormText,
 } from '@ant-design/pro-components';
-import { history } from '@umijs/max'; // 添加这行引入
+import { history, useModel } from '@umijs/max'; // 添加这行引入
 import { Form } from 'antd';
 import { useEffect } from 'react';
 import styles from './index.less';
@@ -19,6 +22,8 @@ interface LoginFormValues {
 }
 
 export default () => {
+  const { setInitialState } = useModel('@@initialState');
+
   const [formRef] = Form.useForm();
   useEffect(() => {
     const values = localStorage.getItem(AUTO_LOGIN_KEY);
@@ -47,6 +52,15 @@ export default () => {
     } else {
       localStorage.removeItem(AUTO_LOGIN_KEY);
     }
+    const { data } = await getUserGetUserForPublic({});
+    const { nickName, headImage } = data;
+    const url = headImage?.imgSrc;
+
+    // 更新用户信息
+    setInitialState({
+      name: nickName || '管理员',
+      avatar: url,
+    });
     history.push('/');
   };
 

@@ -654,3 +654,5 @@ const SiteManagementPage = () => {
     </>
   );
 };
+
+export default SiteManagementPage;

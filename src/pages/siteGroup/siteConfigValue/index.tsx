@@ -1,4 +1,5 @@
 import {
+  getWebSiteGetWebSiteSettingList,
   getWebSiteGetWebSiteSettingValue,
   getWebSiteGetWebSiteSettingValueList,
   postWebSiteDeleteWebSiteSettingValue,
@@ -7,8 +8,8 @@ import {
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Button, Form, Input, message, Modal } from 'antd';
-import { useRef, useState } from 'react';
+import { Button, Form, Input, message, Modal, Select } from 'antd';
+import { useEffect, useRef, useState } from 'react';
 
 // 列表项数据类型
 type WebSiteSettingValue = {
@@ -48,6 +49,12 @@ type FieldType = {
   settingValue: string;
 };
 
+// 网站设置选项类型
+type WebSiteSettingOption = {
+  value: number;
+  label: string;
+};
+
 export default () => {
   // 消息提示
   const [messageApi, messageContextHolder] = message.useMessage();
@@ -64,6 +71,10 @@ export default () => {
   // 当前操作的网站设置值 ID
   const [webSiteSettingValueId, setWebSiteSettingValueId] = useState<number>(0);
 
+  const [webSiteSettingOptions, setWebSiteSettingOptions] = useState<
+    WebSiteSettingOption[]
+  >([]);
+
   // 打开创建/编辑模态框
   const handleOpenCreateDialog = () => {
     form.resetFields();
@@ -71,18 +82,43 @@ export default () => {
     setOpenCreateDialog(true);
   };
 
+  // 获取网站设置选项
+  const fetchWebSiteSettingOptions = async () => {
+    try {
+      const { list = [], total = 0 } = (await getWebSiteGetWebSiteSettingList({
+        page: 1,
+        count: 50,
+      })) as any;
+
+      const options = list.map((item: any) => ({
+        value: item.webSiteSettingId,
+        label: item.settingName,
+      }));
+      setWebSiteSettingOptions(options);
+    } catch (error) {
+      console.log(error);
+      messageApi.error('获取网站设置选项失败');
+    }
+  };
+
+  useEffect(() => {
+    fetchWebSiteSettingOptions();
+  }, []);
+
   // 编辑网站设置值信息
   const handleEditWebsite = async (id: number) => {
     setWebSiteSettingValueId(id);
     try {
       // 根据 id 获取单条数据
-      const { data } = await getWebSiteGetWebSiteSettingValue({ id });
+      const data = (await getWebSiteGetWebSiteSettingValue({ id })) as any;
       form.setFieldsValue({
+        webSiteId: data.webSiteId,
         webSiteSettingId: data.webSiteSettingId,
         settingValue: data.settingValue,
       });
       setOpenCreateDialog(true);
     } catch (error) {
+      console.log(error);
       messageApi.error('获取网站设置值信息失败');
     }
   };
@@ -266,6 +302,23 @@ export default () => {
           onFinish={handleCreateOrUpdateWebsite}
           labelAlign="left"
         >
+          <Form.Item<FieldType>
+            label="站点 ID"
+            name="webSiteId"
+            rules={[{ required: true, message: '请输入站点 ID' }]}
+          >
+            <Input placeholder="请输入站点 ID" />
+          </Form.Item>
+          <Form.Item<FieldType>
+            label="属性 ID"
+            name="webSiteSettingId"
+            rules={[{ required: true, message: '请选择属性 ID' }]}
+          >
+            <Select
+              placeholder="请选择属性 ID"
+              options={webSiteSettingOptions}
+            />
+          </Form.Item>
           <Form.Item<FieldType>
             label="属性值"
             name="settingValue"

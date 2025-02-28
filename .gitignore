@@ -11,4 +11,4 @@
 /dist
 /.mfsu
 .swc
-.pnpm-lock.yaml
+pnpm-lock.yaml

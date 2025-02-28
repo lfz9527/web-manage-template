@@ -102,7 +102,7 @@ const ImageWall: React.FC<ImageWallProps> = ({
         accept={accept}
         action="/api/Image/UploadImage"
       >
-        {fileList.length >= maxCount ? null : uploadButton}
+        {fileList && fileList.length >= maxCount ? null : uploadButton}
       </Upload>
       {previewImage && (
         <Image

@@ -1,4 +1,4 @@
-import { AUTO_LOGIN_KEY } from '@/enum';
+import { AUTO_LOGIN_KEY, LOGIN_PATH } from '@/enum';
 import { getToken, logger, removeToken, setToken } from '@/utils';
 import type { RequestConfig } from '@umijs/max';
 import { history } from '@umijs/max';
@@ -21,7 +21,7 @@ const isSuccess = (code: number) => {
 const handleLogout = () => {
   removeToken();
   localStorage.removeItem(AUTO_LOGIN_KEY);
-  history.push('/login');
+  history.push(LOGIN_PATH);
 };
 
 const errorThrower = (res: ResponseStructure) => {
@@ -86,7 +86,6 @@ export const errorConfig: RequestConfig = {
       if (token) {
         setToken(token);
       }
-
       switch (status) {
         case 200:
           errorHandle(response as unknown as ResponseData);

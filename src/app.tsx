@@ -1,27 +1,27 @@
 // 运行时配置
-import { AUTO_LOGIN_KEY } from '@/enum';
+
+import { Header, PageContainer } from '@/components';
+import { LOGIN_PATH } from '@/enum';
 import { getUserGetUserForPublic } from '@/services/api/user';
-import { getToken, removeToken } from '@/utils';
-import { LogoutOutlined } from '@ant-design/icons';
-import { history, RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
-import { Dropdown, MenuProps, message } from 'antd';
-import Logo from './assets/icon/logo.svg';
+import { logoutFn } from '@/utils';
+import type { HeaderProps } from '@ant-design/pro-layout';
+import type { RunTimeLayoutConfig } from '@umijs/max';
+import { RequestConfig } from '@umijs/max';
 import { errorConfig } from './requestErrorConfig';
-
-const loginPath = '/login';
-
-const logout = () => {
-  removeToken();
-  localStorage.removeItem(AUTO_LOGIN_KEY);
-  history.push('/login');
-};
 
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 // 更多信息见文档：https://umijs.org/docs/api/runtime-config#getinitialstate
+
+type InitialState = {
+  name: string;
+  avatar?: string;
+  id: string;
+};
+
 export async function getInitialState(): Promise<{
   name: string;
   avatar?: string;
-  refresh?: () => Promise<void>;
+  id: string;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -29,78 +29,45 @@ export async function getInitialState(): Promise<{
       return data;
     } catch (error) {
       // 清除登录状态并跳转登录页
-      logout();
+      logoutFn();
     }
   };
 
-  if (location.pathname !== loginPath) {
+  if (location.pathname !== LOGIN_PATH) {
     const data = await fetchUserInfo();
-
-    const { nickName, headImage } = data as Record<string, any>;
+    const { nickName, headImage, id } = data as Record<string, any>;
     const url = headImage?.imgSrc;
     return {
-      name: nickName || '管理员',
+      name: nickName,
       avatar: url,
+      id,
     };
   }
   return {
     name: '管理员',
     avatar: '',
+    id: '',
   };
 }
 
-//运行时基本布局配置
+// 运行时基本布局配置
 export const layout: RunTimeLayoutConfig = ({
   initialState,
 }: {
   initialState: any;
 }) => {
   //initialState上面登录函数返回的信息
-  const DropdownItems: MenuProps['items'] = [
-    {
-      key: 'logout',
-      icon: <LogoutOutlined />,
-      label: '退出登录',
-    },
-  ];
-
-  const DropdownOnClick: MenuProps['onClick'] = ({ key }) => {
-    if (key === 'logout') {
-      logout();
-    }
-  };
-
-  const { location } = history;
-  if (location.pathname === loginPath) {
-    if (!getToken()) {
-      logout();
-    }
-  }
-
   return {
-    logo: Logo,
-    title: '吉韵站群系统后台管理', //左上角Logo后面的名字
     menu: {
       locale: false,
     },
     layout: 'mix', //菜单的方式，有mix,top,side三种，这里用mix
-    avatarProps: {
-      src: initialState?.avatar || undefined, //右上角头像
-      title: initialState?.name || '用户', //右上角名称
-      size: 'small',
-      render: (props, dom) => {
-        return (
-          <Dropdown
-            menu={{
-              items: DropdownItems,
-              onClick: DropdownOnClick,
-            }}
-          >
-            {dom}
-          </Dropdown>
-        );
-      },
+    // 自定义头部
+    headerRender: (props: HeaderProps) => {
+      return <Header {...props} />;
     },
+    // 使用withAuth包装子组件
+    childrenRender: (children) => <PageContainer>{children}</PageContainer>,
     token: {
       // 菜单的样式配置
       sider: {
@@ -109,32 +76,6 @@ export const layout: RunTimeLayoutConfig = ({
       },
     },
   };
-};
-
-interface ResponseData {
-  code: number;
-  data: any;
-  msg: string;
-}
-
-const handleSuccess = ({ code, data, msg }: ResponseData) => {
-  if (code === 10000) {
-    return data;
-  } else if (code === 10402) {
-    localStorage.removeItem(AUTO_LOGIN_KEY);
-    message.error({
-      content: msg || '请重新登录',
-      duration: 2,
-    });
-    history.push('/login');
-    throw new Error(msg || '请重新登录');
-  } else {
-    message.error({
-      content: msg || 'request error',
-      duration: 2,
-    });
-    throw new Error(msg || 'request error');
-  }
 };
 
 export const request: RequestConfig = {

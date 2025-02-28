@@ -1,4 +1,4 @@
-import { AUTO_LOGIN_KEY } from '@/enum';
+import { AUTO_LOGIN_KEY, CURRENT_SITE_ID } from '@/enum';
 import {
   getUserGetUserForPublic,
   postUserLoginByUserPwd,
@@ -26,6 +26,7 @@ export default () => {
 
   const [formRef] = Form.useForm();
   useEffect(() => {
+    sessionStorage.getItem(CURRENT_SITE_ID);
     const values = localStorage.getItem(AUTO_LOGIN_KEY);
     const { username, password, autoLogin } = JSON.parse(values || '{}');
     if (autoLogin) {
@@ -53,13 +54,14 @@ export default () => {
       localStorage.removeItem(AUTO_LOGIN_KEY);
     }
     const { data } = await getUserGetUserForPublic({});
-    const { nickName, headImage } = data;
+    const { nickName, headImage, id } = data;
     const url = headImage?.imgSrc;
 
     // 更新用户信息
     setInitialState({
       name: nickName || '管理员',
       avatar: url,
+      id: id,
     });
     history.push('/');
   };

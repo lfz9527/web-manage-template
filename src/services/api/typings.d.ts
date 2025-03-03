@@ -23,6 +23,18 @@ declare namespace API {
     count?: number;
   };
 
+  type FBCrawlerKeyword = {
+    crawlerKeywordId?: number;
+    keywordName?: string;
+  };
+
+  type FBCrawlerLog = {
+    crawlerLogId?: number;
+    crawlerKeywordId?: number;
+    dataCount?: number;
+    shopSiteId?: number;
+  };
+
   type FBDealJoin = {
     dealJoinId?: number;
     webSiteLink?: string;
@@ -98,7 +110,6 @@ declare namespace API {
     albumName?: string;
     albumDescribe?: string;
     isPrivate?: boolean;
-    faceImageIds?: string;
   };
 
   type FBGoodAttribute = {
@@ -116,6 +127,15 @@ declare namespace API {
     imageId?: number;
     parentid?: number;
     isHot?: boolean;
+  };
+
+  type FBGoodPartition = {
+    goodPartitionId?: number;
+    webSiteId?: number;
+    partitionName?: string;
+    horizontalImageId?: number;
+    verticalImageId?: number;
+    squareImageId?: number;
   };
 
   type FBGoodPost = {
@@ -312,6 +332,26 @@ declare namespace API {
     count?: number;
   };
 
+  type getCrawlerGetCrawlerKeywordByIdParams = {
+    id?: number;
+  };
+
+  type getCrawlerGetCrawlerKeywordListParams = {
+    keywordName?: string;
+    orderBy?: string;
+    page?: number;
+    count?: number;
+  };
+
+  type getCrawlerGetCrawlerLogByIdParams = {
+    id?: number;
+  };
+
+  type getCrawlerGetCrawlerLogListParams = {
+    page?: number;
+    count?: number;
+  };
+
   type getDataStatisticsGetDomainParams = {
     /** 追踪器ID */
     trackerId?: string;
@@ -405,6 +445,8 @@ declare namespace API {
   };
 
   type getGoodAlbumGetGoodPostLikeListParams = {
+    /** 帖子Id */
+    goodPostId?: number;
     page?: number;
     count?: number;
   };
@@ -432,12 +474,14 @@ declare namespace API {
   };
 
   type getGoodGetGoodCategoryListParams = {
+    parentId?: number;
     page?: number;
     count?: number;
   };
 
   type getGoodGetGoodListParams = {
     title?: string;
+    orderBy?: string;
     webSiteId?: number;
     isShelves?: FilterStateEnum;
     page?: number;
@@ -452,6 +496,23 @@ declare namespace API {
     /** 分类id */
     categoryid?: number;
     /** 分页 */
+    page?: number;
+    /** 行数 */
+    count?: number;
+  };
+
+  type getGoodGetGoodPartitionByIdParams = {
+    id?: number;
+  };
+
+  type getGoodGetGoodPartitionListParams = {
+    /** 分区名 */
+    partitionName?: string;
+    /** 站点Id */
+    webSiteId?: number;
+    /** 排序 */
+    orderBy?: string;
+    /** 页数 */
     page?: number;
     /** 行数 */
     count?: number;
@@ -550,6 +611,7 @@ declare namespace API {
   };
 
   type getUserGetUserListParams = {
+    nickName?: string;
     page?: number;
     count?: number;
   };

@@ -4,6 +4,7 @@
 // API 唯一标识：
 import * as brand from './brand';
 import * as callback from './callback';
+import * as crawler from './crawler';
 import * as dataStatistics from './dataStatistics';
 import * as deals from './deals';
 import * as friendLink from './friendLink';
@@ -20,6 +21,7 @@ import * as webSite from './webSite';
 export default {
   brand,
   callback,
+  crawler,
   dataStatistics,
   deals,
   friendLink,

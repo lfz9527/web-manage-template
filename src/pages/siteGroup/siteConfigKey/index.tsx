@@ -1,22 +1,13 @@
-import { postImageUploadImage } from '@/services/api/image';
 import {
   getWebSiteGetWebSiteSetting,
   getWebSiteGetWebSiteSettingList, // 假设存在保存网站信息的服务
   postWebSiteDeleteWebSiteSetting, // 假设存在删除网站信息的服务
   postWebSiteSaveWebSiteSetting,
 } from '@/services/api/webSite';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import {
-  Button,
-  Form,
-  GetProp,
-  Input,
-  message,
-  Modal,
-  UploadProps,
-} from 'antd';
+import { Button, Form, Input, message, Modal } from 'antd';
 import { useRef, useState } from 'react';
 
 // 列表项数据类型
@@ -27,15 +18,6 @@ type GithubIssueItem = {
   createTime: string;
 };
 
-// 文件信息类型
-type fileInfoType = {
-  imgSrc: string;
-  imageId: string;
-  height: number;
-  size: number;
-  width: number;
-};
-
 // 表单字段类型
 type FieldType = {
   webSiteSettingId: string;
@@ -43,9 +25,6 @@ type FieldType = {
   settingDescribe: string;
   createTime: string;
 };
-
-// 文件类型
-type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
 export default () => {
   // 消息提示
@@ -60,30 +39,13 @@ export default () => {
   const [createLoading, setCreateLoading] = useState(false);
   // 表单实例
   const [form] = Form.useForm();
-  // 图片上传加载状态
-  const [uploadLoading, setUploadLoading] = useState(false);
   // 当前操作的网站设置 ID
   const [webSiteSettingId, setWebSiteSettingId] = useState<number>(0);
-  // 网站 Logo 信息
-  const [websiteLogo, setWebsiteLogo] = useState<fileInfoType>({
-    imgSrc: '',
-    imageId: '',
-    height: 0,
-    size: 0,
-    width: 0,
-  });
 
   // 打开创建/编辑模态框
   const handleOpenCreateDialog = () => {
     form.resetFields();
     setWebSiteSettingId(0);
-    setWebsiteLogo({
-      imgSrc: '',
-      imageId: '',
-      height: 0,
-      size: 0,
-      width: 0,
-    });
     setOpenCreateDialog(true);
   };
 
@@ -92,11 +54,12 @@ export default () => {
     setWebSiteSettingId(id);
     try {
       // 根据 key 获取单条数据
-      const { data } = await getWebSiteGetWebSiteSetting({ id: id });
+      const { data } = await getWebSiteGetWebSiteSetting({ id });
+
       form.setFieldsValue({
-        settingName: data.data.settingName,
-        settingDescribe: data.data.settingDescribe,
-        createTime: data.data.createTime,
+        settingName: data.settingName,
+        settingDescribe: data.settingDescribe,
+        createTime: data.createTime,
       });
       setOpenCreateDialog(true);
     } catch (error) {
@@ -172,10 +135,6 @@ export default () => {
 
   // 创建或更新网站设置
   const handleCreateOrUpdateWebsite = async (values: FieldType) => {
-    if (uploadLoading) {
-      messageApi.error('图片上传中，请稍后再试');
-      return;
-    }
     setCreateLoading(true);
     const params = {
       ...values,
@@ -184,33 +143,12 @@ export default () => {
     try {
       await postWebSiteSaveWebSiteSetting(params);
       messageApi.success(webSiteSettingId ? '更新成功' : '新增成功');
-      setCreateLoading(false);
       setOpenCreateDialog(false);
       actionRef.current?.reload();
     } catch (error) {
       messageApi.error(webSiteSettingId ? '更新失败' : '新增失败');
+    } finally {
       setCreateLoading(false);
-    }
-  };
-
-  // 处理图片上传
-  const handleUpload = async (file: FileType) => {
-    try {
-      const data = (await postImageUploadImage({
-        file: file,
-      })) as fileInfoType;
-      const { imgSrc, imageId, height, size, width } = data;
-      setUploadLoading(false);
-      setWebsiteLogo({
-        imgSrc,
-        imageId,
-        height,
-        size,
-        width,
-      });
-    } catch (error) {
-      messageApi.error('图片上传失败');
-      setUploadLoading(false);
     }
   };
 
@@ -220,22 +158,7 @@ export default () => {
     setWebSiteSettingId(0);
     setCreateLoading(false);
     setOpenCreateDialog(false);
-    setWebsiteLogo({
-      imgSrc: '',
-      imageId: '',
-      height: 0,
-      size: 0,
-      width: 0,
-    });
   };
-
-  // 上传按钮组件
-  const uploadButton = (
-    <button style={{ border: 0, background: 'none' }} type="button">
-      {uploadLoading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>{uploadLoading ? '上传中...' : '上传'}</div>
-    </button>
-  );
 
   return (
     <>
@@ -278,9 +201,7 @@ export default () => {
           pageSizeOptions: ['10', '20', '50', '100'],
           onChange: (page) => console.log(page),
         }}
-        search={{
-          labelWidth: 'auto',
-        }}
+        search={false}
         dateFormatter="string"
         toolBarRender={() => [
           <Button

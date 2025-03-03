@@ -47,6 +47,21 @@ export async function postGoodDeleteGoodCategory(
   });
 }
 
+/** 删除商品分区 POST /api/Good/DeleteGoodPartition */
+export async function postGoodDeleteGoodPartition(
+  body: API.FBIds,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/Good/DeleteGoodPartition', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 删除商品标签 POST /api/Good/DeleteGoodTag */
 export async function postGoodDeleteGoodTag(
   body: API.FBId,
@@ -131,6 +146,10 @@ export async function getGoodGetGoodCategoryList(
   return request<API.REWebApiCallback>('/api/Good/GetGoodCategoryList', {
     method: 'GET',
     params: {
+      // page has a default value: 1
+      page: '1',
+      // count has a default value: 20
+      count: '20',
       ...params,
     },
     ...(options || {}),
@@ -169,6 +188,40 @@ export async function getGoodGetGoodListPublic(
       page: '1',
       // count has a default value: 10
       count: '10',
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 根据Id查询商品分区 GET /api/Good/GetGoodPartitionById */
+export async function getGoodGetGoodPartitionById(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getGoodGetGoodPartitionByIdParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/Good/GetGoodPartitionById', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 查询商品分区列表 GET /api/Good/GetGoodPartitionList */
+export async function getGoodGetGoodPartitionList(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getGoodGetGoodPartitionListParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/Good/GetGoodPartitionList', {
+    method: 'GET',
+    params: {
+      // page has a default value: 1
+      page: '1',
+      // count has a default value: 50
+      count: '50',
       ...params,
     },
     ...(options || {}),
@@ -241,6 +294,21 @@ export async function postGoodSaveGoodCategory(
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/Good/SaveGoodCategory', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** 编辑商品分区 POST /api/Good/SaveGoodPartition */
+export async function postGoodSaveGoodPartition(
+  body: API.FBGoodPartition,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/Good/SaveGoodPartition', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -1,30 +1,15 @@
-import { postImageUploadImage } from '@/services/api/image';
+import { Image, ImageWall } from '@/components';
 import {
   getWebSiteGetWebSiteById,
   getWebSiteGetWebSiteList, // 假设存在保存网站信息的服务
   postWebSiteDeleteWebSite, // 假设存在删除网站信息的服务
   postWebSiteSaveWebSite,
 } from '@/services/api/webSite';
-import {
-  DeleteOutlined,
-  LoadingOutlined,
-  PlusOutlined,
-} from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import {
-  Avatar,
-  Button,
-  Form,
-  GetProp,
-  Image,
-  Input,
-  message,
-  Modal,
-  Upload,
-  UploadProps,
-} from 'antd';
-import { useRef, useState } from 'react';
+import { Button, Form, Input, message, Modal } from 'antd';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type GithubIssueItem = {
   webSiteId: number;
@@ -65,8 +50,6 @@ type FieldType = {
   logoImage: fileInfoType;
 };
 
-type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
-
 export default () => {
   const [messageApi, messageContextHolder] = message.useMessage();
   const [modal, contextHolder] = Modal.useModal();
@@ -74,7 +57,6 @@ export default () => {
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [form] = Form.useForm();
-  const [uploadLoading, setUploadLoading] = useState(false);
   const [websiteId, setWebsiteId] = useState<number>(0);
   const [websiteLogo, setWebsiteLogo] = useState<fileInfoType>({
     imgSrc: '',
@@ -84,44 +66,41 @@ export default () => {
     width: 0,
   });
 
+  // 获取log 文件，格式化传入 文件上传组件用于回显
+  const getFile = useCallback(() => {
+    return [websiteLogo]
+      .map((f) => ({
+        url: f.imgSrc,
+      }))
+      .filter((f) => f.url);
+  }, [websiteLogo]);
+
   // 打开创建用户对话框
   const handleOpenCreateDialog = () => {
-    form.resetFields();
-    setWebsiteId(0);
-    setWebsiteLogo({
-      imgSrc: '',
-      imageId: '',
-      height: 0,
-      size: 0,
-      width: 0,
-    });
     setOpenCreateDialog(true);
   };
+
+  // 获取网站详情
+  const getSiteDetail = async () => {
+    const { data } = await getWebSiteGetWebSiteById({ id: websiteId });
+    form.setFieldsValue({
+      ...data,
+    });
+    const logoImage = data?.logoImage || {};
+    setWebsiteLogo((state) => ({
+      ...state,
+      ...logoImage,
+    }));
+  };
+  useEffect(() => {
+    if (websiteId > 0 && websiteId) {
+      getSiteDetail();
+    }
+  }, [websiteId]);
 
   // 编辑网站信息
   const handleEditWebsite = async (id: number) => {
     setWebsiteId(id);
-    const { data } = await getWebSiteGetWebSiteById({
-      id: id,
-    });
-    const website = data;
-    form.setFieldsValue({
-      name: website.name,
-      slogan: website.slogan,
-      domain: website.domain,
-      describe: website.describe,
-      seoTitle: website.seoTitle,
-      seoKeyword: website.seoKeyword,
-      seoDescription: website.seoDescription,
-      goodCategoryId: website.goodCategoryId,
-    });
-    setWebsiteLogo({
-      imgSrc: website.logoImage.imgSrc,
-      imageId: '',
-      height: 0,
-      size: 0,
-      width: 0,
-    });
     setOpenCreateDialog(true);
   };
 
@@ -136,7 +115,11 @@ export default () => {
       dataIndex: 'logoImage',
       search: false,
       render: (_, record) => {
-        return <Avatar src={record.logoImage.imgSrc} />;
+        return record?.logoImage?.imgSrc ? (
+          <Image src={record?.logoImage?.imgSrc} />
+        ) : (
+          '-'
+        );
       },
     },
     {
@@ -148,6 +131,7 @@ export default () => {
       title: 'slogan',
       dataIndex: 'slogan',
       search: false,
+      ellipsis: true,
     },
     {
       title: '域名',
@@ -168,11 +152,13 @@ export default () => {
       title: 'seo关键词',
       dataIndex: 'seoKeyword',
       search: false,
+      ellipsis: true,
     },
     {
       title: 'seo描述',
       dataIndex: 'seoDescription',
       search: false,
+      ellipsis: true,
     },
     {
       title: '绑定类目',
@@ -181,9 +167,10 @@ export default () => {
     },
     {
       title: '创建时间',
-      valueType: 'dateTime',
+      valueType: 'date',
       dataIndex: 'createTime',
       search: false,
+      width: 100,
     },
     {
       title: '操作',
@@ -226,10 +213,6 @@ export default () => {
 
   // 创建或更新网站
   const handleCreateOrUpdateWebsite = async (values: FieldType) => {
-    if (uploadLoading) {
-      messageApi.error('图片上传中，请稍后再试');
-      return;
-    }
     setCreateLoading(true);
     const params = {
       ...values,
@@ -237,46 +220,18 @@ export default () => {
       webSiteId: websiteId,
     } as Record<string, any>;
 
-    await postWebSiteSaveWebSite(params);
-
-    messageApi.success(websiteId ? '更新成功' : '新增成功');
-
-    setCreateLoading(false);
-    setOpenCreateDialog(false);
-    actionRef.current?.reload();
-  };
-
-  const handleUpload = async (file: FileType) => {
-    // 假设存在上传图片的服务
-    const { data } = await postImageUploadImage({
-      file: file,
-    });
-
-    const { imgSrc, imageId, height, size, width } = data;
-    setUploadLoading(false);
-    setWebsiteLogo({
-      imgSrc,
-      imageId,
-      height,
-      size,
-      width,
-    });
-  };
-
-  const beforeUpload = (file: FileType) => {
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-    if (!isJpgOrPng) {
-      messageApi.error('只能上传 JPG/PNG 文件!');
-      return false;
+    if (params.webSiteId === 0 || !params.webSiteId) {
+      delete params.webSiteId;
     }
-    const isLt5M = file.size / 1024 / 1024 < 5;
-    if (!isLt5M) {
-      messageApi.error('图片大小不能超过5MB!');
-      return false;
+
+    try {
+      await postWebSiteSaveWebSite(params);
+      messageApi.success(websiteId ? '更新成功' : '新增成功');
+      setOpenCreateDialog(false);
+      actionRef.current?.reload();
+    } finally {
+      setCreateLoading(false);
     }
-    setUploadLoading(true);
-    handleUpload(file);
-    return false;
   };
 
   //  关闭表单时 重置表单
@@ -293,13 +248,6 @@ export default () => {
       width: 0,
     });
   };
-
-  const uploadButton = (
-    <button style={{ border: 0, background: 'none' }} type="button">
-      {uploadLoading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>{uploadLoading ? '上传中...' : '上传'}</div>
-    </button>
-  );
 
   return (
     <>
@@ -327,6 +275,7 @@ export default () => {
             total,
           };
         }}
+        search={false}
         rowKey="webSiteId"
         pagination={{
           pageSize: 20,
@@ -334,9 +283,6 @@ export default () => {
           showQuickJumper: true,
           pageSizeOptions: ['10', '20', '50', '100'],
           onChange: (page) => console.log(page),
-        }}
-        search={{
-          labelWidth: 'auto',
         }}
         dateFormatter="string"
         toolBarRender={() => [
@@ -426,59 +372,15 @@ export default () => {
             <Input placeholder="请输入绑定类目" />
           </Form.Item>
 
-          <Form.Item<FieldType>
-            label="Logo"
-            name="logoImageId"
-            valuePropName="fileList"
-            getValueFromEvent={(e) => (Array.isArray(e) ? e : [e])}
-          >
-            <Upload
-              name="file"
-              listType="picture-card"
-              showUploadList={false}
-              action="/api/Image/UploadImage"
-              accept="image/*"
-              beforeUpload={beforeUpload}
-            >
-              {websiteLogo.imgSrc ? (
-                <>
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                  >
-                    <Image
-                      src={websiteLogo.imgSrc}
-                      alt="logo"
-                      style={{ width: '100%' }}
-                    />
-                  </div>
-
-                  <Button
-                    type="text"
-                    danger
-                    icon={<DeleteOutlined color="#000" />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setWebsiteLogo({
-                        imgSrc: '',
-                        imageId: '',
-                        height: 0,
-                        size: 0,
-                        width: 0,
-                      });
-                    }}
-                    style={{
-                      position: 'absolute',
-                      left: 70,
-                      top: -5,
-                    }}
-                  />
-                </>
-              ) : (
-                uploadButton
-              )}
-            </Upload>
+          <Form.Item<FieldType> label="Logo" name="logoImageId">
+            <ImageWall
+              fileList={getFile()}
+              onChange={(file) => {
+                const [first] = file;
+                const platformLogo = first?.response?.data;
+                setWebsiteLogo(platformLogo);
+              }}
+            />
           </Form.Item>
         </Form>
       </Modal>

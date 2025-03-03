@@ -26,6 +26,7 @@ const ImageWall: React.FC<ImageWallProps> = ({
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   useEffect(() => {
+    console.log(propFileList as UploadFile[]);
     setFileList(propFileList as UploadFile[]);
   }, [propFileList]);
 

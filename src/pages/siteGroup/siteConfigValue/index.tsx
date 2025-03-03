@@ -14,32 +14,12 @@ import { useEffect, useRef, useState } from 'react';
 // 列表项数据类型
 type WebSiteSettingValue = {
   webSiteSettingValueId: number;
-  webSiteSettingId: number;
-  webSiteSetting: {
-    webSiteSettingId: number;
-    settingName: string;
-    settingDescribe: string;
-    createTime: string;
-  };
-  webSiteId: number;
   webSite: {
-    webSiteId: number;
     name: string;
-    slogan: string | null;
-    seoTitle: string | null;
-    seoKeyword: string | null;
-    seoDescription: string | null;
-    domain: string | null;
-    describe: string | null;
-    logoImageId: number;
-    logoImage: any | null;
-    goodCategoryId: number;
-    state: number;
-    updateTime: string;
-    createTime: string;
   };
+  settingDescribe: string;
+  settingName: string;
   settingValue: string;
-  createTime: string;
 };
 
 // 表单字段类型
@@ -138,12 +118,12 @@ export default () => {
     },
     {
       title: '属性名称',
-      dataIndex: ['webSiteSetting', 'settingName'],
+      dataIndex: 'settingName',
       search: false,
     },
     {
       title: '属性说明',
-      dataIndex: ['webSiteSetting', 'settingDescribe'],
+      dataIndex: 'settingDescribe',
       search: false,
     },
     {
@@ -156,6 +136,7 @@ export default () => {
       valueType: 'dateTime',
       dataIndex: 'createTime',
       search: false,
+      width: 180,
     },
     {
       title: '操作',
@@ -268,9 +249,7 @@ export default () => {
           pageSizeOptions: ['10', '20', '50', '100'],
           onChange: (page) => console.log(page),
         }}
-        search={{
-          labelWidth: 'auto',
-        }}
+        search={false}
         dateFormatter="string"
         toolBarRender={() => [
           <Button

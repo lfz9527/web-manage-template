@@ -1,33 +1,15 @@
-import { postImageUploadImage } from '@/services/api/image';
+import { Image, ImageWall } from '@/components';
 import {
   getUserGetProviderById,
   postUserDeleteProvider,
   postUserGetProviderList,
   postUserSaveProvider,
 } from '@/services/api/user';
-import {
-  DeleteOutlined,
-  LoadingOutlined,
-  PlusOutlined,
-} from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import {
-  Avatar,
-  Button,
-  Form,
-  GetProp,
-  Image,
-  Input,
-  message,
-  Modal,
-  Select,
-  Upload,
-  UploadProps,
-} from 'antd';
-import { useEffect, useRef, useState } from 'react';
-
-type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
+import { Button, Form, Input, message, Modal, Select } from 'antd';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type fileInfoType = {
   imgSrc: string;
@@ -69,12 +51,10 @@ export default () => {
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [form] = Form.useForm();
-  const [uploadLoading, setUploadLoading] = useState(false);
 
   // 第三方平台id，用于详情页
   const [providerId, setProviderId] = useState<number>(0);
 
-  // 第三方平台logo详情
   const [platformLogo, setPlatformLogo] = useState<fileInfoType>({
     imgSrc: '',
     imageId: '',
@@ -106,7 +86,7 @@ export default () => {
       dataIndex: 'providerLogoImage',
       search: false,
       render: (_, record) => {
-        return <Avatar src={record.providerLogoImage?.imgSrc} />;
+        return <Image src={record.providerLogoImage?.imgSrc} />;
       },
     },
     {
@@ -163,7 +143,6 @@ export default () => {
     const { data } = await getUserGetProviderById({
       id: providerId,
     });
-
     form.setFieldsValue({
       webSiteId: data.webSiteId,
       providerAction: data.providerAction,
@@ -173,7 +152,6 @@ export default () => {
     });
     setPlatformLogo({
       ...data.providerLogoImage,
-      imageId: data.providerLogoImageId,
     } as fileInfoType);
     if (open) {
       setOpenCreateDialog(true);
@@ -192,58 +170,33 @@ export default () => {
     setOpenCreateDialog(true);
   };
 
+  // 获取log 文件，格式化传入 文件上传组件用于回显
+  const getFile = useCallback(() => {
+    return [platformLogo]
+      .map((f) => ({
+        url: f.imgSrc,
+      }))
+      .filter(Boolean);
+  }, [platformLogo]);
+
   // 创建第三方平台
   const handleCreatePlatform = async (values: FieldType) => {
-    if (uploadLoading) {
-      messageApi.error('图片上传中，请稍后再试');
-      return;
-    }
     setCreateLoading(true);
-    const params = {
+    const params: API.FBProvider = {
       ...values,
-      providerLogoImageId: platformLogo.imageId,
+      providerLogoImageId: Number(platformLogo.imageId),
       providerId: providerId,
-    } as Record<string, any>;
-
-    await postUserSaveProvider(params);
-
-    messageApi.success('新增成功');
-
-    setCreateLoading(false);
-    setOpenCreateDialog(false);
-    actionRef.current?.reload();
-  };
-
-  const handleUpload = async (file: FileType) => {
-    const { data } = await postImageUploadImage({
-      file: file,
-    });
-
-    const { imgSrc, imageId, height, size, width } = data;
-    setUploadLoading(false);
-    setPlatformLogo({
-      imgSrc,
-      imageId,
-      height,
-      size,
-      width,
-    });
-  };
-
-  const beforeUpload = (file: FileType) => {
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-    if (!isJpgOrPng) {
-      messageApi.error('只能上传 JPG/PNG 文件!');
-      return false;
+      webSiteId: Number(values.webSiteId),
+      providerAction: Number(values.providerAction), // 将 providerAction 转换为数字类型
+    };
+    try {
+      await postUserSaveProvider(params);
+      messageApi.success(providerId > 0 ? '编辑成功' : '新增成功');
+      setOpenCreateDialog(false);
+      actionRef.current?.reload();
+    } finally {
+      setCreateLoading(false);
     }
-    const isLt5M = file.size / 1024 / 1024 < 5;
-    if (!isLt5M) {
-      messageApi.error('图片大小不能超过5MB!');
-      return false;
-    }
-    setUploadLoading(true);
-    handleUpload(file);
-    return false;
   };
 
   //  关闭表单时 重置表单
@@ -260,13 +213,6 @@ export default () => {
       width: 0,
     });
   };
-
-  const uploadButton = (
-    <button style={{ border: 0, background: 'none' }} type="button">
-      {uploadLoading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>{uploadLoading ? '上传中...' : '上传'}</div>
-    </button>
-  );
 
   return (
     <>
@@ -313,7 +259,7 @@ export default () => {
       />
 
       <Modal
-        title="新增第三方平台"
+        title={`${providerId > 0 ? '编辑' : '新增'}第三方平台`}
         centered
         open={openCreateDialog}
         onOk={() => form.submit()}
@@ -372,59 +318,15 @@ export default () => {
             <Input placeholder="请输入回调地址" />
           </Form.Item>
 
-          <Form.Item<FieldType>
-            label="Logo"
-            name="providerLogoImageId"
-            valuePropName="fileList"
-            getValueFromEvent={(e) => (Array.isArray(e) ? e : [e])}
-          >
-            <Upload
-              name="file"
-              listType="picture-card"
-              showUploadList={false}
-              action="/api/Image/UploadImage"
-              accept="image/*"
-              beforeUpload={beforeUpload}
-            >
-              {platformLogo.imgSrc ? (
-                <>
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                  >
-                    <Image
-                      src={platformLogo.imgSrc}
-                      alt="logo"
-                      style={{ width: '100%' }}
-                    />
-                  </div>
-
-                  <Button
-                    type="text"
-                    danger
-                    icon={<DeleteOutlined color="#000" />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPlatformLogo({
-                        imgSrc: '',
-                        imageId: '',
-                        height: 0,
-                        size: 0,
-                        width: 0,
-                      });
-                    }}
-                    style={{
-                      position: 'absolute',
-                      left: 70,
-                      top: -5,
-                    }}
-                  />
-                </>
-              ) : (
-                uploadButton
-              )}
-            </Upload>
+          <Form.Item<FieldType> label="Logo" name="providerLogoImageId">
+            <ImageWall
+              fileList={getFile()}
+              onChange={(file) => {
+                const [first] = file;
+                const platformLogo = first?.response?.data;
+                setPlatformLogo(platformLogo);
+              }}
+            />
           </Form.Item>
         </Form>
       </Modal>

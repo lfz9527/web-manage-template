@@ -66,14 +66,6 @@ const errorHandle = (response: ResponseData) => {
  * @doc https://umijs.org/docs/max/request#配置
  */
 export const errorConfig: RequestConfig = {
-  errorConfig: {
-    // 错误抛出
-    errorThrower: (res) => {
-      console.log(123, res);
-    },
-    // 错误接收及处理
-    errorHandler: (error: any, opts: any) => {},
-  },
   // 请求拦截器
   requestInterceptors: [
     (config: any) => {

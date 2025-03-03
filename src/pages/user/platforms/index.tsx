@@ -160,9 +160,9 @@ export default () => {
   ];
 
   const handleGetPlatform = async (open: boolean = true) => {
-    const data = (await getUserGetProviderById({
+    const { data } = await getUserGetProviderById({
       id: providerId,
-    })) as FieldType;
+    });
 
     form.setFieldsValue({
       webSiteId: data.webSiteId,
@@ -215,9 +215,9 @@ export default () => {
   };
 
   const handleUpload = async (file: FileType) => {
-    const data = (await postImageUploadImage({
+    const { data } = await postImageUploadImage({
       file: file,
-    })) as fileInfoType;
+    });
 
     const { imgSrc, imageId, height, size, width } = data;
     setUploadLoading(false);
@@ -282,13 +282,8 @@ export default () => {
             page: params.current,
             count: params.pageSize,
           };
-
-          const { list = [], total = 0 } = (await postUserGetProviderList(
-            searchParams,
-          )) as {
-            list: GithubIssueItem[];
-            total: number;
-          };
+          const { data } = await postUserGetProviderList(searchParams);
+          const { list, total } = data;
           return {
             data: list,
             success: true,

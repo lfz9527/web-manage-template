@@ -85,12 +85,8 @@ export default () => {
             count: params.pageSize,
           };
 
-          const { list = [], total = 0 } = (await getUserGetUserProviderList(
-            searchParams,
-          )) as {
-            list: GithubIssueItem[];
-            total: number;
-          };
+          const { data } = await getUserGetUserProviderList(searchParams);
+          const { list, total } = data;
           return {
             data: list,
             success: true,

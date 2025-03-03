@@ -167,12 +167,8 @@ export default () => {
             nickName: params.nickName,
           };
 
-          const { list = [], total = 0 } = (await getUserGetUserList(
-            searchParams as API.getUserGetUserListParams,
-          )) as {
-            list: GithubIssueItem[];
-            total: number;
-          };
+          const { data } = await getUserGetUserList(searchParams);
+          const { list, total } = data;
           return {
             data: list,
             success: true,

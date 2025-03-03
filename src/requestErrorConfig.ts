@@ -81,7 +81,7 @@ export const errorConfig: RequestConfig = {
   responseInterceptors: [
     (response) => {
       // 拦截响应数据，进行个性化处理
-      const { status, headers, data } = response as unknown as ResponseData;
+      const { status, headers } = response as unknown as ResponseData;
       const token = headers['login-token'];
       if (token) {
         setToken(token);

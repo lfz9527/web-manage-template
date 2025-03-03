@@ -12,17 +12,13 @@ import { errorConfig } from './requestErrorConfig';
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 // 更多信息见文档：https://umijs.org/docs/api/runtime-config#getinitialstate
 
-type InitialState = {
+type InitialStateType = {
   name: string;
   avatar?: string;
   id: string;
 };
 
-export async function getInitialState(): Promise<{
-  name: string;
-  avatar?: string;
-  id: string;
-}> {
+export async function getInitialState(): Promise<InitialStateType> {
   const fetchUserInfo = async () => {
     try {
       const { data } = await getUserGetUserForPublic({});
@@ -54,7 +50,7 @@ export async function getInitialState(): Promise<{
 export const layout: RunTimeLayoutConfig = ({
   initialState,
 }: {
-  initialState: any;
+  initialState?: InitialStateType;
 }) => {
   //initialState上面登录函数返回的信息
   return {

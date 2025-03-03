@@ -128,7 +128,7 @@ const SiteManagementPage = () => {
   const handleEditShopSite = async (id: number) => {
     setShopSiteId(id);
     try {
-      const data = (await getShopSiteGetShopSiteById({ id })) as any;
+      const { data } = await getShopSiteGetShopSiteById({ id });
       const emails = data.emails ? data.emails.split(',') : [];
       const tels = data.tels ? data.tels.split(',') : [];
       form.setFieldsValue({
@@ -385,8 +385,8 @@ const SiteManagementPage = () => {
             count: params.pageSize,
           };
           try {
-            const data = await getShopSiteGetShopSiteList(searchParams);
-            const { list = [], total = 0 } = data as any;
+            const { data } = await getShopSiteGetShopSiteList(searchParams);
+            const { list = [], total = 0 } = data;
             return {
               data: list,
               success: true,

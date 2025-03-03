@@ -47,6 +47,7 @@ type FieldType = {
   webSiteSettingValueId: number;
   webSiteSettingId: number;
   settingValue: string;
+  webSiteId: string;
 };
 
 // 网站设置选项类型
@@ -85,11 +86,11 @@ export default () => {
   // 获取网站设置选项
   const fetchWebSiteSettingOptions = async () => {
     try {
-      const { list = [], total = 0 } = (await getWebSiteGetWebSiteSettingList({
+      const { data } = await getWebSiteGetWebSiteSettingList({
         page: 1,
         count: 50,
-      })) as any;
-
+      });
+      const { list = [], total = 0 } = data;
       const options = list.map((item: any) => ({
         value: item.webSiteSettingId,
         label: item.settingName,
@@ -110,7 +111,7 @@ export default () => {
     setWebSiteSettingValueId(id);
     try {
       // 根据 id 获取单条数据
-      const data = (await getWebSiteGetWebSiteSettingValue({ id })) as any;
+      const { data } = await getWebSiteGetWebSiteSettingValue({ id });
       form.setFieldsValue({
         webSiteId: data.webSiteId,
         webSiteSettingId: data.webSiteSettingId,
@@ -205,7 +206,7 @@ export default () => {
     const params = {
       ...values,
       webSiteSettingValueId: webSiteSettingValueId,
-    };
+    } as Record<string, any>;
     try {
       await postWebSiteSaveWebSiteSettingValue(params);
       messageApi.success(webSiteSettingValueId ? '更新成功' : '新增成功');
@@ -240,10 +241,10 @@ export default () => {
             count: params.pageSize,
           };
           try {
-            const result = await getWebSiteGetWebSiteSettingValueList(
+            const { data } = await getWebSiteGetWebSiteSettingValueList(
               searchParams,
             );
-            const { list = [], total = 0 } = result as any;
+            const { list = [], total = 0 } = data;
             return {
               data: list,
               success: true,

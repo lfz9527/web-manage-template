@@ -168,7 +168,7 @@ export default () => {
   const handleEditDeals = async (id: number) => {
     setDealsId(id);
     try {
-      const data = (await getDealsGetDealsById({ id })) as any;
+      const { data } = await getDealsGetDealsById({ id });
       const startTimeMoment = data.startTime
         ? moment(data.startTime, 'YYYY-MM-DD HH:mm:ss')
         : null;
@@ -505,10 +505,10 @@ export default () => {
 
   // 上传按钮组件
   const uploadButton = (
-    <button style={{ border: 0, background: 'none' }} type="button">
+    <Button style={{ border: 0, background: 'none' }} type="button">
       {uploadLoading ? <LoadingOutlined /> : <PlusOutlined />}
       <div style={{ marginTop: 8 }}>{uploadLoading ? '上传中...' : '上传'}</div>
-    </button>
+    </Button>
   );
 
   return (
@@ -524,9 +524,8 @@ export default () => {
             count: params.pageSize,
           };
           try {
-            const { list = [], total = 0 } = (await getDealsGetDealsList(
-              searchParams,
-            )) as any;
+            const { data } = await getDealsGetDealsList(searchParams);
+            const { list = [], total = 0 } = data;
             return {
               data: list,
               success: true,

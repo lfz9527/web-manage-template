@@ -74,13 +74,12 @@ export default () => {
 
   // 获取站点列表
   const getShopSiteList = async (name: string = '') => {
-    const { list } = (await getShopSiteGetShopSiteList({
+    const { data } = await getShopSiteGetShopSiteList({
       name,
       page: 1,
       count: 5000,
-    })) as {
-      list: ShopSiteType[];
-    };
+    });
+    const { list } = data;
     setShopSiteList(
       list.map((item: ShopSiteType) => ({
         label: item.shopSiteName,
@@ -91,12 +90,10 @@ export default () => {
 
   // 获取站群列表
   const getWebSiteList = async () => {
-    const data = (await getWebSiteGetWebSiteList({
+    const { data } = await getWebSiteGetWebSiteList({
       page: 1,
       count: 500,
-    })) as {
-      list: WebSiteItem[];
-    };
+    });
     const listData: WebSiteItem[] = data.list;
     setWebSiteList(
       listData.map((item: WebSiteItem) => {
@@ -113,12 +110,11 @@ export default () => {
 
   // 获取商品品牌列表
   const getBrandList = async () => {
-    const { list } = (await getBrandGetBrandList({
+    const { data } = await getBrandGetBrandList({
       page: 1,
       count: 100,
-    })) as {
-      list: BrandType[];
-    };
+    });
+    const { list } = data;
     setBrandList(
       list.map((item: BrandType) => ({
         label: item.brandName,
@@ -130,9 +126,9 @@ export default () => {
   const getGoodId = async () => {
     if (params.id) {
       setGoodId(Number(params.id));
-      const data = (await getGoodGetGoodById({
+      const { data } = await getGoodGetGoodById({
         id: Number(params.id),
-      })) as API.FBGood;
+      });
 
       const { attributes = [], tags = [], banners = [] } = data;
 
@@ -179,7 +175,7 @@ export default () => {
 
   // 添加标签
   const addTag = async (tagName: string) => {
-    const data = await postGoodEditGoodTag({
+    const { data } = await postGoodEditGoodTag({
       goodTagId: 0,
       tagName,
     });

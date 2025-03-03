@@ -148,7 +148,7 @@ const BrandManagementPage = () => {
       centered: true,
       onOk: async () => {
         try {
-          await postBrandDeleteBrand({ id });
+          await postBrandDeleteBrand({ ids: [id] });
           messageApi.success('删除成功');
           actionRef.current?.reload();
         } catch (error) {

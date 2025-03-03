@@ -237,16 +237,9 @@ export default () => {
   };
 
   const handleGetPosterById = async () => {
-    const data = (await getPosterGetPosterById({
+    const { data } = await getPosterGetPosterById({
       id: Number(posterId),
-    })) as
-      | FieldType
-      | {
-          posterImage: {
-            imgSrc: string;
-          };
-        };
-
+    });
     form.setFieldsValue({
       ...data,
     });
@@ -356,12 +349,8 @@ export default () => {
             count: params.pageSize,
             posterTitle: params.posterTitle?.trim(),
           };
-          const { list = [], total = 0 } = (await getPosterGetPosterList(
-            searchParams,
-          )) as {
-            list: GithubIssueItem[];
-            total: number;
-          };
+          const { data } = await getPosterGetPosterList(searchParams);
+          const { list = [], total = 0 } = data;
           return {
             data: list,
             success: true,

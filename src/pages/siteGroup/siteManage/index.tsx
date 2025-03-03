@@ -101,9 +101,9 @@ export default () => {
   // 编辑网站信息
   const handleEditWebsite = async (id: number) => {
     setWebsiteId(id);
-    const data = (await getWebSiteGetWebSiteById({
+    const { data } = await getWebSiteGetWebSiteById({
       id: id,
-    })) as FieldType;
+    });
     const website = data;
     form.setFieldsValue({
       name: website.name,
@@ -248,9 +248,9 @@ export default () => {
 
   const handleUpload = async (file: FileType) => {
     // 假设存在上传图片的服务
-    const data = (await postImageUploadImage({
+    const { data } = await postImageUploadImage({
       file: file,
-    })) as fileInfoType;
+    });
 
     const { imgSrc, imageId, height, size, width } = data;
     setUploadLoading(false);
@@ -317,12 +317,10 @@ export default () => {
             name: params.name,
           };
 
-          const { list = [], total = 0 } = (await getWebSiteGetWebSiteList(
+          const { data } = await getWebSiteGetWebSiteList(
             searchParams as API.getWebSiteGetWebSiteListParams,
-          )) as {
-            list: GithubIssueItem[];
-            total: number;
-          };
+          );
+          const { list = [], total = 0 } = data;
           return {
             data: list,
             success: true,

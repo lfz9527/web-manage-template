@@ -511,12 +511,10 @@ export default () => {
             isShelves: getIsShelvesBool(isShelves),
             title: title,
           };
-          const { list = [], total = 0 } = (await getGoodGetGoodList(
+          const { data } = await getGoodGetGoodList(
             searchParams as API.getGoodGetGoodListParams,
-          )) as {
-            list: TableItem[];
-            total: number;
-          };
+          );
+          const { list = [], total = 0 } = data;
           return {
             data: list,
             success: true,

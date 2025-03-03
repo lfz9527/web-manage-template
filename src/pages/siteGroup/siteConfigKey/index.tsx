@@ -92,7 +92,7 @@ export default () => {
     setWebSiteSettingId(id);
     try {
       // 根据 key 获取单条数据
-      const data = await getWebSiteGetWebSiteSetting({ id: id });
+      const { data } = await getWebSiteGetWebSiteSetting({ id: id });
       form.setFieldsValue({
         settingName: data.data.settingName,
         settingDescribe: data.data.settingDescribe,
@@ -251,8 +251,11 @@ export default () => {
             count: params.pageSize,
           };
           try {
-            const { list = [], total = 0 } =
-              (await getWebSiteGetWebSiteSettingList(searchParams)) as any;
+            const { data } = await getWebSiteGetWebSiteSettingList(
+              searchParams,
+            );
+            const { list = [], total = 0 } = data;
+
             return {
               data: list,
               success: true,

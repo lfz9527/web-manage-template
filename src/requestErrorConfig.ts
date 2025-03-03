@@ -10,6 +10,7 @@ type ResponseStructure = API.REWebApiCallback;
 type ResponseData = {
   status: number;
   data: ResponseStructure;
+  message: string;
   headers: any;
 };
 
@@ -65,6 +66,14 @@ const errorHandle = (response: ResponseData) => {
  * @doc https://umijs.org/docs/max/request#配置
  */
 export const errorConfig: RequestConfig = {
+  errorConfig: {
+    // 错误抛出
+    errorThrower: (res) => {
+      console.log(123, res);
+    },
+    // 错误接收及处理
+    errorHandler: (error: any, opts: any) => {},
+  },
   // 请求拦截器
   requestInterceptors: [
     (config: any) => {
@@ -81,24 +90,28 @@ export const errorConfig: RequestConfig = {
   responseInterceptors: [
     (response) => {
       // 拦截响应数据，进行个性化处理
-      const { status, headers } = response as unknown as ResponseData;
+      const {
+        status,
+        headers,
+        message: resMessage,
+      } = response as unknown as ResponseData;
       const token = headers['login-token'];
       if (token) {
         setToken(token);
       }
-      switch (status) {
-        case 200:
-          errorHandle(response as unknown as ResponseData);
-          break;
-        case 404:
-          logger.error('资源不存在');
-          break;
-        case 500:
-          logger.error('服务器错误');
-          break;
-        default:
-          logger.error('网络错误');
-          break;
+      let errorMessage = '';
+      if (status === 200) {
+        errorHandle(response as unknown as ResponseData);
+      } else if (status === 404) {
+        errorMessage = resMessage || '请求资源不存在';
+      } else if (status === 500) {
+        errorMessage = resMessage || '服务器内部错误';
+      } else {
+        errorMessage = resMessage || '网络错误';
+      }
+      if (errorMessage) {
+        logger.error(errorMessage);
+        message.error(errorMessage);
       }
       return { ...response };
     },

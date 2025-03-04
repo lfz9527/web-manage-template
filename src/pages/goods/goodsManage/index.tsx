@@ -24,6 +24,9 @@ type TableItem = {
   faceSrc: string;
   title: string;
   price: string;
+  goodCategory: {
+    categoryName: string;
+  };
   goodCategoryId: boolean;
   brandId: string;
   isAIOver: boolean;
@@ -37,23 +40,10 @@ type TableItem = {
   createTime: string;
 };
 
-type FieldType = {
-  webSiteId: string;
-  posterTitle: string;
-  posterLink: string;
-  isOnline: boolean;
-  posterImageId: string;
-};
-
 type CopyFieldType = {
   webSiteId: string;
   belongWebSiteId: string;
   title: string;
-};
-
-type WebSiteItem = {
-  webSiteId: string;
-  name: string;
 };
 
 export default () => {
@@ -174,23 +164,19 @@ export default () => {
 
   const columns: ProColumns<TableItem>[] = [
     {
+      title: '序号',
       dataIndex: 'index',
-      valueType: 'indexBorder',
+      valueType: 'index',
       width: 48,
     },
     {
-      title: 'ID',
-      dataIndex: 'goodId',
-      search: false,
-    },
-    {
-      title: '站点',
+      title: '店铺名称',
       dataIndex: ['shopSite', 'shopSiteName'],
       search: false,
       ellipsis: true,
     },
     {
-      title: '站群',
+      title: '站群ID',
       dataIndex: 'webSiteId',
       search: true,
       valueEnum: webSiteListValueEnum(),
@@ -201,7 +187,7 @@ export default () => {
       search: false,
       width: 100,
       render: (_, record) => {
-        return <Image src={record.faceSrc} />;
+        return record.faceSrc ? <Image src={record.faceSrc} /> : '-';
       },
     },
     {
@@ -217,8 +203,8 @@ export default () => {
       search: false,
     },
     {
-      title: '商品分类Id',
-      dataIndex: 'goodCategoryId',
+      title: '商品分类',
+      dataIndex: ['goodCategory', 'categoryName'],
       search: false,
     },
     {

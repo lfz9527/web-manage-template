@@ -1,7 +1,12 @@
+import {
+  getGoodGetGoodTagList,
+  postGoodDeleteGoodTag,
+  postGoodSaveGoodTag,
+} from '@/services/api/good';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Button, Form, Input, message, Modal, Radio, Space, Tag } from 'antd';
+import { Button, Form, Input, message, Modal, Radio, Tag } from 'antd';
 import { useRef, useState } from 'react';
 
 interface TableItem {
@@ -24,24 +29,46 @@ export default () => {
   const [modal, contextHolder] = Modal.useModal();
   const [messageApi, messageContextHolder] = message.useMessage();
 
-  const [selectedRows, setSelectedRows] = useState<TableItem[]>([]);
-
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState(false);
-  const [goodTag, setGoodTag] = useState<TableItem[]>([]);
-  const [goodTagId, setGoodTagId] = useState<number>(0);
+  const [goodTagItem, setGoodTagItem] = useState<TableItem>({} as TableItem);
+
+  const handleEdit = (record: TableItem) => {
+    setGoodTagItem(record);
+    form.setFieldsValue({
+      tagName: record.tagName,
+      isHot: record.isHot,
+    });
+    setDialog(true);
+  };
+
+  const handleDelete = async (record: TableItem) => {
+    modal.confirm({
+      title: '提示',
+      centered: true,
+      content: '确定删除该标签吗？',
+      onOk: async () => {
+        try {
+          await postGoodDeleteGoodTag({
+            ids: [record.goodTagId],
+          });
+
+          messageApi.success('操作成功');
+          actionRef.current?.reload();
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
+  };
 
   const columns: ProColumns<TableItem>[] = [
     {
+      title: '序号',
       dataIndex: 'index',
-      valueType: 'indexBorder',
+      valueType: 'index',
       width: 48,
-    },
-    {
-      title: 'ID',
-      dataIndex: 'goodTagId',
-      search: false,
     },
     {
       title: '名称',
@@ -59,6 +86,7 @@ export default () => {
     {
       title: '热门时间',
       dataIndex: 'hotTime',
+      valueType: 'dateTime',
       search: false,
     },
     {
@@ -69,6 +97,7 @@ export default () => {
     {
       title: '创建时间',
       dataIndex: 'createTime',
+      valueType: 'dateTime',
       search: false,
     },
     {
@@ -76,23 +105,23 @@ export default () => {
       valueType: 'option',
       key: 'option',
       width: 220,
-      ellipsis: true,
       render: (_, record) =>
         [
-          <a key="edit" onClick={() => {}}>
+          <a
+            key="edit"
+            onClick={() => {
+              handleEdit(record);
+            }}
+          >
             编辑
           </a>,
-          record.isHot && (
-            <a key="upHot" onClick={() => {}}>
-              上热门
-            </a>
-          ),
-          !record.isHot && (
-            <a key="downHot" onClick={() => {}}>
-              下热门
-            </a>
-          ),
-          <a key="delete" style={{ color: 'red' }} onClick={() => {}}>
+          <a
+            key="delete"
+            style={{ color: 'red' }}
+            onClick={() => {
+              handleDelete(record);
+            }}
+          >
             删除
           </a>,
         ].filter(Boolean),
@@ -102,36 +131,53 @@ export default () => {
   // 重置表单
   const resetForm = () => {
     form.resetFields();
+    setDialog(false);
+    setLoading(false);
   };
 
   // 提交表单
-  const handleSubmit = (values: any) => {
+  const handleSubmit = async (values: any) => {
     console.log(values);
+    setLoading(true);
+
+    try {
+      await postGoodSaveGoodTag({
+        goodTagId: goodTagItem.goodTagId || 0,
+        ...values,
+      });
+
+      messageApi.success('操作成功');
+      setDialog(false);
+      actionRef.current?.reload();
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
+      {messageContextHolder}
+      {contextHolder}
       <ProTable<TableItem>
         columns={columns}
         actionRef={actionRef}
         cardBordered
-        rowSelection={{}}
-        tableAlertOptionRender={() => {
-          return (
-            <Space size={16}>
-              <a onClick={() => {}}>批量上热门</a>
-              <a onClick={() => {}}>批量下热门</a>
-            </Space>
-          );
-        }}
         request={async (params) => {
+          const searchParams = {
+            page: params.current,
+            count: params.pageSize,
+            tagName: params.tagName?.trim(),
+          };
+          const { data } = await getGoodGetGoodTagList(searchParams);
+          const { list, total } = data;
+
           return {
-            data: [],
+            data: list,
             success: true,
-            total: 0,
+            total: total,
           };
         }}
-        rowKey="goodId"
+        rowKey="goodTagId"
         pagination={{
           pageSize: 10,
           showSizeChanger: true,
@@ -141,6 +187,7 @@ export default () => {
             actionRef.current?.clearSelected?.();
           },
         }}
+        search={false}
         dateFormatter="string"
         toolBarRender={() => [
           <Button
@@ -155,7 +202,7 @@ export default () => {
       />
 
       <Modal
-        title={goodTagId ? '编辑标签' : '新增标签'}
+        title={goodTagItem.goodTagId ? '编辑标签' : '新增标签'}
         centered
         open={dialog}
         onOk={() => {

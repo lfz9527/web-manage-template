@@ -128,14 +128,14 @@ export default () => {
       },
     },
     {
-      title: '名称',
+      title: '分类名称',
       dataIndex: 'categoryName',
       search: true,
     },
     {
       title: '父级Id',
       dataIndex: 'parentId',
-      search: false,
+      search: true,
     },
     {
       title: '是否热门',
@@ -217,7 +217,7 @@ export default () => {
           const searchParams = {
             page: params.current,
             count: params.pageSize,
-            categoryName: params.categoryName,
+            parentId: params.parentId,
           } as Record<string, any>;
           const { data } = await getGoodGetGoodCategoryList(searchParams);
 

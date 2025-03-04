@@ -1,38 +1,28 @@
+import { Image, ImageWall } from '@/components';
 import {
   getBrandGetBrandById,
   getBrandGetBrandList,
   postBrandDeleteBrand,
   postBrandSaveBrand,
 } from '@/services/api/brand';
-import { postImageUploadImage } from '@/services/api/image';
-import {
-  DeleteOutlined,
-  LoadingOutlined,
-  PlusOutlined,
-} from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import {
-  Avatar,
   Button,
-  DatePicker,
   Form,
-  GetProp,
-  Image,
   Input,
+  InputNumber,
   message,
   Modal,
   Radio,
-  Upload,
-  UploadProps,
+  Tag,
 } from 'antd';
-import moment from 'moment';
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // 品牌列表项数据类型
 type BrandItem = {
   brandId: number;
-  goodCategoryId: number;
   brandName: string;
   brandDescribe: string;
   logoImageId: number;
@@ -56,19 +46,13 @@ type BrandItem = {
 // 表单字段类型
 type FieldType = {
   brandId: number;
-  goodCategoryId: number;
   brandName: string;
   brandDescribe: string;
   logoImageId: number;
-  logoImageBackground: string;
   isOnline: boolean;
   isHot: boolean;
   goodCount: number;
-  createTime: moment.Moment;
 };
-
-// 文件类型
-type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
 // 文件信息类型
 type fileInfoType = {
@@ -87,8 +71,6 @@ const BrandManagementPage = () => {
   const [createLoading, setCreateLoading] = useState(false);
   const [form] = Form.useForm();
   const [brandId, setBrandId] = useState<number>(0);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
-  const [uploadLoading, setUploadLoading] = useState(false);
   const [brandLogo, setBrandLogo] = useState<fileInfoType>({
     imgSrc: '',
     imageId: '',
@@ -97,48 +79,34 @@ const BrandManagementPage = () => {
     width: 0,
   });
 
-  // 打开创建/编辑模态框
-  const handleOpenCreateDialog = () => {
-    form.resetFields();
-    setBrandId(0);
-    setBrandLogo({
-      imgSrc: '',
-      imageId: '',
-      height: 0,
-      size: 0,
-      width: 0,
+  // 获取log 文件，格式化传入 文件上传组件用于回显
+  const getFile = useCallback(() => {
+    return [brandLogo]
+      .map((f) => ({
+        url: f.imgSrc,
+      }))
+      .filter((f) => f.url);
+  }, [brandLogo]);
+
+  // 获取品牌详情
+  const getBrandDetail = useCallback(async (id: number) => {
+    const { data } = await getBrandGetBrandById({ id });
+    setBrandLogo({ ...data.logoImage });
+    form.setFieldsValue({
+      ...data,
     });
-    setOpenCreateDialog(true);
-  };
+  }, []);
+
+  useEffect(() => {
+    if (brandId > 0) {
+      getBrandDetail(brandId);
+    }
+  }, [brandId]);
 
   // 编辑品牌信息
   const handleEditBrand = async (id: number) => {
     setBrandId(id);
-    try {
-      const { data } = await getBrandGetBrandById({ id });
-      form.setFieldsValue({
-        brandId: data.brandId,
-        goodCategoryId: data.goodCategoryId,
-        brandName: data.brandName,
-        brandDescribe: data.brandDescribe,
-        logoImageId: data.logoImageId,
-        logoImageBackground: data.logoImageBackground,
-        isOnline: data.isOnline,
-        isHot: data.isHot,
-        goodCount: data.goodCount,
-        createTime: moment(data.createTime),
-      });
-      setBrandLogo({
-        imgSrc: data.logoImage.imgSrc,
-        imageId: String(data.logoImageId),
-        height: data.logoImage.height,
-        size: data.logoImage.size,
-        width: data.logoImage.width,
-      });
-      setOpenCreateDialog(true);
-    } catch (error) {
-      messageApi.error('获取品牌信息失败');
-    }
+    setOpenCreateDialog(true);
   };
 
   // 删除品牌信息
@@ -158,70 +126,69 @@ const BrandManagementPage = () => {
     });
   };
 
-  const handleUpload = async (file: FileType) => {
-    try {
-      setUploadLoading(true);
-      const data = (await postImageUploadImage({
-        file: file,
-      })) as fileInfoType;
+  // const hotChange = (id: number, isHot: boolean) => {
+  //   console.log(id, isHot);
+  //   Modal.confirm({
+  //     title: '确定要修改热门状态吗？',
+  //     content: '热门状态将影响品牌在首页的展示',
+  //     onOk: async () => {
+  //       // await postBrandUpdateBrandHot({ id, isHot });
+  //     },
+  //   });
+  // }
 
-      const { imgSrc, imageId, height, size, width } = data;
-      setUploadLoading(false);
-      setBrandLogo({
-        imgSrc,
-        imageId,
-        height,
-        size,
-        width,
-      });
-    } catch (error) {
-      messageApi.error('图片上传失败');
-      setUploadLoading(false);
-    }
-  };
-
-  const beforeUpload = (file: FileType) => {
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-    if (!isJpgOrPng) {
-      messageApi.error('只能上传 JPG/PNG 文件!');
-      return false;
-    }
-    const isLt5M = file.size / 1024 / 1024 < 5;
-    if (!isLt5M) {
-      messageApi.error('图片大小不能超过5MB!');
-      return false;
-    }
-    handleUpload(file);
-    return false;
-  };
+  // const onlineChange = (id: number, isOnline: boolean) => {
+  //   console.log(id, isOnline);
+  //   Modal.confirm({
+  //     title: '确定要修改上线状态吗？',
+  //     content: '上线状态将影响品牌在首页的展示',
+  //     onOk: async () => {
+  //       // await postBrandUpdateBrandOnline({ id, isOnline });
+  //     },
+  //   });
+  // }
 
   // 表格列定义
   const columns: ProColumns<BrandItem>[] = [
     {
+      dataIndex: 'index',
+      valueType: 'indexBorder',
+      width: 48,
+    },
+    {
       title: 'ID',
       dataIndex: 'brandId',
       width: 60,
+      search: false,
     },
     {
       title: 'Logo',
       dataIndex: ['logoImage', 'imgSrc'],
       search: false,
-      render: (text) => <Avatar src={text} />,
+      render: (_, record) =>
+        record?.logoImage?.imgSrc ? (
+          <Image objectFit="contain" src={record?.logoImage?.imgSrc} />
+        ) : (
+          '-'
+        ),
     },
     {
-      title: 'Logo背景',
+      title: 'Logo背景颜色',
       dataIndex: 'logoImageBackground',
       search: false,
-    },
-    {
-      title: '关联类目',
-      dataIndex: 'goodCategoryId',
-      search: false,
+      render: (_, record) =>
+        record?.logoImageBackground ? (
+          <Tag color={record?.logoImageBackground}>
+            {record?.logoImageBackground}
+          </Tag>
+        ) : (
+          '-'
+        ),
     },
     {
       title: '名称',
       dataIndex: 'brandName',
-      search: false,
+      copyable: true,
     },
     {
       title: '简介',
@@ -232,13 +199,14 @@ const BrandManagementPage = () => {
       title: '上线',
       dataIndex: 'isOnline',
       search: false,
-      render: (text) => (text ? '上线' : '下线'),
+      render: (text) =>
+        text ? <Tag color="success">上线</Tag> : <Tag color="red">下线</Tag>,
     },
     {
       title: '热门',
       dataIndex: 'isHot',
       search: false,
-      render: (text) => (text ? '热门' : ''),
+      render: (text) => (text ? <Tag color="red">热门</Tag> : ''),
     },
     {
       title: '商品数',
@@ -248,7 +216,8 @@ const BrandManagementPage = () => {
     {
       title: '创建时间',
       dataIndex: 'createTime',
-      valueType: 'dateTime',
+      valueType: 'date',
+      width: 150,
       search: false,
     },
     {
@@ -263,6 +232,12 @@ const BrandManagementPage = () => {
         >
           编辑
         </a>,
+        // <a key='hot' type='link' onClick={() => { hotChange(record.brandId, record.isHot) }}>
+        //   {record.isHot ? '下热门' : '上热门'}
+        // </a>,
+        // <a key='online' type='link' onClick={() => { onlineChange(record.brandId, record.isOnline) }}>
+        //   {record.isOnline ? '下线' : '上线'}
+        // </a>,
         <a
           key="delete"
           style={{ color: '#f00' }}
@@ -278,8 +253,8 @@ const BrandManagementPage = () => {
 
   // 创建或更新品牌信息
   const handleCreateOrUpdateBrand = async (values: FieldType) => {
-    if (uploadLoading) {
-      messageApi.error('图片上传中，请稍后再试');
+    if (createLoading) {
+      messageApi.error('操作中，请稍后再试');
       return;
     }
     setCreateLoading(true);
@@ -294,8 +269,7 @@ const BrandManagementPage = () => {
       setCreateLoading(false);
       setOpenCreateDialog(false);
       actionRef.current?.reload();
-    } catch (error) {
-      messageApi.error(brandId ? '更新失败' : '新增失败');
+    } finally {
       setCreateLoading(false);
     }
   };
@@ -316,13 +290,6 @@ const BrandManagementPage = () => {
   };
 
   // 上传按钮组件
-  const uploadButton = (
-    <button style={{ border: 0, background: 'none' }} type="button">
-      {uploadLoading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>{uploadLoading ? '上传中...' : '上传'}</div>
-    </button>
-  );
-
   return (
     <>
       {messageContextHolder}
@@ -335,6 +302,7 @@ const BrandManagementPage = () => {
           const searchParams = {
             page: params.current,
             count: params.pageSize,
+            brandName: params.brandName,
           };
           try {
             const { data } = await getBrandGetBrandList(searchParams);
@@ -361,15 +329,12 @@ const BrandManagementPage = () => {
           pageSizeOptions: ['10', '20', '50', '100'],
           onChange: (page) => console.log(page),
         }}
-        search={{
-          labelWidth: 'auto',
-        }}
         dateFormatter="string"
         toolBarRender={() => [
           <Button
             key="button"
             icon={<PlusOutlined />}
-            onClick={handleOpenCreateDialog}
+            onClick={() => setOpenCreateDialog(true)}
             type="primary"
           >
             新建
@@ -385,99 +350,30 @@ const BrandManagementPage = () => {
           loading: createLoading,
         }}
         onCancel={() => setOpenCreateDialog(false)}
-        width={800}
+        width={600}
         afterClose={resetForm}
       >
         <Form
           form={form}
-          labelCol={{ span: 5 }}
+          labelCol={{ span: 4 }}
           onFinish={handleCreateOrUpdateBrand}
+          initialValues={{
+            isOnline: false,
+            isHot: false,
+          }}
           labelAlign="left"
         >
           <Form.Item<FieldType> label="ID" name="brandId" hidden>
             <Input />
           </Form.Item>
           <Form.Item<FieldType>
-            label="关联类目"
-            name="goodCategoryId"
-            rules={[{ required: true, message: '请输入关联类目' }]}
-          >
-            <Input placeholder="请输入关联类目" />
-          </Form.Item>
-          <Form.Item<FieldType>
-            label="Logo"
-            name="logoImageId"
-            valuePropName="fileList"
-            getValueFromEvent={(e) => (Array.isArray(e) ? e : [e])}
-          >
-            <Upload
-              name="file"
-              listType="picture-card"
-              showUploadList={false}
-              action="/api/Image/UploadImage"
-              accept="image/*"
-              beforeUpload={beforeUpload}
-            >
-              {brandLogo.imgSrc ? (
-                <>
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                  >
-                    <Image
-                      src={brandLogo.imgSrc}
-                      alt="logo"
-                      style={{ width: '100%' }}
-                    />
-                  </div>
-                  <Button
-                    type="text"
-                    danger
-                    icon={<DeleteOutlined color="#000" />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setBrandLogo({
-                        imgSrc: '',
-                        imageId: '',
-                        height: 0,
-                        size: 0,
-                        width: 0,
-                      });
-                    }}
-                    style={{
-                      position: 'absolute',
-                      left: 70,
-                      top: -5,
-                    }}
-                  />
-                </>
-              ) : (
-                uploadButton
-              )}
-            </Upload>
-          </Form.Item>
-          <Form.Item<FieldType>
-            label="Logo背景"
-            name="logoImageBackground"
-            rules={[{ required: true, message: '请输入Logo背景' }]}
-          >
-            <Input placeholder="请输入Logo背景" />
-          </Form.Item>
-          <Form.Item<FieldType>
-            label="名称"
+            label="品牌名称"
             name="brandName"
             rules={[{ required: true, message: '请输入名称' }]}
           >
             <Input placeholder="请输入名称" />
           </Form.Item>
-          <Form.Item<FieldType>
-            label="简介"
-            name="brandDescribe"
-            rules={[{ required: false, message: '请输入简介' }]}
-          >
-            <Input.TextArea placeholder="请输入简介" />
-          </Form.Item>
+
           <Form.Item<FieldType>
             label="上线"
             name="isOnline"
@@ -498,22 +394,34 @@ const BrandManagementPage = () => {
               <Radio value={false}>非热门</Radio>
             </Radio.Group>
           </Form.Item>
+
           <Form.Item<FieldType>
-            label="商品数"
+            label="品牌商品数"
             name="goodCount"
             rules={[{ required: true, message: '请输入商品数' }]}
           >
-            <Input placeholder="请输入商品数" />
+            <InputNumber
+              style={{ width: '100%' }}
+              min={0}
+              step={1}
+              placeholder="请输入商品数"
+            />
           </Form.Item>
           <Form.Item<FieldType>
-            label="创建时间"
-            name="createTime"
-            rules={[{ required: true, message: '请选择创建时间' }]}
+            label="品牌简介"
+            name="brandDescribe"
+            rules={[{ required: false, message: '请输入简介' }]}
           >
-            <DatePicker
-              showTime={{ format: 'HH:mm:ss' }}
-              format="YYYY-MM-DD HH:mm:ss"
-              placeholder="请选择创建时间"
+            <Input.TextArea placeholder="请输入简介" />
+          </Form.Item>
+          <Form.Item<FieldType> label="品牌Logo" name="logoImageId">
+            <ImageWall
+              fileList={getFile()}
+              onChange={(fileList) => {
+                const [first] = fileList;
+                const file = first?.response?.data || {};
+                setBrandLogo({ ...file });
+              }}
             />
           </Form.Item>
         </Form>

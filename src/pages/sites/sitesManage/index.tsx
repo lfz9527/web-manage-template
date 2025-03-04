@@ -1,10 +1,9 @@
 import { Image, ImageWall } from '@/components';
-import { getGoodGetGoodCategoryList } from '@/services/api/good';
 import {
   getShopSiteGetShopSiteById,
   getShopSiteGetShopSiteList,
   postShopSiteDeleteShopSite,
-  postShopSiteEditShopSite,
+  postShopSiteSaveShopSite,
 } from '@/services/api/shopSite';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
@@ -19,14 +18,13 @@ import {
   Modal,
   Radio,
   Row,
-  Select,
   Space,
   Tag,
 } from 'antd';
 import moment from 'moment';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-// 站点列表项数据类型
+// 店铺列表项数据类型
 type ShopSiteItem = {
   shopSiteId: number;
   shopSiteName: string;
@@ -34,13 +32,12 @@ type ShopSiteItem = {
   shopSiteTitle: string;
   describe: string;
   link: string;
-  siteType: string;
   logoImageId: number;
   logoImage: {
     imgSrc: string;
   };
-  emails: string;
-  tels: string;
+  emails: string[];
+  tels: string[];
   yearOpened: number;
   starLevel: number;
   isOnline: boolean;
@@ -59,7 +56,7 @@ type FieldType = {
   shopSiteTitle: string;
   describe: string;
   link: string;
-  siteType: string;
+  // siteType: string;
   logoImageId: number;
   emails: string[];
   tels: string[];
@@ -81,20 +78,14 @@ type fileInfoType = {
   width: number;
 };
 
-type SelectOptionType = {
-  value: string;
-  label: string;
-};
-
 const SiteManagementPage = () => {
   const [messageApi, messageContextHolder] = message.useMessage();
   const [modal, contextHolder] = Modal.useModal();
   const actionRef = useRef<ActionType>();
-  const [openCreateDialog, setOpenCreateDialog] = useState(true);
+  const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [form] = Form.useForm();
   const [shopSiteId, setShopSiteId] = useState<number>(0);
-  const [siteTypeOption, setSiteTypeOption] = useState<SelectOptionType[]>([]);
 
   const [websiteLogo, setWebsiteLogo] = useState<fileInfoType>({
     imgSrc: '',
@@ -113,58 +104,36 @@ const SiteManagementPage = () => {
       .filter((f) => f.url);
   }, [websiteLogo]);
 
-  const getCareFirstLevelList = async () => {
-    const { data } = await getGoodGetGoodCategoryList({
-      page: 1,
-      count: 50,
-    });
-    const { list = [] } = data;
-    setSiteTypeOption(
-      list.map((item: any) => ({
-        value: item.goodCategoryId,
-        label: item.categoryName,
-      })),
-    );
+  const getShopSiteInfo = async () => {
+    const { data } = await getShopSiteGetShopSiteById({ id: shopSiteId });
+    const params = {
+      ...data,
+    };
+    setWebsiteLogo({ ...data.logoImage });
+    form.setFieldsValue(params);
   };
-  useEffect(() => {
-    getCareFirstLevelList();
-  }, []);
 
-  // 打开创建/编辑模态框
-  const handleOpenCreateDialog = () => {
-    form.resetFields();
-    setShopSiteId(0);
-    setWebsiteLogo({
-      imgSrc: '',
-      imageId: '',
-      height: 0,
-      size: 0,
-      width: 0,
-    });
+  useEffect(() => {
+    if (Number(shopSiteId) > 0) {
+      getShopSiteInfo();
+    }
+  }, [shopSiteId]);
+
+  // 编辑店铺信息
+  const handleEditShopSite = async (id: number) => {
+    setShopSiteId(id);
     setOpenCreateDialog(true);
   };
 
-  // 编辑站点信息
-  const handleEditShopSite = async (id: number) => {
-    setShopSiteId(id);
-    try {
-      const { data } = await getShopSiteGetShopSiteById({ id });
-      const emails = data.emails ? data.emails.split(',') : [];
-      const tels = data.tels ? data.tels.split(',') : [];
-      setOpenCreateDialog(true);
-    } catch (error) {
-      messageApi.error('获取站点信息失败');
-    }
-  };
-
-  // 删除站点信息
-  const handleDeleteShopSite = async (id: number) => {
+  // 删除店铺信息
+  const handleDeleteShopSite = async (id: number, shopSiteName: string) => {
     await modal.confirm({
-      title: '确定删除该站点吗？',
+      title: '删除店铺',
+      content: `确定删除名称：${shopSiteName} 的店铺吗？`,
       centered: true,
       onOk: async () => {
         try {
-          await postShopSiteDeleteShopSite({ id });
+          await postShopSiteDeleteShopSite({ ids: [id] });
           messageApi.success('删除成功');
           actionRef.current?.reload();
         } catch (error) {
@@ -185,10 +154,6 @@ const SiteManagementPage = () => {
       title: 'ID',
       dataIndex: 'shopSiteId',
       width: 60,
-    },
-    {
-      title: '类型',
-      dataIndex: 'siteType',
       search: false,
     },
     {
@@ -210,7 +175,7 @@ const SiteManagementPage = () => {
     {
       title: '名称',
       dataIndex: 'shopSiteName',
-      search: false,
+      copyable: true,
     },
     {
       title: '简介',
@@ -226,11 +191,13 @@ const SiteManagementPage = () => {
       title: 'Email',
       dataIndex: 'emails',
       search: false,
+      render: (_, record) => record?.emails?.join(',') || '-',
     },
     {
       title: '电话',
       dataIndex: 'tels',
       search: false,
+      render: (_, record) => record?.tels?.join(','),
     },
     {
       title: '年限',
@@ -257,7 +224,7 @@ const SiteManagementPage = () => {
       title: '热门',
       dataIndex: 'isHot',
       search: false,
-      render: (_, record) => (record?.isHot ? <Tag color="red">热梦</Tag> : _),
+      render: (_, record) => (record?.isHot ? <Tag color="red">热门</Tag> : _),
     },
     {
       title: '状态',
@@ -291,7 +258,9 @@ const SiteManagementPage = () => {
           key="delete"
           style={{ color: '#f00' }}
           type="link"
-          onClick={() => handleDeleteShopSite(record.shopSiteId)}
+          onClick={() =>
+            handleDeleteShopSite(record.shopSiteId, record.shopSiteName)
+          }
         >
           删除
         </a>,
@@ -300,24 +269,23 @@ const SiteManagementPage = () => {
     },
   ];
 
-  // 创建或更新站点信息
+  // 创建或更新店铺信息
   const handleCreateOrUpdateShopSite = async (values: FieldType) => {
     setCreateLoading(true);
     const params = {
       ...values,
       shopSiteId: shopSiteId,
-      logoImageId: Number(websiteLogo.imageId),
-      emails: values?.emails?.join(',') ?? '',
-      tels: values?.tels?.join(',') ?? '',
+      logoImageId: websiteLogo.imageId,
+      emails: values?.emails || [],
+      tels: values?.tels || [],
     } as Record<string, any>;
     try {
-      await postShopSiteEditShopSite(params);
+      await postShopSiteSaveShopSite(params);
       messageApi.success(shopSiteId ? '更新成功' : '新增成功');
       setCreateLoading(false);
       setOpenCreateDialog(false);
       actionRef.current?.reload();
-    } catch (error) {
-      messageApi.error(shopSiteId ? '更新失败' : '新增失败');
+    } finally {
       setCreateLoading(false);
     }
   };
@@ -348,6 +316,7 @@ const SiteManagementPage = () => {
           const searchParams = {
             page: params.current,
             count: params.pageSize,
+            shopSiteName: params.shopSiteName,
           };
           try {
             const { data } = await getShopSiteGetShopSiteList(searchParams);
@@ -358,7 +327,7 @@ const SiteManagementPage = () => {
               total,
             };
           } catch (error) {
-            messageApi.error('获取站点列表失败');
+            messageApi.error('获取店铺列表失败');
             return {
               data: [],
               success: false,
@@ -382,7 +351,7 @@ const SiteManagementPage = () => {
           <Button
             key="button"
             icon={<PlusOutlined />}
-            onClick={handleOpenCreateDialog}
+            onClick={() => setOpenCreateDialog(true)}
             type="primary"
           >
             新建
@@ -391,7 +360,7 @@ const SiteManagementPage = () => {
       />
 
       <Modal
-        title={shopSiteId ? '编辑站点信息' : '新增站点信息'}
+        title={shopSiteId ? '编辑店铺信息' : '新增店铺信息'}
         centered
         open={openCreateDialog}
         onOk={() => form.submit()}
@@ -417,73 +386,54 @@ const SiteManagementPage = () => {
           <Row gutter={24}>
             <Col xs={24} sm={24} md={12} lg={8} xl={8}>
               <Form.Item<FieldType>
-                label="站点类型"
-                name="siteType"
-                rules={[
-                  {
-                    required: true,
-                    message: '请选择站点类型',
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="请选择站点类型"
-                  options={siteTypeOption}
-                  optionFilterProp="label"
-                  showSearch
-                ></Select>
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={8} xl={8}>
-              <Form.Item<FieldType>
-                label="站点名称"
+                label="店铺名称"
                 name="shopSiteName"
                 rules={[
                   {
                     required: true,
-                    message: '请输入站点名称',
+                    message: '请输入店铺名称',
                   },
                 ]}
               >
-                <Input placeholder="请输入站点名称" />
+                <Input placeholder="请输入店铺名称" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={8} xl={8}>
               <Form.Item<FieldType>
-                label="站点链接"
+                label="店铺链接"
                 name="link"
                 rules={[
                   {
                     required: true,
-                    message: '请输入站点链接',
+                    message: '请输入店铺链接',
                   },
                 ]}
               >
-                <Input placeholder="请输入站点链接" />
+                <Input placeholder="请输入店铺链接" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={8} xl={8}>
-              <Form.Item<FieldType> label="站点称呼" name="shopSiteTitle">
-                <Input placeholder="请输入站点称呼" />
+              <Form.Item<FieldType> label="店铺称呼" name="shopSiteTitle">
+                <Input placeholder="请输入店铺称呼" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={8} xl={8}>
-              <Form.Item<FieldType> label="站点年限" name="yearOpened">
+              <Form.Item<FieldType> label="店铺年限" name="yearOpened">
                 <InputNumber
                   style={{ width: '100%' }}
-                  placeholder="请输入站点年限"
+                  placeholder="请输入店铺年限"
                   min={0}
-                  step={0.1}
+                  step={1}
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={8} xl={8}>
-              <Form.Item<FieldType> label="站点星级" name="starLevel">
+              <Form.Item<FieldType> label="店铺星级" name="starLevel">
                 <InputNumber
                   style={{ width: '100%' }}
-                  placeholder="请输入站点星级"
+                  placeholder="请输入店铺星级"
                   min={0}
-                  step={0.1}
+                  step={1}
                 />
               </Form.Item>
             </Col>
@@ -504,16 +454,23 @@ const SiteManagementPage = () => {
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-              <Form.Item<FieldType> label="站点简介" name="describe">
+              <Form.Item<FieldType> label="店铺简介" name="describe">
                 <Input.TextArea
-                  placeholder="请输入站点简介"
+                  placeholder="请输入店铺简介"
                   rows={4}
                 ></Input.TextArea>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={8} xl={8}>
-              <Form.Item<FieldType> label="站点Logo" name="logoImageId">
-                <ImageWall fileList={getFile()} />
+              <Form.Item<FieldType> label="店铺Logo" name="logoImageId">
+                <ImageWall
+                  fileList={getFile()}
+                  onChange={(fileList) => {
+                    const [first] = fileList;
+                    const file = first?.response?.data || {};
+                    setWebsiteLogo({ ...file });
+                  }}
+                />
               </Form.Item>
             </Col>
 
@@ -523,7 +480,7 @@ const SiteManagementPage = () => {
                   <>
                     {fields.map((field, index) => (
                       <Form.Item
-                        label={index === 0 ? '站点邮箱' : ''}
+                        label={index === 0 ? '店铺邮箱' : ''}
                         required={false}
                         key={field.key}
                       >
@@ -541,7 +498,7 @@ const SiteManagementPage = () => {
                             noStyle
                           >
                             <Input
-                              placeholder="请输入站点邮箱"
+                              placeholder="请输入店铺邮箱"
                               style={{ width: '100%' }}
                             />
                           </Form.Item>
@@ -577,7 +534,7 @@ const SiteManagementPage = () => {
                   <>
                     {fields.map((field, index) => (
                       <Form.Item
-                        label={index === 0 ? '站点联系电话' : ''}
+                        label={index === 0 ? '店铺联系电话' : ''}
                         required={false}
                         key={field.key}
                       >
@@ -595,7 +552,7 @@ const SiteManagementPage = () => {
                             noStyle
                           >
                             <Input
-                              placeholder="请输入站点联系电话"
+                              placeholder="请输入店铺联系电话"
                               style={{ width: '100%' }}
                             />
                           </Form.Item>

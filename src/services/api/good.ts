@@ -17,9 +17,9 @@ export async function postGoodCopyGoodToWebSite(
   });
 }
 
-/** 删除一条商品 POST /api/Good/DeleteGood */
+/** 批量删除商品 POST /api/Good/DeleteGood */
 export async function postGoodDeleteGood(
-  body: API.FBId,
+  body: API.FBIds,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/Good/DeleteGood', {
@@ -34,7 +34,7 @@ export async function postGoodDeleteGood(
 
 /** 删除商品分类 POST /api/Good/DeleteGoodCategory */
 export async function postGoodDeleteGoodCategory(
-  body: API.FBId,
+  body: API.FBIds,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/Good/DeleteGoodCategory', {
@@ -64,40 +64,10 @@ export async function postGoodDeleteGoodPartition(
 
 /** 删除商品标签 POST /api/Good/DeleteGoodTag */
 export async function postGoodDeleteGoodTag(
-  body: API.FBId,
+  body: API.FBIds,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/Good/DeleteGoodTag', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
-/** 编辑一个商品（goodId=0为新增，goodId>0为修改） POST /api/Good/EditGood */
-export async function postGoodEditGood(
-  body: API.FBGood,
-  options?: { [key: string]: any },
-) {
-  return request<API.REWebApiCallback>('/api/Good/EditGood', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
-/** 新增/修改商品标签 POST /api/Good/EditGoodTag */
-export async function postGoodEditGoodTag(
-  body: API.FBGoodTag,
-  options?: { [key: string]: any },
-) {
-  return request<API.REWebApiCallback>('/api/Good/EditGoodTag', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -150,6 +120,21 @@ export async function getGoodGetGoodCategoryList(
       page: '1',
       // count has a default value: 20
       count: '20',
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 根据父类查询所有子类 GET /api/Good/GetGoodCategoryListParent */
+export async function getGoodGetGoodCategoryListParent(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getGoodGetGoodCategoryListParentParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/Good/GetGoodCategoryListParent', {
+    method: 'GET',
+    params: {
       ...params,
     },
     ...(options || {}),
@@ -288,6 +273,21 @@ export async function postGoodInsertGoodPublic(
   });
 }
 
+/** 编辑一个商品（goodId=0为新增，goodId>0为修改） POST /api/Good/SaveGood */
+export async function postGoodSaveGood(
+  body: API.FBGood,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/Good/SaveGood', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 新增/修改商品分类 POST /api/Good/SaveGoodCategory */
 export async function postGoodSaveGoodCategory(
   body: API.FBGoodCategory,
@@ -309,6 +309,21 @@ export async function postGoodSaveGoodPartition(
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/Good/SaveGoodPartition', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** 新增/修改商品标签 POST /api/Good/SaveGoodTag */
+export async function postGoodSaveGoodTag(
+  body: API.FBGoodTag,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/Good/SaveGoodTag', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

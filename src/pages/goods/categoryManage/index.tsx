@@ -1,23 +1,28 @@
 import { Image, ImageWall } from '@/components';
+import {
+  getGoodGetGoodCategoryList,
+  getGoodGetGoodCategoryListParent,
+  postGoodHotGoodCategory,
+} from '@/services/api/good';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import {
   Button,
+  Cascader,
   Form,
   Input,
   message,
   Modal,
   Radio,
-  Select,
   Space,
   Tag,
 } from 'antd';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface TableItem {
   goodCategoryId: number;
-  categoryname: string;
+  categoryName: string;
   parentId: number;
   image: {
     imgSrc: string;
@@ -29,11 +34,18 @@ interface TableItem {
 
 type FileType = {
   goodCategoryId: number;
-  categoryname: string;
+  categoryName: string;
   parentId: number;
   imageId: string;
   isHot: boolean;
   image: Record<string, string>[];
+};
+
+type CategoryOptionItem = {
+  value: string;
+  label: string;
+  isLeaf: boolean;
+  children: CategoryOptionItem[];
 };
 
 export default () => {
@@ -49,9 +61,47 @@ export default () => {
   const [dialog, setDialog] = useState(false);
   const [category, setCategory] = useState<TableItem[]>([]);
 
-  const [categoryList, setCategoryList] = useState<TableItem[]>([]);
+  const [categoryOptionList, setCategoryOptionList] = useState<
+    CategoryOptionItem[]
+  >([]);
   const [categoryImage, setCategoryImage] = useState<{ url: string }[]>([]);
   const [goodCategoryId, setGoodCategoryId] = useState<number>(0);
+
+  const handleCateOption = async (parentId: number = 0, level: number = 0) => {
+    const { data } = await getGoodGetGoodCategoryListParent({
+      parentId,
+    });
+    setCategoryOptionList((state) =>
+      [...state, ...data].map((item) => ({
+        value: item.goodCategoryId,
+        label: item.categoryName,
+        children: [],
+        level,
+        isLeaf: level === 1,
+      })),
+    );
+  };
+
+  useEffect(() => {
+    handleCateOption();
+  }, []);
+
+  // 上热门
+  const handleHotGoodCategory = async (
+    category: TableItem[],
+    isHot: boolean,
+  ) => {
+    const ids = category.map((item) => item.goodCategoryId);
+    const params = {
+      ids,
+      isHot,
+    };
+    try {
+      await postGoodHotGoodCategory(params);
+      messageApi.success(isHot ? '上热门成功' : '下热门成功');
+      actionRef.current?.reload();
+    } catch (error) {}
+  };
 
   const columns: ProColumns<TableItem>[] = [
     {
@@ -63,18 +113,23 @@ export default () => {
       title: 'ID',
       dataIndex: 'goodCategoryId',
       search: false,
+      width: 100,
     },
     {
       title: '图片',
       dataIndex: 'imageId',
       search: false,
       render: (_, record) => {
-        return <Image src={record.image.imgSrc} />;
+        return record?.image?.imgSrc ? (
+          <Image src={record.image.imgSrc} />
+        ) : (
+          '-'
+        );
       },
     },
     {
       title: '名称',
-      dataIndex: 'categoryname',
+      dataIndex: 'categoryName',
       search: true,
     },
     {
@@ -106,13 +161,23 @@ export default () => {
           <a key="edit" onClick={() => {}}>
             编辑
           </a>,
-          record.isHot && (
-            <a key="upHot" onClick={() => {}}>
+          !record.isHot && (
+            <a
+              key="upHot"
+              onClick={() => {
+                handleHotGoodCategory([record], true);
+              }}
+            >
               上热门
             </a>
           ),
-          !record.isHot && (
-            <a key="downHot" onClick={() => {}}>
+          record.isHot && (
+            <a
+              key="downHot"
+              onClick={() => {
+                handleHotGoodCategory([record], false);
+              }}
+            >
               下热门
             </a>
           ),
@@ -149,10 +214,19 @@ export default () => {
           );
         }}
         request={async (params) => {
+          const searchParams = {
+            page: params.current,
+            count: params.pageSize,
+            categoryName: params.categoryName,
+          } as Record<string, any>;
+          const { data } = await getGoodGetGoodCategoryList(searchParams);
+
+          const { list = [], total } = data;
+
           return {
-            data: [],
+            data: list,
             success: true,
-            total: 0,
+            total,
           };
         }}
         rowKey="goodCategoryId"
@@ -202,7 +276,7 @@ export default () => {
         >
           <Form.Item<FileType>
             label="分类名称"
-            name="categoryname"
+            name="categoryName"
             rules={[{ required: true, message: '请输入分类名称' }]}
           >
             <Input placeholder="请输入分类名称" />
@@ -212,7 +286,7 @@ export default () => {
             name="parentId"
             rules={[{ required: true, message: '请选择父级Id' }]}
           >
-            <Select placeholder="请选择父级Id" options={categoryList} />
+            <Cascader placeholder="请选择父级Id" options={categoryOptionList} />
           </Form.Item>
           <Form.Item<FileType>
             label="是否热门"

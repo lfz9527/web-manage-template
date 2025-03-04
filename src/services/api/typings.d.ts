@@ -60,6 +60,7 @@ declare namespace API {
     startTime?: string;
     endTime?: string;
     expireDay?: number;
+    expireType?: number;
     dealsNote?: string;
     isShelves?: boolean;
     isHot?: boolean;
@@ -479,6 +480,10 @@ declare namespace API {
     count?: number;
   };
 
+  type getGoodGetGoodCategoryListParentParams = {
+    parentId?: number;
+  };
+
   type getGoodGetGoodListParams = {
     title?: string;
     orderBy?: string;
@@ -575,8 +580,7 @@ declare namespace API {
   };
 
   type getShopSiteGetShopSiteListParams = {
-    /** 站点名 */
-    name?: string;
+    shopSiteName?: string;
     page?: number;
     count?: number;
   };

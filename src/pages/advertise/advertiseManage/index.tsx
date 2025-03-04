@@ -23,7 +23,7 @@ import {
 } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 
-type GithubIssueItem = {
+type TableItem = {
   posterId: string;
   posterImage: {
     imgSrc: string;
@@ -76,14 +76,11 @@ export default () => {
     }[]
   >([]);
 
-  const [selectedRows, setSelectedRows] = useState<GithubIssueItem[]>([]);
+  const [selectedRows, setSelectedRows] = useState<TableItem[]>([]);
 
   // 状态变化
   // 上架，下架
-  const handleStatusChange = async (
-    poster: GithubIssueItem[],
-    isOnline: boolean,
-  ) => {
+  const handleStatusChange = async (poster: TableItem[], isOnline: boolean) => {
     const message = isOnline ? '上架' : '下架';
     const names = poster.map((item) => item.posterTitle).join(',');
     const ids = poster.map((item) => Number(item.posterId));
@@ -92,7 +89,6 @@ export default () => {
       ids,
       state: isOnline,
     };
-    console.log(params);
 
     modal.confirm({
       title: `确定${message}广告：${names}吗？`,
@@ -106,7 +102,7 @@ export default () => {
   };
 
   // 删除广告
-  const handleDelete = async (poster: GithubIssueItem[]) => {
+  const handleDelete = async (poster: TableItem[]) => {
     const names = poster.map((item) => item.posterTitle).join(',');
     const ids = poster.map((item) => Number(item.posterId));
 
@@ -121,7 +117,7 @@ export default () => {
     });
   };
 
-  const columns: ProColumns<GithubIssueItem>[] = [
+  const columns: ProColumns<TableItem>[] = [
     {
       dataIndex: 'index',
       valueType: 'indexBorder',
@@ -219,12 +215,10 @@ export default () => {
 
   // 获取站点列表
   const getWebSiteList = async () => {
-    const data = (await getWebSiteGetWebSiteList({
+    const { data } = await getWebSiteGetWebSiteList({
       page: 1,
       count: 500,
-    })) as {
-      list: WebSiteItem[];
-    };
+    });
     const listData: WebSiteItem[] = data.list;
     setWebSiteList(
       listData.map((item: WebSiteItem) => {
@@ -302,7 +296,7 @@ export default () => {
   return (
     <>
       {messageContextHolder}
-      <ProTable<GithubIssueItem>
+      <ProTable<TableItem>
         columns={columns}
         actionRef={actionRef}
         cardBordered

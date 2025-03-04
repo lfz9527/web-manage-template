@@ -2,27 +2,12 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
-/** 删除一条优惠券 POST /api/Deals/DeleteDeals */
+/** 删除优惠券 POST /api/Deals/DeleteDeals */
 export async function postDealsDeleteDeals(
-  body: API.FBId,
+  body: API.FBIds,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/Deals/DeleteDeals', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
-/** 编辑一个优惠券（dealsId=0为新增，dealsId>0为修改） POST /api/Deals/EditDeals */
-export async function postDealsEditDeals(
-  body: API.FBDeals,
-  options?: { [key: string]: any },
-) {
-  return request<API.REWebApiCallback>('/api/Deals/EditDeals', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -66,6 +51,16 @@ export async function getDealsGetDealsById(
   });
 }
 
+/** 查询优惠券过期时间类型列表 GET /api/Deals/GetDealsExpireTypeList */
+export async function getDealsGetDealsExpireTypeList(options?: {
+  [key: string]: any;
+}) {
+  return request<API.REWebApiCallback>('/api/Deals/GetDealsExpireTypeList', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
 /** 后台查询优惠券列表 GET /api/Deals/GetDealsList */
 export async function getDealsGetDealsList(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
@@ -104,6 +99,16 @@ export async function getDealsGetDealsListPublic(
   });
 }
 
+/** 查询优惠券类型列表 GET /api/Deals/GetDealsTypeList */
+export async function getDealsGetDealsTypeList(options?: {
+  [key: string]: any;
+}) {
+  return request<API.REWebApiCallback>('/api/Deals/GetDealsTypeList', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
 /** 优惠券上下热门 POST /api/Deals/HotDeals */
 export async function postDealsHotDeals(
   body: API.FBHot,
@@ -125,6 +130,21 @@ export async function postDealsInsertDealJoin(
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/Deals/InsertDealJoin', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** 编辑一个优惠券（dealsId=0为新增，dealsId>0为修改） POST /api/Deals/SaveDeals */
+export async function postDealsSaveDeals(
+  body: API.FBDeals,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/Deals/SaveDeals', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

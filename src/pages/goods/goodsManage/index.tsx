@@ -152,7 +152,7 @@ export default () => {
       title: `确定删除名字：${names} 的商品吗？`,
       centered: true,
       onOk: async () => {
-        await postGoodDeleteGood({ id });
+        await postGoodDeleteGood({ ids: [id] });
         messageApi.success(`删除成功`);
         actionRef.current?.reload();
       },

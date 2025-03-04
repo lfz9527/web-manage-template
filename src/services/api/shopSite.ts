@@ -2,27 +2,12 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
-/** 删除单个站点 POST /api/ShopSite/DeleteShopSite */
+/** 删除站点 POST /api/ShopSite/DeleteShopSite */
 export async function postShopSiteDeleteShopSite(
-  body: API.FBId,
+  body: API.FBIds,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/ShopSite/DeleteShopSite', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
-/** 编辑站点信息[传id为修改，不传id为新增] POST /api/ShopSite/EditShopSite */
-export async function postShopSiteEditShopSite(
-  body: API.FBShopSite,
-  options?: { [key: string]: any },
-) {
-  return request<API.REWebApiCallback>('/api/ShopSite/EditShopSite', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -91,6 +76,21 @@ export async function postShopSiteInsertShopSiteJoin(
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/ShopSite/InsertShopSiteJoin', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** 编辑站点信息[传id为修改，不传id为新增] POST /api/ShopSite/SaveShopSite */
+export async function postShopSiteSaveShopSite(
+  body: API.FBShopSite,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/ShopSite/SaveShopSite', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -1,7 +1,6 @@
-import ImageWall from '@/components/ImageWall';
-import PageFooter from '@/components/PageFooter';
+import { ImageWall, PageFooter } from '@/components';
 import { getBrandGetBrandList } from '@/services/api/brand';
-import { getGoodGetGoodById, postGoodEditGoodTag } from '@/services/api/good';
+import { getGoodGetGoodById, postGoodSaveGoodTag } from '@/services/api/good';
 import { getShopSiteGetShopSiteList } from '@/services/api/shopSite';
 import { getWebSiteGetWebSiteList } from '@/services/api/webSite';
 import { history, useParams } from '@umijs/max';
@@ -73,9 +72,9 @@ export default () => {
   const [brandList, setBrandList] = useState<OptionType[]>([]);
 
   // 获取站点列表
-  const getShopSiteList = async (name: string = '') => {
+  const getShopSiteList = async (shopSiteName: string = '') => {
     const { data } = await getShopSiteGetShopSiteList({
-      name,
+      shopSiteName,
       page: 1,
       count: 5000,
     });
@@ -175,7 +174,7 @@ export default () => {
 
   // 添加标签
   const addTag = async (tagName: string) => {
-    const { data } = await postGoodEditGoodTag({
+    const { data } = await postGoodSaveGoodTag({
       goodTagId: 0,
       tagName,
     });

@@ -60,7 +60,7 @@ const routes = [
     ],
   },
   {
-    name: '站点管理',
+    name: '店铺管理',
     path: '/sites',
     icon: 'ReconciliationFilled',
     component: '@/pages/sites/sitesManage',
@@ -81,7 +81,31 @@ const routes = [
     name: '优惠券管理',
     path: '/deals',
     icon: 'MoneyCollectFilled',
-    component: '@/pages/deals/dealsManage',
+    routes: [
+      {
+        path: '/deals', // 修改为父级路径
+        exact: true, // 添加精确匹配
+        redirect: '/deals/dealsManage', // 重定向到实际页面
+      },
+      {
+        path: '/deals/dealsManage', // 修改主路径
+        name: '优惠券管理',
+        component: '@/pages/deals/dealsManage',
+        hideInMenu: true,
+      },
+      {
+        path: '/deals/update/:id',
+        name: '优惠券更新',
+        component: '@/pages/deals/dealsManage/update',
+        hideInMenu: true,
+      },
+      {
+        path: '/deals/create',
+        name: '新增优惠券',
+        component: '@/pages/deals/dealsManage/update',
+        hideInMenu: true,
+      },
+    ],
   },
   {
     name: '商品管理',

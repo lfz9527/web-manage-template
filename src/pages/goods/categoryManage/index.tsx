@@ -1,8 +1,11 @@
 import { Image, ImageWall } from '@/components';
 import {
+  getGoodGetGoodCategoryById,
   getGoodGetGoodCategoryList,
   getGoodGetGoodCategoryListParent,
+  postGoodDeleteGoodCategory,
   postGoodHotGoodCategory,
+  postGoodSaveGoodCategory,
 } from '@/services/api/good';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
@@ -26,9 +29,11 @@ interface TableItem {
   parentId: number;
   image: {
     imgSrc: string;
+    imageId: number;
   };
   isHot: boolean;
   goodCount: number;
+  isAdult: boolean;
   createTime: string;
 }
 
@@ -38,7 +43,7 @@ type FileType = {
   parentId: number;
   imageId: string;
   isHot: boolean;
-  image: Record<string, string>[];
+  isAdult: boolean;
 };
 
 type CategoryOptionItem = {
@@ -59,31 +64,48 @@ export default () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState(false);
+
+  // 当前选择/编辑的分类
   const [category, setCategory] = useState<TableItem[]>([]);
 
-  const [categoryOptionList, setCategoryOptionList] = useState<
-    CategoryOptionItem[]
+  // 分类选项
+  const [cateOptList, setCateOptList] = useState<CategoryOptionItem[]>([]);
+  // 分类图片
+  const [categoryImage, setCategoryImage] = useState<
+    { url: string; id: string }[]
   >([]);
-  const [categoryImage, setCategoryImage] = useState<{ url: string }[]>([]);
-  const [goodCategoryId, setGoodCategoryId] = useState<number>(0);
 
-  const handleCateOption = async (parentId: number = 0, level: number = 0) => {
+  // 获取分类选项
+  const fetchCateOptList = async (
+    parentId: number = 0,
+    isLeaf: boolean = false,
+  ): Promise<CategoryOptionItem[]> => {
     const { data } = await getGoodGetGoodCategoryListParent({
       parentId,
     });
-    setCategoryOptionList((state) =>
-      [...state, ...data].map((item) => ({
-        value: item.goodCategoryId,
-        label: item.categoryName,
-        children: [],
-        level,
-        isLeaf: level === 1,
-      })),
-    );
+    return data.map((item: TableItem) => ({
+      value: item.goodCategoryId,
+      label: item.categoryName,
+      children: [],
+      isLeaf,
+    }));
+  };
+  // 初始化分类选项
+  const initCategoryOption = async () => {
+    const data = await fetchCateOptList(0, false);
+    setCateOptList(data);
+  };
+
+  // 获取分类详情
+  const fetchCategoryById = async (id: number) => {
+    const { data } = await getGoodGetGoodCategoryById({
+      id,
+    });
+    return data;
   };
 
   useEffect(() => {
-    handleCateOption();
+    initCategoryOption();
   }, []);
 
   // 上热门
@@ -103,6 +125,65 @@ export default () => {
     } catch (error) {}
   };
 
+  // 删除分类
+  const handleDeleteCategory = async (id: number) => {
+    try {
+      modal.confirm({
+        title: '提示',
+        content: '确定删除该分类吗？',
+        centered: true,
+        onOk: async () => {
+          await postGoodDeleteGoodCategory({ ids: [id] });
+          messageApi.success('删除成功');
+          actionRef.current?.reload();
+        },
+      });
+    } finally {
+    }
+  };
+
+  // 级联懒加载
+  const loadCateOption = async (selOption: CategoryOptionItem[]) => {
+    const targetOption = selOption[selOption.length - 1];
+    const parentId = targetOption.value;
+    const data = await fetchCateOptList(Number(parentId), true);
+    targetOption.children = data;
+    targetOption.isLeaf = data.length === 0 || !data;
+    setCateOptList([...cateOptList]);
+  };
+
+  const editCategory = async (category: TableItem) => {
+    setCategory([category]);
+    setDialog(true);
+
+    // 获取爷爷级分类
+    const { parentId: grandParentId } = await fetchCategoryById(
+      category.parentId,
+    );
+
+    form.setFieldsValue({
+      categoryName: category.categoryName,
+      parentId: [grandParentId, category.parentId].filter(Boolean),
+      isHot: category.isHot,
+      isAdult: category.isAdult,
+      imageId: category.image.imageId,
+    });
+    // 回显分类图片
+    setCategoryImage([
+      {
+        url: category.image.imgSrc,
+        id: category.image.imageId.toString(),
+      },
+    ]);
+    // 懒加载回显
+    const targetOption = cateOptList.find(
+      (option) => option.value === grandParentId,
+    );
+    if (targetOption) {
+      loadCateOption([targetOption]);
+    }
+  };
+
   const columns: ProColumns<TableItem>[] = [
     {
       dataIndex: 'index',
@@ -116,7 +197,7 @@ export default () => {
       width: 100,
     },
     {
-      title: '图片',
+      title: '分类图片',
       dataIndex: 'imageId',
       search: false,
       render: (_, record) => {
@@ -138,8 +219,18 @@ export default () => {
       search: true,
     },
     {
+      title: '是否成人用品',
+      dataIndex: 'isAdult',
+      search: false,
+      width: 200,
+      render: (_, record) => {
+        return record.isAdult ? <Tag color="red">是</Tag> : <Tag>否</Tag>;
+      },
+    },
+    {
       title: '是否热门',
       dataIndex: 'isHot',
+      width: 200,
       search: false,
       render: (_, record) => {
         return record.isHot ? <Tag color="red">是</Tag> : '';
@@ -158,7 +249,12 @@ export default () => {
       ellipsis: true,
       render: (_, record) =>
         [
-          <a key="edit" onClick={() => {}}>
+          <a
+            key="edit"
+            onClick={() => {
+              editCategory(record);
+            }}
+          >
             编辑
           </a>,
           !record.isHot && (
@@ -181,7 +277,13 @@ export default () => {
               下热门
             </a>
           ),
-          <a key="delete" style={{ color: 'red' }} onClick={() => {}}>
+          <a
+            key="delete"
+            style={{ color: 'red' }}
+            onClick={() => {
+              handleDeleteCategory(record.goodCategoryId);
+            }}
+          >
             删除
           </a>,
         ].filter(Boolean),
@@ -191,11 +293,38 @@ export default () => {
   // 重置表单
   const resetForm = () => {
     form.resetFields();
+    setCategory([]);
+    setCategoryImage([]);
   };
 
   // 提交表单
-  const handleSubmit = (values: any) => {
-    console.log(values);
+  const handleSubmit = async (values: any) => {
+    const { imageId, parentId } = values;
+
+    if (!imageId) {
+      form.setFields([{ name: 'imageId' }]);
+      return;
+    }
+    const [first] = categoryImage;
+    setLoading(true);
+    const params = {
+      ...values,
+      goodCategoryId: category[0]?.goodCategoryId || 0,
+      categoryName: values.categoryName,
+      parentId: parentId[parentId.length - 1],
+      isHot: values.isHot,
+      imageId: first.id,
+    };
+
+    console.log(params);
+    try {
+      await postGoodSaveGoodCategory(params);
+      messageApi.success('保存成功');
+      setDialog(false);
+      actionRef.current?.reload();
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -205,11 +334,28 @@ export default () => {
         actionRef={actionRef}
         cardBordered
         rowSelection={{}}
-        tableAlertOptionRender={() => {
+        tableAlertOptionRender={({
+          selectedRowKeys,
+          selectedRows,
+          onCleanSelected,
+        }) => {
+          setSelectedRows(selectedRows);
           return (
             <Space size={16}>
-              <a onClick={() => {}}>批量上热门</a>
-              <a onClick={() => {}}>批量下热门</a>
+              <a
+                onClick={() => {
+                  handleHotGoodCategory(selectedRows, true);
+                }}
+              >
+                批量上热门
+              </a>
+              <a
+                onClick={() => {
+                  handleHotGoodCategory(selectedRows, false);
+                }}
+              >
+                批量下热门
+              </a>
             </Space>
           );
         }}
@@ -220,9 +366,7 @@ export default () => {
             parentId: params.parentId,
           } as Record<string, any>;
           const { data } = await getGoodGetGoodCategoryList(searchParams);
-
           const { list = [], total } = data;
-
           return {
             data: list,
             success: true,
@@ -253,7 +397,7 @@ export default () => {
       />
 
       <Modal
-        title={goodCategoryId ? '编辑分类' : '新增分类'}
+        title={category[0]?.goodCategoryId ? '编辑分类' : '新增分类'}
         centered
         open={dialog}
         onOk={() => {
@@ -271,6 +415,7 @@ export default () => {
           onFinish={handleSubmit}
           labelAlign="left"
           initialValues={{
+            isAdult: false,
             isHot: false,
           }}
         >
@@ -282,11 +427,15 @@ export default () => {
             <Input placeholder="请输入分类名称" />
           </Form.Item>
           <Form.Item<FileType>
-            label="父级Id"
+            label="父级分类"
             name="parentId"
-            rules={[{ required: true, message: '请选择父级Id' }]}
+            rules={[{ required: true, message: '请选择父级分类' }]}
           >
-            <Cascader placeholder="请选择父级Id" options={categoryOptionList} />
+            <Cascader
+              placeholder="请选择父级分类"
+              options={cateOptList}
+              loadData={loadCateOption}
+            />
           </Form.Item>
           <Form.Item<FileType>
             label="是否热门"
@@ -299,11 +448,34 @@ export default () => {
             </Radio.Group>
           </Form.Item>
           <Form.Item<FileType>
-            label="图片"
-            name="image"
-            rules={[{ required: true, message: '请选择图片' }]}
+            label="是否成人用品"
+            name="isAdult"
+            rules={[{ required: true, message: '请选择是否成人用品' }]}
           >
-            <ImageWall fileList={categoryImage} maxCount={1} />
+            <Radio.Group>
+              <Radio value={true}>是</Radio>
+              <Radio value={false}>否</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item<FileType>
+            label="分类图片"
+            name="imageId"
+            rules={[{ required: true, message: '请上传分类图片' }]}
+          >
+            <ImageWall
+              fileList={categoryImage}
+              maxCount={1}
+              onChange={(files) => {
+                const fileList = files.map((item) => {
+                  const file = item.response.data;
+                  return {
+                    url: file.url,
+                    id: file.imageId,
+                  };
+                });
+                setCategoryImage(fileList);
+              }}
+            />
           </Form.Item>
         </Form>
       </Modal>

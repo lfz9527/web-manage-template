@@ -26,6 +26,7 @@ type TableItem = {
   price: string;
   goodCategory: {
     categoryName: string;
+    isAdult: boolean;
   };
   goodCategoryId: boolean;
   brandId: string;
@@ -252,6 +253,18 @@ export default () => {
       title: '支持数',
       dataIndex: 'topCount',
       search: false,
+    },
+    {
+      title: '是否成人用品',
+      dataIndex: ['goodCategory`', 'isAdult'],
+      search: false,
+      render: (_, record) => {
+        return record.goodCategory.isAdult ? (
+          <Tag color="red">是</Tag>
+        ) : (
+          <Tag>否</Tag>
+        );
+      },
     },
     {
       title: '反对数',

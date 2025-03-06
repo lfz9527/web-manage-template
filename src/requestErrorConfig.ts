@@ -1,7 +1,6 @@
-import { AUTO_LOGIN_KEY, CURRENT_SITE_ID, LOGIN_PATH } from '@/enum';
-import { getToken, logger, removeToken, setToken } from '@/utils';
+import { CURRENT_SITE_ID } from '@/enum';
+import { getToken, logger, logoutFn, setToken } from '@/utils';
 import type { RequestConfig } from '@umijs/max';
-import { history } from '@umijs/max';
 import { message } from 'antd';
 
 // 与后端约定的响应数据格式
@@ -16,13 +15,6 @@ type ResponseData = {
 
 const isSuccess = (code: number) => {
   return code === 10000;
-};
-
-// 退出登录
-const handleLogout = () => {
-  removeToken();
-  localStorage.removeItem(AUTO_LOGIN_KEY);
-  history.push(LOGIN_PATH);
 };
 
 const errorThrower = (res: ResponseStructure) => {
@@ -44,7 +36,7 @@ const errorHandle = (response: ResponseData) => {
     let messageContent = '';
     switch (code) {
       case 10402:
-        handleLogout();
+        logoutFn();
         messageContent = msg || '请重新登录';
         logger.error(messageContent);
         break;
@@ -91,6 +83,8 @@ export const errorConfig: RequestConfig = {
       authorSite(config);
       if (token) {
         headers['Authorization'] = 'Bearer ' + token;
+      } else {
+        logoutFn();
       }
       return config;
     },

@@ -31,12 +31,12 @@ export async function getInitialState(): Promise<InitialStateType> {
 
   if (location.pathname !== LOGIN_PATH) {
     const data = await fetchUserInfo();
-    const { nickName, headImage, id } = data as Record<string, any>;
+    const { nickName, headImage, userId } = data as Record<string, any>;
     const url = headImage?.imgSrc;
     return {
       name: nickName,
       avatar: url,
-      id,
+      id: userId,
     };
   }
   return {

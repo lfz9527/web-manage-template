@@ -1,10 +1,15 @@
-import { ImageWall } from '@/components';
-import { getGoodAlbumGetGoodAlbumList } from '@/services/api/goodAlbum';
-import { PlusOutlined } from '@ant-design/icons';
+import {
+  getGoodAlbumGetGoodAlbumById,
+  getGoodAlbumGetGoodAlbumList,
+  postGoodAlbumDeleteGoodAlbum,
+  postGoodAlbumPrivateGoodAlbum,
+  postGoodAlbumSaveGoodAlbum,
+} from '@/services/api/goodAlbum';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Button, Form, Input, message, Modal, Radio, Space, Tag } from 'antd';
-import { useRef, useState } from 'react';
+import { useModel } from '@umijs/max'; // 添加这行引入
+import { Form, Input, message, Modal, Radio, Space, Tag } from 'antd';
+import { useEffect, useRef, useState } from 'react';
 
 interface TableItem {
   goodAlbumId: number;
@@ -28,17 +33,66 @@ type FileType = {
 };
 
 export default () => {
+  const { initialState } = useModel('@@initialState');
   const actionRef = useRef<ActionType>();
   const [modal, contextHolder] = Modal.useModal();
   const [messageApi, messageContextHolder] = message.useMessage();
-
-  const [selectedRows, setSelectedRows] = useState<TableItem[]>([]);
-
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState(false);
 
   const [goodAlbumId, setGoodAlbumId] = useState<number>(0);
+
+  const getGoodAlbumById = async () => {
+    const { data } = await getGoodAlbumGetGoodAlbumById({ id: goodAlbumId });
+    form.setFieldsValue(data);
+  };
+
+  useEffect(() => {
+    if (goodAlbumId > 0 && goodAlbumId) {
+      getGoodAlbumById();
+    }
+  }, [goodAlbumId]);
+
+  // 编辑专辑
+  const handleEditAlbum = (id: number) => {
+    setGoodAlbumId(id);
+    setDialog(true);
+  };
+
+  // 删除专辑
+  const handleDeleteAlbum = (goodAlbum: TableItem[]) => {
+    const ids = goodAlbum.map((item) => item.goodAlbumId);
+
+    modal.confirm({
+      title: '确定删除该专辑吗？',
+      centered: true,
+      onOk: async () => {
+        try {
+          await postGoodAlbumDeleteGoodAlbum({ ids });
+          messageApi.success('删除成功');
+          actionRef.current?.reload();
+        } catch (error) {
+          messageApi.error('删除失败');
+        }
+      },
+    });
+  };
+
+  // 专辑状态管理
+  const albumStatusChange = async (
+    goodAlbum: TableItem[],
+    isPrivate: boolean,
+  ) => {
+    const ids = goodAlbum.map((item) => item.goodAlbumId);
+    try {
+      await postGoodAlbumPrivateGoodAlbum({ ids, state: isPrivate });
+      messageApi.success('操作成功');
+      actionRef.current?.reload();
+    } catch (error) {
+      messageApi.error('操作失败');
+    }
+  };
 
   const columns: ProColumns<TableItem>[] = [
     {
@@ -102,10 +156,22 @@ export default () => {
       key: 'option',
       render: (_, record) =>
         [
-          <a key="edit">编辑</a>,
-          record.isPrivate && <a key="public">公开</a>,
-          !record.isPrivate && <a key="private">私密</a>,
-          <a key="delete">删除</a>,
+          <a key="edit" onClick={() => handleEditAlbum(record.goodAlbumId)}>
+            编辑
+          </a>,
+          <a
+            key="public"
+            onClick={() => albumStatusChange([record], !record.isPrivate)}
+          >
+            {record.isPrivate ? '公开' : '私密'}
+          </a>,
+          <a
+            key="delete"
+            style={{ color: '#f00' }}
+            onClick={() => handleDeleteAlbum([record])}
+          >
+            删除
+          </a>,
         ].filter(Boolean),
     },
   ];
@@ -115,8 +181,21 @@ export default () => {
     setGoodAlbumId(0);
   };
 
-  const handleSubmit = (values: any) => {
-    console.log(values);
+  const handleSubmit = async (values: FileType) => {
+    try {
+      setLoading(true);
+      const params = {
+        ...values,
+        userId: initialState?.id,
+        goodAlbumId: goodAlbumId,
+      };
+      await postGoodAlbumSaveGoodAlbum(params);
+      messageApi.success('保存成功');
+      actionRef.current?.reload();
+      setDialog(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -126,11 +205,23 @@ export default () => {
         actionRef={actionRef}
         cardBordered
         rowSelection={{}}
-        tableAlertOptionRender={() => {
+        tableAlertOptionRender={({ selectedRows }) => {
           return (
             <Space size={16}>
-              <a onClick={() => {}}>批量上热门</a>
-              <a onClick={() => {}}>批量下热门</a>
+              <a
+                onClick={() => {
+                  albumStatusChange(selectedRows, true);
+                }}
+              >
+                批量公开
+              </a>
+              <a
+                onClick={() => {
+                  albumStatusChange(selectedRows, false);
+                }}
+              >
+                批量私密
+              </a>
             </Space>
           );
         }}
@@ -149,7 +240,7 @@ export default () => {
         }}
         rowKey="goodAlbumId"
         pagination={{
-          pageSize: 10,
+          pageSize: 20,
           showSizeChanger: true,
           showQuickJumper: true,
           pageSizeOptions: ['10', '20', '50', '100'],
@@ -159,16 +250,6 @@ export default () => {
         }}
         search={false}
         dateFormatter="string"
-        toolBarRender={() => [
-          <Button
-            key="button"
-            icon={<PlusOutlined />}
-            onClick={() => setDialog(true)}
-            type="primary"
-          >
-            新增
-          </Button>,
-        ]}
       />
 
       <Modal
@@ -200,11 +281,7 @@ export default () => {
           >
             <Input placeholder="请输入专辑名称" />
           </Form.Item>
-          <Form.Item<FileType>
-            label="专辑描述"
-            name="albumDescribe"
-            rules={[{ required: true, message: '请输入专辑名称' }]}
-          >
+          <Form.Item<FileType> label="专辑描述" name="albumDescribe">
             <Input.TextArea placeholder="请输入专辑描述" rows={4} />
           </Form.Item>
           <Form.Item<FileType>
@@ -217,11 +294,10 @@ export default () => {
               <Radio value={false}>否</Radio>
             </Radio.Group>
           </Form.Item>
-          <Form.Item<FileType> label="封面图片" name="faceImageIds">
-            <ImageWall />
-          </Form.Item>
         </Form>
       </Modal>
+      {messageContextHolder}
+      {contextHolder}
     </>
   );
 };

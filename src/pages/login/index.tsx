@@ -53,14 +53,14 @@ export default () => {
       localStorage.removeItem(AUTO_LOGIN_KEY);
     }
     const { data } = await getUserGetUserForPublic({});
-    const { nickName, headImage, id } = data;
+    const { nickName, headImage, userId } = data;
     const url = headImage?.imgSrc;
 
     // 更新用户信息
     setInitialState({
       name: nickName || '管理员',
       avatar: url,
-      id: id,
+      id: userId,
     });
     history.push('/');
   };

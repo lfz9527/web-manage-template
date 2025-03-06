@@ -1,8 +1,9 @@
 import { Image } from '@/components';
+import { getGoodAlbumGetGoodPostList } from '@/services/api/goodAlbum';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { message, Space } from 'antd';
-import { useRef, useState } from 'react';
+import { message, Space, Tag } from 'antd';
+import { useRef } from 'react';
 
 interface TableItem {
   goodPostId: string;
@@ -11,8 +12,10 @@ interface TableItem {
   };
   goodTitle: string;
   goodPrice: string;
-  images: {
-    imgSrc: string;
+  goodPostImages: {
+    image: {
+      imgSrc: string;
+    };
   }[];
   content: string;
   isHot: boolean;
@@ -26,8 +29,9 @@ interface TableItem {
 export default () => {
   const actionRef = useRef<ActionType>();
   const [messageApi, messageContextHolder] = message.useMessage();
-
-  const [selectedRows, setSelectedRows] = useState<TableItem[]>([]);
+  const handleHot = (record: TableItem) => {
+    console.log(record);
+  };
 
   const columns: ProColumns<TableItem>[] = [
     {
@@ -36,22 +40,16 @@ export default () => {
       width: 48,
     },
     {
-      title: 'ID',
-      dataIndex: 'goodAlbumId',
-      search: false,
-    },
-    {
       title: '用户名',
-      dataIndex: 'user',
+      dataIndex: ['user', 'nickName'],
       search: false,
-      render: (_, record) => {
-        return record.user.nickName;
-      },
     },
     {
       title: '商品标题',
       dataIndex: 'goodTitle',
       search: false,
+      width: 300,
+      ellipsis: true,
     },
     {
       title: '商品价格',
@@ -59,11 +57,11 @@ export default () => {
     },
     {
       title: '帖子图片',
-      dataIndex: 'images',
+      dataIndex: 'goodPostImages',
       search: false,
       render: (_, record) => {
-        return record.images.map((item) => {
-          return <Image src={item.imgSrc} key={item.imgSrc} />;
+        return record.goodPostImages.map((item) => {
+          return <Image src={item.image.imgSrc} key={item.image.imgSrc} />;
         });
       },
     },
@@ -71,16 +69,21 @@ export default () => {
       title: '帖子描述',
       dataIndex: 'content',
       search: false,
-      width: 300,
+      width: 600,
     },
     {
       title: '是否热门',
       dataIndex: 'isHot',
       search: false,
+      render: (_, record) => {
+        return record.isHot ? <Tag color="red">是</Tag> : <Tag>否</Tag>;
+      },
     },
     {
       title: '上热门时间',
       dataIndex: 'hotTime',
+      valueType: 'dateTime',
+      width: 150,
       search: false,
     },
     {
@@ -101,6 +104,8 @@ export default () => {
     {
       title: '创建时间',
       dataIndex: 'createTime',
+      valueType: 'dateTime',
+      width: 150,
       search: false,
     },
     {
@@ -109,9 +114,10 @@ export default () => {
       key: 'option',
       render: (_, record) =>
         [
-          record.isHot && <a key="public">下热门</a>,
-          !record.isHot && <a key="private">上热门</a>,
-          <a key="delete">删除</a>,
+          <a key="public">{record.isHot ? '下热门' : '上热门'}</a>,
+          <a key="delete" style={{ color: '#f00' }}>
+            删除
+          </a>,
         ].filter(Boolean),
     },
   ];
@@ -132,10 +138,17 @@ export default () => {
           );
         }}
         request={async (params) => {
+          const { data } = await getGoodAlbumGetGoodPostList({
+            page: params.current,
+            count: params.pageSize,
+            ...params,
+          });
+          const { list, total } = data;
+
           return {
-            data: [],
+            data: list,
             success: true,
-            total: 0,
+            total,
           };
         }}
         rowKey="goodPostId"

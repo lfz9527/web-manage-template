@@ -1,5 +1,6 @@
 import Logo from '@/assets/icon/logo.svg';
 import { CURRENT_SITE_ID } from '@/enum';
+import { getWebSiteGetWebSiteList } from '@/services/api/webSite';
 import { logoutFn } from '@/utils';
 import { LogoutOutlined } from '@ant-design/icons';
 import type { HeaderProps } from '@ant-design/pro-layout';
@@ -21,10 +22,24 @@ export default (props: HeaderProps) => {
   const { initialState } = useModel('@@initialState');
   const { title } = props;
 
-  const [siteId, setSiteId] = useState<string>();
+  const [siteId, setSiteId] = useState<string>('all');
+  const [webSiteList, setWebSiteList] = useState<
+    { label: string; value: string }[]
+  >([{ label: '全部站点', value: 'all' }]);
+
+  const getWebSiteList = async () => {
+    const { data } = await getWebSiteGetWebSiteList({ page: 1, count: 100 });
+    const { list } = data;
+    const webSiteList = list.map((item: any) => ({
+      label: item.name,
+      value: item.webSiteId,
+    }));
+    setWebSiteList((state) => [...state, ...webSiteList]);
+  };
 
   useEffect(() => {
-    setSiteId(sessionStorage.getItem(CURRENT_SITE_ID) || '');
+    setSiteId(sessionStorage.getItem(CURRENT_SITE_ID) || 'all');
+    getWebSiteList();
   }, []);
 
   // 切换站点
@@ -36,17 +51,11 @@ export default (props: HeaderProps) => {
     history.push('/');
   };
 
-  // 退出登录
-  const handleLogout = () => {
-    logoutFn();
-  };
-
   const DropdownOnClick: MenuProps['onClick'] = ({ key }) => {
     if (key === 'logout') {
-      handleLogout();
+      logoutFn();
     }
   };
-
   return (
     <div className={styles['header-container']}>
       <div className={styles['header-left']}>
@@ -60,12 +69,12 @@ export default (props: HeaderProps) => {
           <Select
             placeholder="请选择站点"
             style={{ width: '100%' }}
-            value={siteId}
+            defaultValue={siteId}
             onChange={selectSite}
-            options={[
-              { label: '站群1', value: '1' },
-              { label: '站群2', value: '2' },
-            ]}
+            onSelect={(value) => {
+              console.log('onSelect triggered:', value);
+            }}
+            options={webSiteList}
           />
         </div>
       </div>

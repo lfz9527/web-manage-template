@@ -17,8 +17,10 @@ type WebSiteSettingValue = {
   webSite: {
     name: string;
   };
-  settingDescribe: string;
-  settingName: string;
+  webSiteSetting: {
+    settingName: string;
+    settingDescribe: string;
+  };
   settingValue: string;
 };
 
@@ -118,12 +120,12 @@ export default () => {
     },
     {
       title: '属性名称',
-      dataIndex: 'settingName',
+      dataIndex: ['webSiteSetting', 'settingName'],
       search: false,
     },
     {
       title: '属性说明',
-      dataIndex: 'settingDescribe',
+      dataIndex: ['webSiteSetting', 'settingDescribe'],
       search: false,
     },
     {

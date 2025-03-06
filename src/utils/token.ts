@@ -14,12 +14,10 @@ const removeToken = () => {
 };
 
 const logoutFn = () => {
-  if (!getToken()) {
-    removeToken();
-    sessionStorage.removeItem(CURRENT_SITE_ID);
-    history.push(LOGIN_PATH);
-    message.success('退出成功');
-  }
+  removeToken();
+  sessionStorage.removeItem(CURRENT_SITE_ID);
+  history.push(LOGIN_PATH);
+  message.success('退出成功');
 };
 
 export { getToken, logoutFn, removeToken, setToken };

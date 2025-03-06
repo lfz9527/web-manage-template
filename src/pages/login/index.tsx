@@ -1,4 +1,4 @@
-import { AUTO_LOGIN_KEY, CURRENT_SITE_ID } from '@/enum';
+import { AUTO_LOGIN_KEY } from '@/enum';
 import {
   getUserGetUserForPublic,
   postUserLoginByUserPwd,
@@ -26,7 +26,6 @@ export default () => {
 
   const [formRef] = Form.useForm();
   useEffect(() => {
-    sessionStorage.getItem(CURRENT_SITE_ID);
     const values = localStorage.getItem(AUTO_LOGIN_KEY);
     const { username, password, autoLogin } = JSON.parse(values || '{}');
     if (autoLogin) {
@@ -87,8 +86,7 @@ export default () => {
               size: 'large',
               prefix: <UserOutlined className={'prefixIcon'} />,
             }}
-            placeholder={'用户名: admin'}
-            // width={400}
+            placeholder={'用户名'}
             rules={[
               {
                 required: true,
@@ -102,7 +100,7 @@ export default () => {
               size: 'large',
               prefix: <LockOutlined className={'prefixIcon'} />,
             }}
-            placeholder={'密码: 123456'}
+            placeholder={'密码'}
             rules={[
               {
                 required: true,

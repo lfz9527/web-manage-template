@@ -1,4 +1,4 @@
-import { AUTO_LOGIN_KEY, LOGIN_PATH } from '@/enum';
+import { AUTO_LOGIN_KEY, CURRENT_SITE_ID, LOGIN_PATH } from '@/enum';
 import { getToken, logger, removeToken, setToken } from '@/utils';
 import type { RequestConfig } from '@umijs/max';
 import { history } from '@umijs/max';
@@ -60,6 +60,22 @@ const errorHandle = (response: ResponseData) => {
   }
 };
 
+// 站点鉴权
+const authorSite = (config: any) => {
+  const { method } = config;
+  if (method.toUpperCase() === 'POST') {
+    return;
+  }
+  let siteId = sessionStorage.getItem(CURRENT_SITE_ID);
+  if (!siteId || siteId === 'all') {
+    siteId = '';
+  }
+  if (!config.params) {
+    config.params = {};
+  }
+  config.params['webSiteId'] = siteId;
+};
+
 /**
  * @name 错误处理
  * pro 自带的错误处理， 可以在这里做自己的改动
@@ -72,6 +88,7 @@ export const errorConfig: RequestConfig = {
       const { url, headers } = config;
       const token = getToken();
       logger.info(`请求路径：${url}`);
+      authorSite(config);
       if (token) {
         headers['Authorization'] = 'Bearer ' + token;
       }

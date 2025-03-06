@@ -1,4 +1,5 @@
-import { Image, ImageWall } from '@/components';
+import { ImageWall } from '@/components';
+import { getGoodAlbumGetGoodAlbumList } from '@/services/api/goodAlbum';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
@@ -11,9 +12,6 @@ interface TableItem {
     nickName: number;
     userName: string;
   };
-  faceImages: {
-    face: string;
-  }[];
   albumName: string;
   isPrivate: boolean;
   goodCount: string;
@@ -55,21 +53,8 @@ export default () => {
     },
     {
       title: '用户',
-      dataIndex: 'user',
+      dataIndex: ['user', 'nickName'],
       search: false,
-      render: (_, record) => {
-        return record.user.nickName;
-      },
-    },
-    {
-      title: '封面',
-      dataIndex: 'faceImages',
-      search: false,
-      render: (_, record) => {
-        return record.faceImages.map((item) => {
-          return <Image src={item.face} key={item.face} />;
-        });
-      },
     },
     {
       title: '专辑名称',
@@ -90,21 +75,25 @@ export default () => {
     {
       title: '商品数量',
       dataIndex: 'goodCount',
+      valueType: 'dateTime',
       search: false,
     },
     {
       title: '最后收集时间',
       dataIndex: 'lastCollectTime',
+      valueType: 'dateTime',
       search: false,
     },
     {
       title: '更新时间',
       dataIndex: 'updateTime',
+      valueType: 'dateTime',
       search: false,
     },
     {
       title: '创建时间',
       dataIndex: 'createTime',
+      valueType: 'dateTime',
       search: false,
     },
     {
@@ -146,10 +135,16 @@ export default () => {
           );
         }}
         request={async (params) => {
+          const searchData = {
+            page: params.current,
+            count: params.pageSize,
+          };
+          const { data } = await getGoodAlbumGetGoodAlbumList(searchData);
+          const { list, total } = data;
           return {
-            data: [],
+            data: list,
             success: true,
-            total: 0,
+            total: total,
           };
         }}
         rowKey="goodAlbumId"
@@ -162,6 +157,7 @@ export default () => {
             actionRef.current?.clearSelected?.();
           },
         }}
+        search={false}
         dateFormatter="string"
         toolBarRender={() => [
           <Button

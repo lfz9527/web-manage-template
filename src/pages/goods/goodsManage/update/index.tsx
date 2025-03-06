@@ -153,11 +153,9 @@ export default () => {
             })
           : [],
       };
-
-      if (attributes.length === 0) {
+      if (!attributes || attributes.length === 0) {
         formData.attributes = initAttributes;
       }
-
       form.setFieldsValue({
         ...formData,
       });

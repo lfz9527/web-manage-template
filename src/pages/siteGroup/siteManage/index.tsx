@@ -1,20 +1,26 @@
 import { Image, ImageWall } from '@/components';
+import { getGoodGetGoodCategoryListParent } from '@/services/api/good';
 import {
   getWebSiteGetWebSiteById,
   getWebSiteGetWebSiteList, // 假设存在保存网站信息的服务
   postWebSiteDeleteWebSite, // 假设存在删除网站信息的服务
   postWebSiteSaveWebSite,
 } from '@/services/api/webSite';
+import { isNull } from '@/utils/is';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Button, Form, Input, message, Modal } from 'antd';
+import { Button, Col, Form, Input, message, Modal, Row, Select } from 'antd';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-type GithubIssueItem = {
+type TableItem = {
   webSiteId: number;
   logoImage: {
     imgSrc: string;
+  };
+  goodCategory: {
+    categoryName: string;
+    goodCategoryId: number;
   };
   name: string;
   slogan: string;
@@ -23,7 +29,6 @@ type GithubIssueItem = {
   seoTitle: string;
   seoKeyword: string;
   seoDescription: string;
-  goodCategoryId: number;
   state: number;
   createTime: string;
 };
@@ -66,6 +71,27 @@ export default () => {
     width: 0,
   });
 
+  const [firstCategory, setFirstCategory] = useState<
+    {
+      label: string;
+      value: string;
+    }[]
+  >([]);
+
+  const getFirstCategory = async () => {
+    const { data } = await getGoodGetGoodCategoryListParent({});
+    setFirstCategory(
+      data.map((item: TableItem['goodCategory']) => ({
+        label: item.categoryName,
+        value: item.goodCategoryId,
+      })),
+    );
+  };
+
+  useEffect(() => {
+    getFirstCategory();
+  }, []);
+
   // 获取log 文件，格式化传入 文件上传组件用于回显
   const getFile = useCallback(() => {
     return [websiteLogo]
@@ -83,9 +109,16 @@ export default () => {
   // 获取网站详情
   const getSiteDetail = async () => {
     const { data } = await getWebSiteGetWebSiteById({ id: websiteId });
-    form.setFieldsValue({
+
+    const params = {
       ...data,
-    });
+    };
+
+    if (isNull(params.goodCategoryId, true)) {
+      delete params.goodCategoryId;
+    }
+
+    form.setFieldsValue(params);
     const logoImage = data?.logoImage || {};
     setWebsiteLogo((state) => ({
       ...state,
@@ -104,7 +137,7 @@ export default () => {
     setOpenCreateDialog(true);
   };
 
-  const columns: ProColumns<GithubIssueItem>[] = [
+  const columns: ProColumns<TableItem>[] = [
     {
       dataIndex: 'webSiteId',
       valueType: 'indexBorder',
@@ -123,46 +156,46 @@ export default () => {
       },
     },
     {
-      title: '名称',
+      title: '站点名称',
       dataIndex: 'name',
       search: false,
     },
     {
-      title: 'slogan',
+      title: '站点slogan',
       dataIndex: 'slogan',
       search: false,
       ellipsis: true,
     },
     {
-      title: '域名',
+      title: '站点域名',
       dataIndex: 'domain',
       search: false,
     },
     {
-      title: '描述',
+      title: '站点描述',
       dataIndex: 'describe',
       search: false,
     },
     {
-      title: 'seo标题',
+      title: '站点seo标题',
       dataIndex: 'seoTitle',
       search: false,
     },
     {
-      title: 'seo关键词',
+      title: '站点seo关键词',
       dataIndex: 'seoKeyword',
       search: false,
       ellipsis: true,
     },
     {
-      title: 'seo描述',
+      title: '站点seo描述',
       dataIndex: 'seoDescription',
       search: false,
       ellipsis: true,
     },
     {
-      title: '绑定类目',
-      dataIndex: 'goodCategoryId',
+      title: '站点绑定分类名称',
+      dataIndex: ['goodCategory', 'categoryName'],
       search: false,
     },
     {
@@ -252,7 +285,7 @@ export default () => {
   return (
     <>
       {messageContextHolder}
-      <ProTable<GithubIssueItem>
+      <ProTable<TableItem>
         columns={columns}
         actionRef={actionRef}
         cardBordered
@@ -306,82 +339,103 @@ export default () => {
           loading: createLoading,
         }}
         onCancel={() => setOpenCreateDialog(false)}
-        width={800}
+        width={900}
         afterClose={resetForm}
       >
         <Form
           form={form}
-          labelCol={{ span: 5 }}
           onFinish={handleCreateOrUpdateWebsite}
           labelAlign="left"
+          layout="vertical"
         >
-          <Form.Item<FieldType>
-            label="名称"
-            name="name"
-            rules={[{ required: true, message: '请输入名称' }]}
-          >
-            <Input placeholder="请输入名称" />
-          </Form.Item>
-          <Form.Item<FieldType>
-            label="slogan"
-            name="slogan"
-            rules={[{ required: true, message: '请输入slogan' }]}
-          >
-            <Input placeholder="请输入slogan" />
-          </Form.Item>
-          <Form.Item<FieldType>
-            label="域名"
-            name="domain"
-            rules={[{ required: true, message: '请输入域名' }]}
-          >
-            <Input placeholder="请输入域名" />
-          </Form.Item>
-          <Form.Item<FieldType>
-            label="描述"
-            name="describe"
-            rules={[{ required: true, message: '请输入描述' }]}
-          >
-            <Input placeholder="请输入描述" />
-          </Form.Item>
-          <Form.Item<FieldType>
-            label="seo标题"
-            name="seoTitle"
-            rules={[{ required: true, message: '请输入seo标题' }]}
-          >
-            <Input placeholder="请输入seo标题" />
-          </Form.Item>
-          <Form.Item<FieldType>
-            label="seo关键词"
-            name="seoKeyword"
-            rules={[{ required: true, message: '请输入seo关键词' }]}
-          >
-            <Input placeholder="请输入seo关键词" />
-          </Form.Item>
-          <Form.Item<FieldType>
-            label="seo描述"
-            name="seoDescription"
-            rules={[{ required: true, message: '请输入seo描述' }]}
-          >
-            <Input placeholder="请输入seo描述" />
-          </Form.Item>
-          <Form.Item<FieldType>
-            label="绑定类目"
-            name="goodCategoryId"
-            rules={[{ required: true, message: '请输入绑定类目' }]}
-          >
-            <Input placeholder="请输入绑定类目" />
-          </Form.Item>
+          <Row gutter={24}>
+            <Col span={12}>
+              <Form.Item<FieldType>
+                label="站点名称"
+                name="name"
+                rules={[{ required: true, message: '请输入名称' }]}
+              >
+                <Input placeholder="请输入名称" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item<FieldType>
+                label="站点slogan"
+                name="slogan"
+                rules={[{ required: true, message: '请输入slogan' }]}
+              >
+                <Input placeholder="请输入slogan" />
+              </Form.Item>
+            </Col>
 
-          <Form.Item<FieldType> label="Logo" name="logoImageId">
-            <ImageWall
-              fileList={getFile()}
-              onChange={(file) => {
-                const [first] = file;
-                const platformLogo = first?.response?.data;
-                setWebsiteLogo(platformLogo);
-              }}
-            />
-          </Form.Item>
+            <Col span={12}>
+              <Form.Item<FieldType>
+                label="站点域名"
+                name="domain"
+                rules={[{ required: true, message: '请输入域名' }]}
+              >
+                <Input placeholder="请输入域名" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item<FieldType> label="站点绑定分类" name="goodCategoryId">
+                <Select
+                  placeholder="请选择站点绑定分类"
+                  allowClear
+                  options={firstCategory}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item<FieldType>
+                label="站点描述"
+                name="describe"
+                rules={[{ required: true, message: '请输入描述' }]}
+              >
+                <Input.TextArea rows={4} placeholder="请输入描述" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item<FieldType>
+                label="站点seo标题"
+                name="seoTitle"
+                rules={[{ required: true, message: '请输入seo标题' }]}
+              >
+                <Input.TextArea rows={4} placeholder="请输入seo标题" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item<FieldType>
+                label="站点seo关键词"
+                name="seoKeyword"
+                rules={[{ required: true, message: '请输入seo关键词' }]}
+              >
+                <Input.TextArea rows={4} placeholder="请输入seo关键词" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item<FieldType>
+                label="站点seo描述"
+                name="seoDescription"
+                rules={[{ required: true, message: '请输入seo描述' }]}
+              >
+                <Input.TextArea rows={4} placeholder="请输入seo描述" />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item<FieldType> label="Logo" name="logoImageId">
+                <ImageWall
+                  fileList={getFile()}
+                  onChange={(file) => {
+                    const [first] = file;
+                    const platformLogo = first?.response?.data;
+                    setWebsiteLogo(platformLogo);
+                  }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Modal>
 

@@ -1,7 +1,9 @@
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { message } from 'antd';
+import { Modal, message } from 'antd';
 import { useRef } from 'react';
+
+import { getLogGetTextLogList, postLogDeleteTextLog } from '@/services/api/log';
 
 interface TableItem {
   fileName: string;
@@ -11,6 +13,26 @@ interface TableItem {
 export default () => {
   const actionRef = useRef<ActionType>();
   const [messageApi, messageContextHolder] = message.useMessage();
+
+  const handleDeleteLog = async (record: TableItem) => {
+    Modal.confirm({
+      title: '提示',
+      content: '确定删除该日志文件吗？',
+      centered: true,
+      onOk: async () => {
+        await postLogDeleteTextLog({ filename: record.fileName });
+        messageApi.success('删除成功');
+        actionRef.current?.reload();
+      },
+    });
+  };
+
+  const handleDownloadLog = async (record: TableItem) => {
+    const a = document.createElement('a');
+    a.href = `/api/Log/GetTextLogDetails?filename=${record.fileName}`;
+    a.download = record.fileName;
+    a.click();
+  };
 
   const columns: ProColumns<TableItem>[] = [
     {
@@ -28,7 +50,18 @@ export default () => {
       valueType: 'option',
       key: 'option',
       render: (_, record) =>
-        [<a key="detail">详情</a>, <a key="delete">删除</a>].filter(Boolean),
+        [
+          <a key="detail" onClick={() => handleDownloadLog(record)}>
+            下载
+          </a>,
+          <a
+            key="delete"
+            style={{ color: 'red' }}
+            onClick={() => handleDeleteLog(record)}
+          >
+            删除
+          </a>,
+        ].filter(Boolean),
     },
   ];
 
@@ -39,13 +72,22 @@ export default () => {
         actionRef={actionRef}
         cardBordered
         request={async (params) => {
+          const { data } = await getLogGetTextLogList({
+            page: params.current,
+            count: params.pageSize,
+          });
           return {
-            data: [],
+            data: data.map((file: any) => {
+              return {
+                fileName: file + '.txt',
+                createTime: file,
+              };
+            }),
             success: true,
-            total: 0,
+            total: data.length,
           };
         }}
-        rowKey="goodId"
+        rowKey="fileName"
         pagination={{
           pageSize: 10,
           showSizeChanger: true,
@@ -57,6 +99,7 @@ export default () => {
         }}
         dateFormatter="string"
       />
+      {messageContextHolder}
     </>
   );
 };

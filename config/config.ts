@@ -4,6 +4,7 @@ import proxy from './proxy';
 import routes from './router';
 
 export default defineConfig({
+  title: '吉韵站群系统后台管理',
   define,
   /**
    * @name 开启 hash 模式
@@ -42,6 +43,7 @@ export default defineConfig({
   layout: {
     title: '吉韵站群系统后台管理',
   },
+  favicons: ['/logo.png'],
   routes: routes,
   npmClient: 'pnpm',
   proxy,

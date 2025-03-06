@@ -60,6 +60,16 @@ const ImageWall: React.FC<ImageWallProps> = ({
     file,
     fileList: newFileList,
   }) => {
+    if (file.status === 'error') {
+      // 上传失败时从文件列表中移除该文件
+      const filteredFileList = newFileList.filter(
+        (item) => item.uid !== file.uid,
+      );
+      setFileList(filteredFileList);
+      onChange?.(filteredFileList);
+      message.error('文件上传失败');
+      return;
+    }
     setFileList(newFileList);
     if (file.status === 'done') {
       onChange?.(newFileList);

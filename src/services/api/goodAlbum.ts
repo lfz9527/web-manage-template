@@ -131,25 +131,6 @@ export async function getGoodAlbumGetGoodPostLikeById(
   });
 }
 
-/** 查询商品帖子喜欢列表 GET /api/GoodAlbum/GetGoodPostLikeList */
-export async function getGoodAlbumGetGoodPostLikeList(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getGoodAlbumGetGoodPostLikeListParams,
-  options?: { [key: string]: any },
-) {
-  return request<API.REWebApiCallback>('/api/GoodAlbum/GetGoodPostLikeList', {
-    method: 'GET',
-    params: {
-      // page has a default value: 1
-      page: '1',
-      // count has a default value: 50
-      count: '50',
-      ...params,
-    },
-    ...(options || {}),
-  });
-}
-
 /** 查询商品帖子列表 GET /api/GoodAlbum/GetGoodPostList */
 export async function getGoodAlbumGetGoodPostList(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
@@ -169,17 +150,43 @@ export async function getGoodAlbumGetGoodPostList(
   });
 }
 
-/** 前端通用发布商品帖子 POST /api/GoodAlbum/InsertGoodPost */
-export async function postGoodAlbumInsertGoodPost(
-  body: API.FBGoodPost,
+/** 查询当前登录用户关注的用户帖子列表 GET /api/GoodAlbum/GetGoodPostListByFollow */
+export async function getGoodAlbumGetGoodPostListByFollow(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getGoodAlbumGetGoodPostListByFollowParams,
   options?: { [key: string]: any },
 ) {
-  return request<API.REWebApiCallback>('/api/GoodAlbum/InsertGoodPost', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  return request<API.REWebApiCallback>(
+    '/api/GoodAlbum/GetGoodPostListByFollow',
+    {
+      method: 'GET',
+      params: {
+        // page has a default value: 1
+        page: '1',
+        // count has a default value: 10
+        count: '10',
+        ...params,
+      },
+      ...(options || {}),
     },
-    data: body,
+  );
+}
+
+/** 查询指定用户喜欢的商品帖子列表 GET /api/GoodAlbum/GetGoodPostListByLike */
+export async function getGoodAlbumGetGoodPostListByLike(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getGoodAlbumGetGoodPostListByLikeParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/GoodAlbum/GetGoodPostListByLike', {
+    method: 'GET',
+    params: {
+      // page has a default value: 1
+      page: '1',
+      // count has a default value: 10
+      count: '10',
+      ...params,
+    },
     ...(options || {}),
   });
 }
@@ -229,12 +236,12 @@ export async function postGoodAlbumSaveGoodAlbum(
   });
 }
 
-/** 修改商品帖子 POST /api/GoodAlbum/UpdateGoodPost */
-export async function postGoodAlbumUpdateGoodPost(
+/** 发布/修改商品帖子 POST /api/GoodAlbum/SaveGoodPost */
+export async function postGoodAlbumSaveGoodPost(
   body: API.FBGoodPost,
   options?: { [key: string]: any },
 ) {
-  return request<API.REWebApiCallback>('/api/GoodAlbum/UpdateGoodPost', {
+  return request<API.REWebApiCallback>('/api/GoodAlbum/SaveGoodPost', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

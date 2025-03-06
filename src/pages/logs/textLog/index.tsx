@@ -79,7 +79,7 @@ export default () => {
           return {
             data: data.map((file: any) => {
               return {
-                fileName: file + '.txt',
+                fileName: file,
                 createTime: file,
               };
             }),

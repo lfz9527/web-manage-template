@@ -20,7 +20,7 @@ interface TableItem {
   content: string;
   isHot: boolean;
   hotTime: string;
-  topCount: string;
+  likeCount: string;
   commentCount: string;
   shareCount: string;
   createTime: string;
@@ -88,7 +88,7 @@ export default () => {
     },
     {
       title: '点赞数',
-      dataIndex: 'topCount',
+      dataIndex: 'likeCount',
       search: false,
     },
     {

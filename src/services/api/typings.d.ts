@@ -128,6 +128,7 @@ declare namespace API {
     imageId?: number;
     parentid?: number;
     isHot?: boolean;
+    isAdult?: boolean;
   };
 
   type FBGoodPartition = {
@@ -146,7 +147,7 @@ declare namespace API {
     goodPrice?: number;
     goodLink?: string;
     goodBasePrice?: number;
-    goodAblumId?: number;
+    goodAlbumId?: number;
     content?: string;
     imageIds?: number[];
   };
@@ -358,7 +359,21 @@ declare namespace API {
     trackerId?: string;
   };
 
+  type getDataStatisticsGetDomainV2Params = {
+    /** 追踪器ID */
+    trackerId?: string;
+  };
+
   type getDataStatisticsGetSourceCountParams = {
+    /** 时间范围类型 */
+    rangeType?: string;
+    /** 追踪器 ID */
+    trackerId?: string;
+    /** 域名 */
+    domain?: string;
+  };
+
+  type getDataStatisticsGetSourceCountV2Params = {
     /** 时间范围类型 */
     rangeType?: string;
     /** 追踪器 ID */
@@ -376,7 +391,21 @@ declare namespace API {
     domain?: string;
   };
 
+  type getDataStatisticsGetStatsHourlyV2Params = {
+    /** 时间范围类型 */
+    rangeType?: string;
+    /** 追踪器 ID */
+    trackerId?: string;
+    /** 域名 */
+    domain?: string;
+  };
+
   type getDataStatisticsGetTrackParams = {
+    /** 账号名 */
+    account?: string;
+  };
+
+  type getDataStatisticsGetTrackV2Params = {
     /** 账号名 */
     account?: string;
   };
@@ -445,9 +474,13 @@ declare namespace API {
     id?: number;
   };
 
-  type getGoodAlbumGetGoodPostLikeListParams = {
-    /** 帖子Id */
-    goodPostId?: number;
+  type getGoodAlbumGetGoodPostListByFollowParams = {
+    page?: number;
+    count?: number;
+  };
+
+  type getGoodAlbumGetGoodPostListByLikeParams = {
+    userId?: number;
     page?: number;
     count?: number;
   };
@@ -458,10 +491,6 @@ declare namespace API {
     /** 专辑Id */
     goodAlbumId?: number;
     userId?: number;
-    /** 是否查询Like帖子 */
-    isLike?: boolean;
-    /** 是否只查询关注用户帖子 */
-    isFollow?: boolean;
     page?: number;
     count?: number;
   };
@@ -539,8 +568,6 @@ declare namespace API {
     userId?: number;
     /** 帖子内容（模糊搜索） */
     commentContent?: string;
-    /** 是否查询总页数 */
-    haveTotal?: boolean;
     /** 页数 */
     page?: number;
     /** 行数 */
@@ -580,6 +607,7 @@ declare namespace API {
   };
 
   type getShopSiteGetShopSiteListParams = {
+    /** 站点名 */
     shopSiteName?: string;
     page?: number;
     count?: number;

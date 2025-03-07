@@ -65,7 +65,9 @@ const authorSite = (config: any) => {
   if (!config.params) {
     config.params = {};
   }
-  config.params['webSiteId'] = siteId;
+  if (siteId) {
+    config.params['webSiteId'] = siteId;
+  }
 };
 
 /**

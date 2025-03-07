@@ -1,5 +1,8 @@
 import { Image } from '@/components';
-import { getGoodAlbumGetGoodPostList } from '@/services/api/goodAlbum';
+import {
+  getGoodAlbumGetGoodPostList,
+  postGoodAlbumHotGoodPost,
+} from '@/services/api/goodAlbum';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { message, Space, Tag } from 'antd';
@@ -29,8 +32,18 @@ interface TableItem {
 export default () => {
   const actionRef = useRef<ActionType>();
   const [messageApi, messageContextHolder] = message.useMessage();
-  const handleHot = (record: TableItem) => {
-    console.log(record);
+  const handleHot = async (record: TableItem[], isHot: boolean) => {
+    const params = {
+      ids: record.map((item) => Number(item.goodPostId)),
+      state: isHot,
+    };
+    try {
+      await postGoodAlbumHotGoodPost(params);
+      messageApi.success('操作成功');
+      actionRef.current?.reload();
+    } catch (error) {
+      messageApi.error('操作失败');
+    }
   };
 
   const columns: ProColumns<TableItem>[] = [
@@ -114,7 +127,9 @@ export default () => {
       key: 'option',
       render: (_, record) =>
         [
-          <a key="public">{record.isHot ? '下热门' : '上热门'}</a>,
+          <a key="public" onClick={() => handleHot([record], !record.isHot)}>
+            {record.isHot ? '下热门' : '上热门'}
+          </a>,
           <a key="delete" style={{ color: '#f00' }}>
             删除
           </a>,
@@ -129,11 +144,23 @@ export default () => {
         actionRef={actionRef}
         cardBordered
         rowSelection={{}}
-        tableAlertOptionRender={() => {
+        tableAlertOptionRender={({ selectedRows }) => {
           return (
             <Space size={16}>
-              <a onClick={() => {}}>批量上热门</a>
-              <a onClick={() => {}}>批量下热门</a>
+              <a
+                onClick={() => {
+                  handleHot(selectedRows, true);
+                }}
+              >
+                批量上热门
+              </a>
+              <a
+                onClick={() => {
+                  handleHot(selectedRows, false);
+                }}
+              >
+                批量下热门
+              </a>
             </Space>
           );
         }}
@@ -161,6 +188,7 @@ export default () => {
             actionRef.current?.clearSelected?.();
           },
         }}
+        search={false}
         dateFormatter="string"
       />
     </>

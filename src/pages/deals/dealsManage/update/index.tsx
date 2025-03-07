@@ -7,6 +7,7 @@ import {
   postDealsSaveDeals,
 } from '@/services/api/deals';
 import { getShopSiteGetShopSiteList } from '@/services/api/shopSite';
+import { isNull } from '@/utils';
 import { history, useParams } from '@umijs/max';
 import {
   Button,
@@ -152,11 +153,31 @@ export default () => {
       expireType,
       startTime: [dayjs(data.startTime), dayjs(data.endTime)],
     };
+
+    if (isNull(data.shopSiteId, true)) {
+      delete formData.shopSiteId;
+    }
+
+    if (isNull(data.brandId, true)) {
+      delete formData.brandId;
+    }
+
+    if (isNull(data.imageId, true)) {
+      delete formData.imageId;
+    }
+
     setExpireTypeValue(expireType);
-    setFile({
-      imgSrc: data.image.imgSrc,
-      imageId: data.image.imageId,
-    });
+
+    if (!isNull(data.imageId, true)) {
+      setFile({
+        imgSrc: data?.image?.imgSrc,
+        imageId: data?.imageId,
+      });
+    }
+
+    getShopSiteList(data?.shopSite?.shopSiteName || '');
+    getBrandList(data?.brand?.brandName || '');
+
     form.setFieldsValue(formData);
   };
 
@@ -175,7 +196,6 @@ export default () => {
   const handleSubmit = async (values: FieldType) => {
     setLoading(true);
     const [start, end] = values.startTime;
-
     const submitData = {
       ...values,
       imageId: Number(file.imageId),

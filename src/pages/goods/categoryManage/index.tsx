@@ -90,6 +90,7 @@ export default () => {
       isLeaf,
     }));
   };
+
   // 初始化分类选项
   const initCategoryOption = async () => {
     const data = await fetchCateOptList(0, false);
@@ -157,24 +158,29 @@ export default () => {
     setDialog(true);
 
     // 获取爷爷级分类
-    const { parentId: grandParentId } = await fetchCategoryById(
-      category.parentId,
-    );
+    const grandData = await fetchCategoryById(category.parentId);
 
-    form.setFieldsValue({
+    const { parentId: grandParentId } = grandData || {};
+
+    const params = {
       categoryName: category.categoryName,
       parentId: [grandParentId, category.parentId].filter(Boolean),
       isHot: category.isHot,
       isAdult: category.isAdult,
-      imageId: category.image.imageId,
-    });
-    // 回显分类图片
-    setCategoryImage([
-      {
-        url: category.image.imgSrc,
-        id: category.image.imageId.toString(),
-      },
-    ]);
+      imageId: category?.image?.imageId,
+    };
+
+    form.setFieldsValue(params);
+
+    if (category?.image?.imageId) {
+      // 回显分类图片
+      setCategoryImage([
+        {
+          url: category.image.imgSrc,
+          id: category.image.imageId.toString(),
+        },
+      ]);
+    }
     // 懒加载回显
     const targetOption = cateOptList.find(
       (option) => option.value === grandParentId,
@@ -299,21 +305,16 @@ export default () => {
 
   // 提交表单
   const handleSubmit = async (values: any) => {
-    const { imageId, parentId } = values;
-
-    if (!imageId) {
-      form.setFields([{ name: 'imageId' }]);
-      return;
-    }
+    const { parentId } = values;
     const [first] = categoryImage;
     setLoading(true);
     const params = {
       ...values,
       goodCategoryId: category[0]?.goodCategoryId || 0,
       categoryName: values.categoryName,
-      parentId: parentId[parentId.length - 1],
+      parentId: parentId?.[parentId.length - 1] || 0,
       isHot: values.isHot,
-      imageId: first.id,
+      imageId: first?.id || 0,
     };
 
     console.log(params);
@@ -334,11 +335,7 @@ export default () => {
         actionRef={actionRef}
         cardBordered
         rowSelection={{}}
-        tableAlertOptionRender={({
-          selectedRowKeys,
-          selectedRows,
-          onCleanSelected,
-        }) => {
+        tableAlertOptionRender={({ selectedRows, onCleanSelected }) => {
           setSelectedRows(selectedRows);
           return (
             <Space size={16}>
@@ -426,12 +423,9 @@ export default () => {
           >
             <Input placeholder="请输入分类名称" />
           </Form.Item>
-          <Form.Item<FileType>
-            label="父级分类"
-            name="parentId"
-            rules={[{ required: true, message: '请选择父级分类' }]}
-          >
+          <Form.Item<FileType> label="父级分类" name="parentId">
             <Cascader
+              allowClear
               placeholder="请选择父级分类"
               options={cateOptList}
               loadData={loadCateOption}
@@ -457,11 +451,7 @@ export default () => {
               <Radio value={false}>否</Radio>
             </Radio.Group>
           </Form.Item>
-          <Form.Item<FileType>
-            label="分类图片"
-            name="imageId"
-            rules={[{ required: true, message: '请上传分类图片' }]}
-          >
+          <Form.Item<FileType> label="分类图片" name="imageId">
             <ImageWall
               fileList={categoryImage}
               maxCount={1}

@@ -1,16 +1,24 @@
 import { ImageWall, PageFooter } from '@/components';
 import { getBrandGetBrandList } from '@/services/api/brand';
-import { getGoodGetGoodById, postGoodSaveGoodTag } from '@/services/api/good';
+import {
+  getGoodGetGoodById,
+  getGoodGetGoodCategoryListParent,
+  postGoodSaveGood,
+  postGoodSaveGoodTag,
+} from '@/services/api/good';
 import { getShopSiteGetShopSiteList } from '@/services/api/shopSite';
 import { getWebSiteGetWebSiteList } from '@/services/api/webSite';
+import { isNull } from '@/utils';
 import { history, useParams } from '@umijs/max';
 import {
   Button,
   Card,
+  Cascader,
   Col,
   Form,
   Input,
   InputNumber,
+  message,
   Radio,
   Row,
   Select,
@@ -40,17 +48,20 @@ type WebSiteItem = {
   name: string;
 };
 
-type GoodCategoryType = {
-  goodCategoryId: string;
-  goodCategoryName: string;
-};
-
 type BrandType = {
   brandId: string;
   brandName: string;
 };
 
+type CategoryOptionItem = {
+  value: string;
+  label: string;
+  isLeaf: boolean;
+  children: CategoryOptionItem[];
+};
+
 export default () => {
+  const [messageApi, messageContextHolder] = message.useMessage();
   const params = useParams<{ [key: string]: string }>();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -67,7 +78,9 @@ export default () => {
   const [shopSiteList, setShopSiteList] = useState<OptionType[]>([]);
 
   // 商品分类列表
-  const [goodCategoryList, setGoodCategoryList] = useState<OptionType[]>([]);
+  const [goodCategoryList, setGoodCategoryList] = useState<
+    CategoryOptionItem[]
+  >([]);
   // 商品品牌列表
   const [brandList, setBrandList] = useState<OptionType[]>([]);
 
@@ -104,14 +117,46 @@ export default () => {
     );
   };
 
+  // 获取分类选项
+  const fetchCateOptList = async (
+    parentId: number = 0,
+    isLeaf: boolean = false,
+  ): Promise<CategoryOptionItem[]> => {
+    const { data } = await getGoodGetGoodCategoryListParent({
+      parentId,
+    });
+    return data.map((item: TableItem) => ({
+      value: item.goodCategoryId,
+      label: item.categoryName,
+      children: [],
+      isLeaf,
+    }));
+  };
+
+  // 初始化分类选项
+  const initCategoryOption = async () => {
+    const data = await fetchCateOptList(0, false);
+    setGoodCategoryList(data);
+  };
+
+  const loadCate = async (selOption: CategoryOptionItem[]) => {
+    const targetOption = selOption[selOption.length - 1];
+    const parentId = targetOption.value;
+    const data = await fetchCateOptList(Number(parentId), true);
+    targetOption.children = data;
+    targetOption.isLeaf = data.length === 0 || !data;
+    setGoodCategoryList([...goodCategoryList]);
+  };
+
   // 获取商品分类列表
   const getGoodCategoryList = async () => {};
 
   // 获取商品品牌列表
-  const getBrandList = async () => {
+  const getBrandList = async (name: string = '') => {
     const { data } = await getBrandGetBrandList({
       page: 1,
       count: 100,
+      brandname: name,
     });
     const { list } = data;
     setBrandList(
@@ -129,7 +174,9 @@ export default () => {
         id: Number(params.id),
       });
 
-      const { attributes = [], tags = [], banners = [] } = data;
+      const { attributes = [], tags = [], banners = [], shopSite } = data;
+
+      getShopSiteList(shopSite.shopSiteName || '');
 
       const initAttributes = [
         {
@@ -156,18 +203,31 @@ export default () => {
       if (!attributes || attributes.length === 0) {
         formData.attributes = initAttributes;
       }
+
+      if (!isNull(data.brandId)) {
+        delete formData.brandId;
+      }
+
       form.setFieldsValue({
         ...formData,
       });
     }
   };
 
+  const init = async () => {
+    await getWebSiteList();
+    if (!params.id) {
+      await getShopSiteList();
+    }
+
+    await getGoodCategoryList();
+    await getBrandList();
+    await initCategoryOption();
+    await getGoodId();
+  };
+
   useEffect(() => {
-    getWebSiteList();
-    getShopSiteList();
-    getGoodCategoryList();
-    getBrandList();
-    getGoodId();
+    init();
   }, []);
 
   // 添加标签
@@ -203,11 +263,13 @@ export default () => {
   };
   // 格式化banner图
   const formatBanner = (banners: any[]) => {
-    return banners.map((banner: any) => {
-      return {
-        imageId: banner?.response?.data.imageId || '',
-      };
-    });
+    return (
+      banners?.map((banner: any) => {
+        return {
+          imageId: banner?.response?.data.imageId || '',
+        };
+      }) || []
+    );
   };
 
   const footerBack = () => {
@@ -218,27 +280,26 @@ export default () => {
   const handleSubmit = async (values: any) => {
     setLoading(true);
     // 先添加标签
+    console.log(values);
+    console.log(formatBanner(values.banners));
+
+    const tags = await getAllTags(values.tags);
+    const banners = formatBanner(values.banners);
+    const params = {
+      ...values,
+      tags,
+      banners,
+      goodId,
+      attributes: values.attributes.filter((item: any) => item.attributeValue),
+      brandId: values.brandId || 0,
+    };
+
     try {
-      console.log(values);
-      console.log(formatBanner(values.banners));
-
-      // const tags = await getAllTags(values.tags);
-      // const banners = formatBanner(values.banners);
-      // const params = {
-      //   ...values,
-      //   tags,
-      //   banners,
-      //   goodId
-      // };
-      // console.log(params);
-
-      // message.success('添加成功');
-      // await postGoodEditGood(params);
-      // setTimeout(() => {
-      //   footerBack();
-      // }, 1000);
+      await postGoodSaveGood(params);
+      messageApi.success('添加成功');
+      footerBack();
     } catch (error) {
-      console.log(error);
+      messageApi.error('添加失败');
     } finally {
       setLoading(false);
     }
@@ -440,22 +501,24 @@ export default () => {
               <Form.Item<FieldType>
                 label="商品分类"
                 name="goodCategoryId"
-                // rules={[{ required: true, message: '请选择商品分类' }]}
+                rules={[{ required: true, message: '请选择商品分类' }]}
               >
-                <Select placeholder="请选择商品分类" options={shopSiteList} />
+                <Cascader
+                  allowClear
+                  placeholder="请选择商品分类"
+                  options={goodCategoryList}
+                  loadData={loadCate}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={8} xl={6}>
-              <Form.Item<FieldType>
-                label="商品品牌"
-                name="brandId"
-                rules={[{ required: true, message: '请选择商品品牌' }]}
-              >
+              <Form.Item<FieldType> label="商品品牌" name="brandId">
                 <Select
                   optionFilterProp="label"
                   placeholder="请选择商品品牌"
-                  filterOption={true}
                   showSearch
+                  onSearch={(name) => getBrandList(name)}
+                  filterOption={false}
                   options={brandList}
                 />
               </Form.Item>
@@ -718,6 +781,7 @@ export default () => {
           </>
         }
       ></PageFooter>
+      {messageContextHolder}
     </div>
   );
 };

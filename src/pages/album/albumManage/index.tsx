@@ -101,18 +101,14 @@ export default () => {
       width: 48,
     },
     {
-      title: 'ID',
-      dataIndex: 'goodAlbumId',
-      search: false,
-    },
-    {
       title: '用户',
       dataIndex: ['user', 'nickName'],
-      search: false,
+      search: true,
     },
     {
       title: '专辑名称',
       dataIndex: 'albumName',
+      search: true,
     },
     {
       title: '是否私密',
@@ -188,6 +184,7 @@ export default () => {
         ...values,
         userId: initialState?.id,
         goodAlbumId: goodAlbumId,
+        albumDescribe: values.albumDescribe?.trim() || '',
       };
       await postGoodAlbumSaveGoodAlbum(params);
       messageApi.success('保存成功');
@@ -229,6 +226,8 @@ export default () => {
           const searchData = {
             page: params.current,
             count: params.pageSize,
+            nickName: params?.user?.nickName?.trim(),
+            albumName: params?.albumName?.trim(),
           };
           const { data } = await getGoodAlbumGetGoodAlbumList(searchData);
           const { list, total } = data;
@@ -248,7 +247,6 @@ export default () => {
             actionRef.current?.clearSelected?.();
           },
         }}
-        search={false}
         dateFormatter="string"
       />
 

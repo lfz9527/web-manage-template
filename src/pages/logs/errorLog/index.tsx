@@ -9,6 +9,7 @@ interface TableItem {
   logId: string;
   logType: string;
   logData: string;
+  logTypeName: string;
   createTime: string;
 }
 
@@ -45,7 +46,7 @@ export default () => {
     },
     {
       title: '日志类型',
-      dataIndex: 'logType',
+      dataIndex: 'logTypeName',
       search: false,
       width: 100,
     },

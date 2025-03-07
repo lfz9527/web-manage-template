@@ -7,7 +7,6 @@ import {
   postGoodShelvesGood,
   postGoodUpdateGoodForAi,
 } from '@/services/api/good';
-import { isFalse, isTrue } from '@/utils';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
@@ -496,18 +495,10 @@ export default () => {
         }}
         request={async (params) => {
           const { webSiteId, current, pageSize, isShelves, title } = params;
-          const getIsShelvesBool = (
-            value: string | boolean,
-          ): API.FilterStateEnum => {
-            if (isTrue(value)) return 1;
-            if (isFalse(value)) return 0;
-            return -1;
-          };
           const searchParams = {
             page: current,
             count: pageSize,
-            webSiteId: Number(webSiteId) > 0 ? Number(webSiteId) : '',
-            isShelves: getIsShelvesBool(isShelves),
+            isShelves: isShelves,
             title: title,
           };
           const { data } = await getGoodGetGoodList(

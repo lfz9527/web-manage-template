@@ -36,6 +36,14 @@ export async function getLogGetLogList(
   });
 }
 
+/** 查询错误日志类型列表 GET /api/Log/GetLogTypeList */
+export async function getLogGetLogTypeList(options?: { [key: string]: any }) {
+  return request<API.REWebApiCallback>('/api/Log/GetLogTypeList', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
 /** 读取单个日志文件内容 GET /api/Log/GetTextLogDetails */
 export async function getLogGetTextLogDetails(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)

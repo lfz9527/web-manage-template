@@ -139,6 +139,11 @@ const routes = [
         name: '标签管理',
         component: '@/pages/goods/tagManage',
       },
+      {
+        path: '/goods/partitionManage',
+        name: '分区管理',
+        component: '@/pages/goods/partitionManage',
+      },
     ],
   },
   {

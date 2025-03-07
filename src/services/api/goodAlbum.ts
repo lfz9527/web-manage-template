@@ -191,6 +191,21 @@ export async function getGoodAlbumGetGoodPostListByLike(
   });
 }
 
+/** 上下热门 POST /api/GoodAlbum/HotGoodPost */
+export async function postGoodAlbumHotGoodPost(
+  body: API.FBState,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/GoodAlbum/HotGoodPost', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 新增商品帖子喜欢记录 POST /api/GoodAlbum/InsertGoodPostLike */
 export async function postGoodAlbumInsertGoodPostLike(
   body: API.FBId,

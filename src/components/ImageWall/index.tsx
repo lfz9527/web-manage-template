@@ -71,7 +71,7 @@ const ImageWall: React.FC<ImageWallProps> = ({
       return;
     }
     setFileList(newFileList);
-    if (file.status === 'done') {
+    if (file.status === 'done' || file.status === 'removed') {
       onChange?.(newFileList);
     }
   };

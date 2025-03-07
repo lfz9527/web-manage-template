@@ -455,6 +455,10 @@ declare namespace API {
   };
 
   type getGoodAlbumGetGoodAlbumListParams = {
+    albumName?: string;
+    userId?: number;
+    userName?: string;
+    nickName?: string;
     keyWord?: string;
     page?: number;
     count?: number;
@@ -504,8 +508,12 @@ declare namespace API {
   };
 
   type getGoodGetGoodCategoryListParams = {
+    isadult?: boolean;
+    /** 父类Id */
     parentId?: number;
+    /** 页数 */
     page?: number;
+    /** 行数 */
     count?: number;
   };
 

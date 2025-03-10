@@ -158,10 +158,6 @@ export async function getWebSiteGetWebSiteSettingValueList(
     {
       method: 'GET',
       params: {
-        // page has a default value: 1
-        page: '1',
-        // count has a default value: 50
-        count: '50',
         ...params,
       },
       ...(options || {}),

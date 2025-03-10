@@ -61,9 +61,9 @@ const routes = [
   },
   {
     name: '店铺管理',
-    path: '/sites',
+    path: '/shops',
     icon: 'ReconciliationFilled',
-    component: '@/pages/sites/sitesManage',
+    component: '@/pages/shops/shopsManage',
   },
   {
     name: '广告管理',

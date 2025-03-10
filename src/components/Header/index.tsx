@@ -1,12 +1,11 @@
 import Logo from '@/assets/icon/logo.svg';
-import { CURRENT_SITE_ID } from '@/enum';
 import { getWebSiteGetWebSiteList } from '@/services/api/webSite';
-import { logoutFn } from '@/utils';
+import { getCurrentSiteId, logoutFn, setCurrentSiteId } from '@/utils';
 import { LogoutOutlined } from '@ant-design/icons';
 import type { HeaderProps } from '@ant-design/pro-layout';
 import { history, useModel } from '@umijs/max';
 import type { MenuProps } from 'antd';
-import { Avatar, Dropdown, Select, message } from 'antd';
+import { Avatar, Dropdown, Form, Select, message } from 'antd';
 import { useEffect, useState } from 'react';
 import styles from './index.less';
 
@@ -21,11 +20,11 @@ const DropdownItems: MenuProps['items'] = [
 export default (props: HeaderProps) => {
   const { initialState } = useModel('@@initialState');
   const { title } = props;
+  const [form] = Form.useForm();
 
-  const [siteId, setSiteId] = useState<string>('all');
   const [webSiteList, setWebSiteList] = useState<
-    { label: string; value: string }[]
-  >([{ label: '全部站点', value: 'all' }]);
+    { label: string; value: number }[]
+  >([{ label: '全部站点', value: 0 }]);
 
   const getWebSiteList = async () => {
     const { data } = await getWebSiteGetWebSiteList({ page: 1, count: 100 });
@@ -38,15 +37,15 @@ export default (props: HeaderProps) => {
   };
 
   useEffect(() => {
-    setSiteId(sessionStorage.getItem(CURRENT_SITE_ID) || 'all');
+    form.setFieldsValue({
+      siteId: getCurrentSiteId() ?? 0,
+    });
     getWebSiteList();
   }, []);
 
   // 切换站点
-  const selectSite = (value: string) => {
-    console.log(value);
-    setSiteId(value);
-    sessionStorage.setItem(CURRENT_SITE_ID, value);
+  const selectSite = (value: number) => {
+    setCurrentSiteId(value);
     message.success('切换站点成功');
     history.push('/');
   };
@@ -66,16 +65,17 @@ export default (props: HeaderProps) => {
         )}
         {title && <div className={styles['header-left-title']}>{title}</div>}
         <div className={styles['header-left-site-select']}>
-          <Select
-            placeholder="请选择站点"
-            style={{ width: '100%' }}
-            defaultValue={siteId}
-            onChange={selectSite}
-            onSelect={(value) => {
-              console.log('onSelect triggered:', value);
-            }}
-            options={webSiteList}
-          />
+          <Form form={form}>
+            <Form.Item name="siteId" initialValue={{ siteId: 'all' }} noStyle>
+              <Select
+                allowClear
+                placeholder="请选择站点"
+                style={{ width: '100%' }}
+                onChange={selectSite}
+                options={webSiteList}
+              />
+            </Form.Item>
+          </Form>
         </div>
       </div>
       <div className={styles['header-right']}>

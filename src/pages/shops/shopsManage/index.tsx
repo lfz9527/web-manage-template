@@ -21,7 +21,6 @@ import {
   Space,
   Tag,
 } from 'antd';
-import moment from 'moment';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 // 店铺列表项数据类型
@@ -56,7 +55,6 @@ type FieldType = {
   shopSiteTitle: string;
   describe: string;
   link: string;
-  // siteType: string;
   logoImageId: number;
   emails: string[];
   tels: string[];
@@ -66,7 +64,6 @@ type FieldType = {
   isHot: boolean;
   state: number;
   goodCount: number;
-  createTime: moment.Moment;
 };
 
 // 文件信息类型
@@ -186,6 +183,7 @@ const SiteManagementPage = () => {
       title: '链接',
       dataIndex: 'link',
       search: false,
+      copyable: true,
     },
     {
       title: 'Email',

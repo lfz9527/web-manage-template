@@ -3,6 +3,23 @@ import { postUserLoginOut } from '@/services/api/user';
 import { history } from '@umijs/max';
 import { message } from 'antd';
 
+const getCurrentSiteId = () => {
+  return JSON.parse(sessionStorage.getItem(CURRENT_SITE_ID)!);
+};
+
+const setCurrentSiteId = (siteId: number) => {
+  sessionStorage.setItem(CURRENT_SITE_ID, siteId.toString());
+};
+
+const removeCurrentSiteId = () => {
+  sessionStorage.removeItem(CURRENT_SITE_ID);
+};
+
+// 是否允许使用全部站点id
+const allowAllSiteId = () => {
+  return getCurrentSiteId() === 0 || !getCurrentSiteId();
+};
+
 const getToken = () => {
   return localStorage.getItem(TOKEN_KEY);
 };
@@ -18,7 +35,7 @@ const logoutFn = async () => {
   const logout = () => {
     removeToken();
     localStorage.removeItem(AUTO_LOGIN_KEY);
-    sessionStorage.removeItem(CURRENT_SITE_ID);
+    removeCurrentSiteId();
     history.push(LOGIN_PATH);
     message.success('退出成功');
   };
@@ -37,4 +54,12 @@ const logoutFn = async () => {
   }
 };
 
-export { getToken, logoutFn, removeToken, setToken };
+export {
+  allowAllSiteId,
+  getCurrentSiteId,
+  getToken,
+  logoutFn,
+  removeToken,
+  setCurrentSiteId,
+  setToken,
+};

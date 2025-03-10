@@ -160,10 +160,6 @@ export async function getGoodGetGoodList(
   return request<API.REWebApiCallback>('/api/Good/GetGoodList', {
     method: 'GET',
     params: {
-      // page has a default value: 1
-      page: '1',
-      // count has a default value: 10
-      count: '10',
       ...params,
     },
     ...(options || {}),
@@ -179,10 +175,6 @@ export async function getGoodGetGoodListPublic(
   return request<API.REWebApiCallback>('/api/Good/GetGoodListPublic', {
     method: 'GET',
     params: {
-      // page has a default value: 1
-      page: '1',
-      // count has a default value: 10
-      count: '10',
       ...params,
     },
     ...(options || {}),
@@ -213,10 +205,6 @@ export async function getGoodGetGoodPartitionList(
   return request<API.REWebApiCallback>('/api/Good/GetGoodPartitionList', {
     method: 'GET',
     params: {
-      // page has a default value: 1
-      page: '1',
-      // count has a default value: 50
-      count: '50',
       ...params,
     },
     ...(options || {}),

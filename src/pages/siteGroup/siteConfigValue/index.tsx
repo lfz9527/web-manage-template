@@ -1,10 +1,12 @@
 import {
+  getWebSiteGetWebSiteList,
   getWebSiteGetWebSiteSettingList,
   getWebSiteGetWebSiteSettingValue,
   getWebSiteGetWebSiteSettingValueList,
   postWebSiteDeleteWebSiteSettingValue,
   postWebSiteSaveWebSiteSettingValue,
 } from '@/services/api/webSite';
+import { allowAllSiteId } from '@/utils';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
@@ -58,6 +60,28 @@ export default () => {
     WebSiteSettingOption[]
   >([]);
 
+  // 站点列表
+  const [webSiteList, setWebSiteList] = useState<
+    {
+      label: string;
+      value: string;
+    }[]
+  >([]);
+
+  const getWebSiteList = async () => {
+    const { data } = await getWebSiteGetWebSiteList({
+      page: 1,
+      count: 100,
+    });
+    const { list } = data;
+    setWebSiteList(
+      list.map((item: any) => ({
+        label: item.name,
+        value: item.webSiteId,
+      })),
+    );
+  };
+
   // 打开创建/编辑模态框
   const handleOpenCreateDialog = () => {
     form.resetFields();
@@ -85,6 +109,7 @@ export default () => {
   };
 
   useEffect(() => {
+    getWebSiteList();
     fetchWebSiteSettingOptions();
   }, []);
 
@@ -106,6 +131,21 @@ export default () => {
     }
   };
 
+  // 站点列表valueEnum
+  const webSiteListValueEnum = () => {
+    const result = {
+      0: { text: '全部' },
+      ...webSiteList.reduce(
+        (acc, item) => ({
+          ...acc,
+          [item.value]: { text: item.label },
+        }),
+        {},
+      ),
+    };
+    return result;
+  };
+
   // 表格列定义
   const columns: ProColumns<WebSiteSettingValue>[] = [
     {
@@ -116,7 +156,8 @@ export default () => {
     {
       title: '站点名',
       dataIndex: ['webSite', 'name'],
-      search: false,
+      search: true,
+      valueEnum: webSiteListValueEnum(),
     },
     {
       title: '属性名称',
@@ -222,7 +263,18 @@ export default () => {
           const searchParams = {
             page: params.current,
             count: params.pageSize,
+            webSiteId: params?.webSite?.name || 0,
+            ...params,
           };
+
+          if ('webSite' in searchParams) {
+            delete searchParams.webSite;
+          }
+          delete searchParams.current;
+          delete searchParams.pageSize;
+
+          console.log(searchParams);
+
           try {
             const { data } = await getWebSiteGetWebSiteSettingValueList(
               searchParams,
@@ -243,6 +295,7 @@ export default () => {
             };
           }
         }}
+        search={allowAllSiteId() ? {} : false}
         rowKey="webSiteSettingValueId"
         pagination={{
           pageSize: 20,
@@ -251,7 +304,6 @@ export default () => {
           pageSizeOptions: ['10', '20', '50', '100'],
           onChange: (page) => console.log(page),
         }}
-        search={false}
         dateFormatter="string"
         toolBarRender={() => [
           <Button

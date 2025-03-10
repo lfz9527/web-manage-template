@@ -6,7 +6,7 @@ import {
   postGoodSaveGoodPartition,
 } from '@/services/api/good';
 import { getWebSiteGetWebSiteList } from '@/services/api/webSite';
-import { isNull } from '@/utils';
+import { allowAllSiteId, isNull } from '@/utils';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
@@ -181,6 +181,21 @@ export default () => {
     });
   };
 
+  // 站点列表valueEnum
+  const webSiteListValueEnum = () => {
+    const result = {
+      0: { text: '全部' },
+      ...webSiteList.reduce(
+        (acc, item) => ({
+          ...acc,
+          [item.value]: { text: item.label },
+        }),
+        {},
+      ),
+    };
+    return result;
+  };
+
   const columns: ProColumns<TableItem>[] = [
     {
       title: '序号',
@@ -191,6 +206,8 @@ export default () => {
     {
       title: '站点名称',
       dataIndex: ['webSite', 'name'],
+      search: allowAllSiteId(),
+      valueEnum: webSiteListValueEnum(),
     },
     {
       title: '分区名称',
@@ -306,6 +323,7 @@ export default () => {
             page: params.current,
             count: params.pageSize,
             partitionName: params.partitionName?.trim(),
+            webSiteId: params?.webSite?.name || 0,
           });
           const { list, total } = data;
           return {

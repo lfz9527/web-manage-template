@@ -8,6 +8,7 @@ import {
   postGoodUpdateGoodForAi,
 } from '@/services/api/good';
 import { getWebSiteGetWebSiteList } from '@/services/api/webSite';
+import { allowAllSiteId } from '@/utils';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
@@ -22,6 +23,9 @@ type TableItem = {
   };
   webSite: {
     name: string;
+  };
+  brand: {
+    brandName: string;
   };
   webSiteId: string;
   faceSrc: string;
@@ -192,6 +196,12 @@ export default () => {
       width: 48,
     },
     {
+      title: '商品ID',
+      dataIndex: 'goodId',
+      search: false,
+      copyable: true,
+    },
+    {
       title: '店铺名称',
       dataIndex: ['shopSite', 'shopSiteName'],
       search: false,
@@ -200,7 +210,7 @@ export default () => {
     {
       title: '所属站点',
       dataIndex: ['webSite', 'name'],
-      search: true,
+      search: allowAllSiteId(),
       valueEnum: webSiteListValueEnum(),
     },
     {
@@ -230,8 +240,8 @@ export default () => {
       search: false,
     },
     {
-      title: '商品品牌Id',
-      dataIndex: 'brandId',
+      title: '商品品牌',
+      dataIndex: ['brand', 'brandName'],
       search: false,
     },
     {
@@ -250,9 +260,9 @@ export default () => {
       title: '上下架状态',
       dataIndex: 'isShelves',
       valueEnum: {
-        0: { text: '全部' },
-        true: { text: '已上架' },
-        false: { text: '已下架' },
+        '-1': { text: '全部' },
+        1: { text: '已上架' },
+        0: { text: '已下架' },
       },
       render: (_, record) => {
         return record.isShelves ? (
@@ -277,8 +287,13 @@ export default () => {
     },
     {
       title: '是否成人用品',
-      dataIndex: ['goodCategory`', 'isAdult'],
-      search: false,
+      dataIndex: ['goodCategory', 'isAdult'],
+      search: true,
+      valueEnum: {
+        '-1': { text: '全部' },
+        1: { text: '是' },
+        0: { text: '否' },
+      },
       render: (_, record) => {
         return record.goodCategory.isAdult ? (
           <Tag color="red">是</Tag>
@@ -311,6 +326,7 @@ export default () => {
       title: '创建时间',
       search: false,
       dataIndex: 'createTime',
+      valueType: 'dateTime',
     },
     {
       title: '操作',
@@ -516,21 +532,34 @@ export default () => {
           );
         }}
         request={async (params) => {
-          const { webSite, current, pageSize } = params;
+          console.log(222, params);
+
+          const { webSite, current, pageSize, goodCategory } = params;
           const searchParams = {
             page: current,
             count: pageSize,
+            aiOverState: Number(params.isShelves) || -1,
             ...params,
           } as Record<string, any>;
 
-          if (webSite?.name) {
-            searchParams['webSiteId'] = webSite?.name;
+          if ('webSite' in searchParams) {
+            searchParams['webSiteId'] = webSite?.name || -1;
+            delete searchParams.webSite;
+          }
+
+          if ('goodCategory' in searchParams) {
+            searchParams['adultState'] = goodCategory?.isAdult
+              ? Number(goodCategory?.isAdult)
+              : -1;
+            delete searchParams.goodCategory;
           }
 
           // 删除不必要的参数
-          delete searchParams.webSite;
           delete searchParams.current;
           delete searchParams.pageSize;
+          delete searchParams.isShelves;
+
+          console.log(searchParams);
 
           const { data } = await getGoodGetGoodList(
             searchParams as API.getGoodGetGoodListParams,
@@ -551,6 +580,9 @@ export default () => {
           onChange: () => {
             actionRef.current?.clearSelected?.();
           },
+        }}
+        search={{
+          labelWidth: 'auto',
         }}
         dateFormatter="string"
         toolBarRender={() => [

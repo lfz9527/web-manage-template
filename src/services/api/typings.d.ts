@@ -1,11 +1,18 @@
 declare namespace API {
   type FBBrand = {
+    /** 品牌的唯一标识符 */
     brandId?: number;
+    /** 分类Id */
     goodCategoryId?: number;
+    /** 品牌的名称 */
     brandName?: string;
+    /** 对品牌的详细描述信息 */
     brandDescribe?: string;
+    /** 品牌logo对应的唯一标识符 */
     logoImageId?: number;
+    /** 表示品牌是否处于在线状态 */
     isOnline?: boolean;
+    /** 表示品牌是否为热门品牌 */
     isHot?: boolean;
   };
 
@@ -36,12 +43,19 @@ declare namespace API {
   };
 
   type FBDealJoin = {
+    /** 优惠提交Id */
     dealJoinId?: number;
+    /** 网站链接 */
     webSiteLink?: string;
+    /** 优惠信息类型 */
     offerType?: number;
+    /** 券码 */
     dealCode?: string;
+    /** 优惠说明 */
     discountDescription?: string;
+    /** 过期时间 */
     expirationTime?: string;
+    /** 邮箱 */
     email?: string;
   };
 
@@ -74,69 +88,115 @@ declare namespace API {
 
   type FBFriendLink = {
     friendLinkId?: number;
+    /** 友情链接名称 */
     friendName?: string;
+    /** 友情链接 */
     friendLink?: string;
+    /** 友情链接Logo */
     logoImageId?: number;
   };
 
   type FBGood = {
+    /** 商品id */
     goodId?: number;
+    /** 对应的独立站点id */
     shopSiteId?: number;
+    /** 独立站点商品Id */
     shopSiteGoodId?: string;
+    /** 对应的站群id */
     webSiteId?: number;
+    /** 商品封面图 */
     faceSrc?: string;
+    /** 商品标题 */
     title?: string;
+    /** 商品描述 */
     content?: string;
+    /** seo标题 */
     seoTitle?: string;
+    /** seo关键词 */
     seoKeyword?: string;
+    /** seo描述 */
     seoDescription?: string;
+    /** 商品原始标价 */
     basePrice?: number;
+    /** 商品当前售价 */
     price?: number;
+    /** 价格权重 */
     priceWeight?: number;
+    /** 购买链接 */
     buyLink?: string;
+    /** 分销购买链接 */
     distributionLink?: string;
+    /** 类目id */
     goodCategoryId?: number;
+    /** 库存 */
     stock?: number;
+    /** 销量 */
     salesVolume?: number;
+    /** 是否上架 */
     isShelves?: boolean;
+    /** 是否热门 */
     isHot?: boolean;
+    /** 品牌Id */
+    brandId?: number;
+    /** 评分 */
     scope?: number;
     tags?: FBGoodTag[];
+    /** 属性键值对 */
     attributes?: FBGoodAttribute[];
+    /** 商品轮播图片 */
     banners?: FBGoodBanner[];
   };
 
   type FBGoodAlbum = {
+    /** 商品专辑Id */
     goodAlbumId?: number;
+    /** 专辑名称 */
     albumName?: string;
+    /** 专辑描述 */
     albumDescribe?: string;
+    /** 是否私密 */
     isPrivate?: boolean;
   };
 
   type FBGoodAttribute = {
+    /** 商品属性名 */
     attributeName?: string;
+    /** 商品属性值 */
     attributeValue?: string;
   };
 
   type FBGoodBanner = {
+    /** 图片表的id */
     imageId?: number;
   };
 
   type FBGoodCategory = {
+    /** 商品分类Id */
     goodCategoryId?: number;
+    /** 商品分类名称 */
     categoryname?: string;
+    /** 图片id */
     imageId?: number;
+    /** 分类父级id */
     parentid?: number;
+    /** 是否热门 */
     isHot?: boolean;
+    /** 是否成人用品 */
     isAdult?: boolean;
   };
 
   type FBGoodPartition = {
     goodPartitionId?: number;
+    /** 站群Id */
     webSiteId?: number;
+    /** 分区名称 */
     partitionName?: string;
+    /** 横向图片Id */
     horizontalImageId?: number;
+    /** 纵向图片Id */
     verticalImageId?: number;
+    /** 正方形图片Id */
     squareImageId?: number;
   };
 
@@ -158,17 +218,29 @@ declare namespace API {
   };
 
   type FBGoodPublic = {
+    /** 商品id */
     pid?: string;
+    /** 商品标题 */
     title?: string;
+    /** 商品价格 */
     price?: string;
+    /** 商品原始价格 */
     price_orgin?: string;
+    /** 分类 */
     category?: string;
+    /** 属性 */
     attribute?: string;
+    /** 描述 */
     content?: string;
+    /** 链接 */
     url?: string;
+    /** 独立站名称 */
     merchant_name?: string;
+    /** 独立站链接 */
     merchant_url?: string;
+    /** 图片集合 */
     images?: string;
+    /** 站点类型 */
     source_type?: string;
   };
 
@@ -179,24 +251,34 @@ declare namespace API {
   };
 
   type FBHot = {
+    /** 商品Id集 */
     ids?: number[];
+    /** 上下热门 */
     isHot?: boolean;
   };
 
   type FBId = {
+    /** 通用参数id */
     id?: number;
   };
 
   type FBIds = {
+    /** 通用参数id集合 */
     ids?: number[];
   };
 
   type FBImage = {
+    /** 图片id */
     imageId?: number;
+    /** 图片链接 */
     imgSrc?: string;
+    /** 图片宽 */
     width?: number;
+    /** 图片高 */
     height?: number;
+    /** 图片大小 */
     size?: number;
+    /** 图片hash值 */
     hash?: string;
   };
 
@@ -205,11 +287,17 @@ declare namespace API {
   };
 
   type FBPoster = {
+    /** 广告Id */
     posterId?: number;
+    /** 站点Id */
     webSiteId?: number;
+    /** 广告标题 */
     posterTitle?: string;
+    /** 广告链接 */
     posterLink?: string;
+    /** 图片Id */
     posterImageId?: number;
+    /** 是否上线 */
     isOnline?: boolean;
   };
 
@@ -234,38 +322,62 @@ declare namespace API {
   };
 
   type FBReport = {
+    /** 举报的数据类型 */
     objectType?: string;
+    /** 举报的数据对象 */
     objectId?: number;
+    /** 举报的内容 */
     content?: string;
   };
 
   type FBShelves = {
+    /** 商品Id集 */
     ids?: number[];
+    /** 上下架 */
     isShelves?: boolean;
   };
 
   type FBShopSite = {
+    /** 站点id */
     shopSiteId?: number;
+    /** 称呼 */
     shopSiteTitle?: string;
+    /** 站点名称 */
     shopSiteName?: string;
+    /** 站点描述 */
     describe?: string;
+    /** 站点链接 */
     link?: string;
+    /** 站点logoId */
     logoImageId?: number;
+    /** 邮箱 */
     emails?: string[];
+    /** 电话 */
     tels?: string[];
+    /** 开通年限 */
     yearopened?: number;
+    /** 星级评定 */
     starlevel?: number;
+    /** 是否上线 */
     isonline?: boolean;
+    /** 是否热门 */
     ishot?: boolean;
+    /** 站点状态 */
     state?: number;
   };
 
   type FBShopSiteJoin = {
+    /** 称呼 */
     title?: string;
+    /** 站点名称 */
     name: string;
+    /** 站点描述 */
     describe: string;
+    /** 站点链接 */
     link: string;
+    /** 联系邮箱 */
     email: string;
+    /** 联系电话 */
     tel?: string;
   };
 
@@ -275,7 +387,9 @@ declare namespace API {
   };
 
   type FBUserLogin = {
+    /** 用户账号 */
     username?: string;
+    /** 请输入用户密码 */
     password?: string;
   };
 
@@ -291,34 +405,53 @@ declare namespace API {
   };
 
   type FBUserUpdatePwd = {
+    /** 旧密码 */
     oldpassword?: string;
+    /** 新密码 */
     newpassword?: string;
   };
 
   type FBWebSite = {
+    /** 站点id */
     webSiteId?: number;
+    /** 站点名 */
     name?: string;
+    /** slogan */
     slogan?: string;
+    /** seo标题 */
     seoTitle?: string;
+    /** seo关键词 */
     seoKeyword?: string;
+    /** seo描述 */
     seoDescription?: string;
+    /** 域名 */
     domain?: string;
+    /** 描述 */
     describe?: string;
+    /** 类目id */
     goodCategoryId?: number;
+    /** 图片id */
     logoImageId?: number;
+    /** 状态 */
     state?: number;
   };
 
   type FBWebSiteSetting = {
+    /** 站点设置Id */
     webSiteSettingId?: number;
+    /** 属性名称 */
     settingName?: string;
+    /** 属性说明 */
     settingDescribe?: string;
   };
 
   type FBWebSiteSettingValue = {
     webSiteSettingValueId?: number;
+    /** 站点设置属性Id */
     webSiteSettingId?: number;
+    /** 站点Id */
     webSiteId?: number;
+    /** 站点设置值 */
     settingValue?: string;
   };
 
@@ -492,8 +625,15 @@ declare namespace API {
   type getGoodAlbumGetGoodPostListParams = {
     /** 关键词 */
     keyWord?: string;
+    /** 商品标题 */
+    goodTitle?: string;
+    /** 商品描述 */
+    goodDescribe?: string;
+    /** 内容 */
+    content?: string;
     /** 专辑Id */
     goodAlbumId?: number;
+    /** 用户Id */
     userId?: number;
     page?: number;
     count?: number;
@@ -522,25 +662,87 @@ declare namespace API {
   };
 
   type getGoodGetGoodListParams = {
+    /** 商品标题 */
     title?: string;
-    orderBy?: string;
+    /** 店铺Id */
+    shopSiteId?: number;
+    /** 店铺名称 */
+    shopSiteName?: string;
+    /** 站群名称 */
+    webSiteName?: string;
+    /** 热门状态 */
+    hotState?: FilterStateEnum;
+    /** 是否成人状态 */
+    adultState?: FilterStateEnum;
+    /** AI是否处理完成状态 */
+    aiOverState?: FilterStateEnum;
+    /** 要排除不查询的商品id */
+    filterGoodIds?: number[];
+    /** 关键词（会查多个字段组合） */
+    keyWord?: string;
+    /** 标签Id */
+    tagId?: number;
+    /** 标签名称 */
+    tagName?: string;
+    /** 分类Id */
+    categoryId?: number;
+    /** 分类名称 */
+    categoryName?: string;
+    /** 品牌Id */
+    brandId?: number;
+    /** 品牌名称 */
+    brandName?: string;
+    /** 上下架状态 */
+    shelvesState?: FilterStateEnum;
+    /** 是否包含成人 */
+    isAdult?: boolean;
+    /** 通用对象Id */
+    Id?: number;
+    /** 站点Id */
     webSiteId?: number;
-    isShelves?: FilterStateEnum;
+    /** 用户Id */
+    loginUserId?: number;
+    /** 查询页数 */
     page?: number;
+    /** 查询行数 */
     count?: number;
+    /** 是否需要查询总行数 */
+    haveTotal?: boolean;
+    /** 排序 */
+    orderBy?: string;
   };
 
   type getGoodGetGoodListPublicParams = {
-    /** 关键词 */
-    keyword?: string;
-    /** 标签id */
-    tagid?: number;
-    /** 分类id */
-    categoryid?: number;
-    /** 分页 */
+    /** 关键词（会查多个字段组合） */
+    keyWord?: string;
+    /** 标签Id */
+    tagId?: number;
+    /** 标签名称 */
+    tagName?: string;
+    /** 分类Id */
+    categoryId?: number;
+    /** 分类名称 */
+    categoryName?: string;
+    /** 品牌Id */
+    brandId?: number;
+    /** 品牌名称 */
+    brandName?: string;
+    /** 上下架状态 */
+    shelvesState?: FilterStateEnum;
+    /** 是否包含成人 */
+    isAdult?: boolean;
+    /** 通用对象Id */
+    Id?: number;
+    /** 站点Id */
+    webSiteId?: number;
+    /** 用户Id */
+    loginUserId?: number;
+    /** 查询页数 */
     page?: number;
-    /** 行数 */
+    /** 查询行数 */
     count?: number;
+    /** 是否需要查询总行数 */
+    haveTotal?: boolean;
   };
 
   type getGoodGetGoodPartitionByIdParams = {
@@ -548,16 +750,22 @@ declare namespace API {
   };
 
   type getGoodGetGoodPartitionListParams = {
-    /** 分区名 */
+    /** 分区名称 */
     partitionName?: string;
+    /** 通用对象Id */
+    Id?: number;
     /** 站点Id */
     webSiteId?: number;
+    /** 用户Id */
+    loginUserId?: number;
+    /** 查询页数 */
+    page?: number;
+    /** 查询行数 */
+    count?: number;
+    /** 是否需要查询总行数 */
+    haveTotal?: boolean;
     /** 排序 */
     orderBy?: string;
-    /** 页数 */
-    page?: number;
-    /** 行数 */
-    count?: number;
   };
 
   type getGoodGetGoodTagListParams = {
@@ -687,10 +895,20 @@ declare namespace API {
   };
 
   type getWebSiteGetWebSiteSettingValueListParams = {
-    /** 页码，默认值为1 */
+    /** 项名称 */
+    webSiteSettingName?: string;
+    /** 通用对象Id */
+    Id?: number;
+    /** 站点Id */
+    webSiteId?: number;
+    /** 用户Id */
+    loginUserId?: number;
+    /** 查询页数 */
     page?: number;
-    /** 每页数量，默认值为50 */
+    /** 查询行数 */
     count?: number;
+    /** 是否需要查询总行数 */
+    haveTotal?: boolean;
   };
 
   type getWebSiteGetWebSiteSettingValueParams = {
@@ -713,6 +931,7 @@ declare namespace API {
     msg?: string;
     code?: number;
     data?: any;
+    /** 额外备用参数 */
     remark?: Record<string, any>;
   };
 }

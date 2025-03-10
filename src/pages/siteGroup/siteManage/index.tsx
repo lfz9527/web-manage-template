@@ -6,6 +6,7 @@ import {
   postWebSiteDeleteWebSite, // 假设存在删除网站信息的服务
   postWebSiteSaveWebSite,
 } from '@/services/api/webSite';
+import { isProduction } from '@/utils';
 import { isNull } from '@/utils/is';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
@@ -170,6 +171,17 @@ export default () => {
       title: '站点域名',
       dataIndex: 'domain',
       search: false,
+      render: (_, record) => {
+        const link = isProduction
+          ? `http://${record.domain}`
+          : `https://localhost:${record.domain}`;
+
+        return (
+          <a href={link} target="_blank" rel="noreferrer">
+            {record.domain}
+          </a>
+        );
+      },
     },
     {
       title: '站点描述',

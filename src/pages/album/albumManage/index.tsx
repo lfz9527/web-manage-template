@@ -125,7 +125,6 @@ export default () => {
     {
       title: '商品数量',
       dataIndex: 'goodCount',
-      valueType: 'dateTime',
       search: false,
     },
     {

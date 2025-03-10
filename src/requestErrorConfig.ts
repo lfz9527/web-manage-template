@@ -1,5 +1,10 @@
-import { CURRENT_SITE_ID } from '@/enum';
-import { getToken, logger, logoutFn, setToken } from '@/utils';
+import {
+  getCurrentSiteId,
+  getToken,
+  logger,
+  logoutFn,
+  setToken,
+} from '@/utils';
 import type { RequestConfig } from '@umijs/max';
 import { message } from 'antd';
 
@@ -58,7 +63,7 @@ const authorSite = (config: any) => {
   if (method.toUpperCase() === 'POST') {
     return;
   }
-  let siteId = sessionStorage.getItem(CURRENT_SITE_ID);
+  let siteId = getCurrentSiteId();
   if (!siteId || siteId === 'all') {
     siteId = '';
   }

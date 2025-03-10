@@ -121,7 +121,7 @@ export default () => {
 
     const params: API.FBShelves = {
       ids,
-      isShelves,
+      state: isShelves,
     };
     console.log(params);
 
@@ -142,12 +142,10 @@ export default () => {
     const names = poster.map((item) => item.title).join(',');
     const ids = poster.map((item) => Number(item.goodId));
 
-    const params: API.FBHot = {
+    const params = {
       ids,
-      isHot,
+      state: isHot,
     };
-    console.log(params);
-
     modal.confirm({
       title: `确定${message}商品：${names}吗？`,
       centered: true,

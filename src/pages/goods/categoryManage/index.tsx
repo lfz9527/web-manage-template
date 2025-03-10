@@ -118,7 +118,7 @@ export default () => {
     const ids = category.map((item) => item.goodCategoryId);
     const params = {
       ids,
-      isHot,
+      state: isHot,
     };
     try {
       await postGoodHotGoodCategory(params);

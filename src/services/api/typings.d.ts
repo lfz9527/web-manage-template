@@ -1,4 +1,12 @@
 declare namespace API {
+  type FBAIPromptWord = {
+    aIPromptWordId?: number;
+    /** 提示词内容 */
+    promptWordContent?: string;
+    /** 提示词标识 */
+    promptWordCode?: string;
+  };
+
   type FBBrand = {
     /** 品牌的唯一标识符 */
     brandId?: number;
@@ -157,6 +165,8 @@ declare namespace API {
     albumDescribe?: string;
     /** 是否私密 */
     isPrivate?: boolean;
+    /** 站点Id */
+    webSiteId?: number;
   };
 
   type FBGoodAttribute = {
@@ -213,7 +223,13 @@ declare namespace API {
   };
 
   type FBGoodPostComment = {
+    /** 评论Id */
     goodPostId?: number;
+    /** 顶级父评论 */
+    parentCommentId?: number;
+    /** 回复的评论 */
+    replyCommentId?: number;
+    /** 评论内容 */
     commentContent?: string;
   };
 
@@ -247,13 +263,6 @@ declare namespace API {
   type FBGoodTag = {
     goodTagId?: number;
     tagName?: string;
-    isHot?: boolean;
-  };
-
-  type FBHot = {
-    /** 商品Id集 */
-    ids?: number[];
-    /** 上下热门 */
     isHot?: boolean;
   };
 
@@ -328,13 +337,6 @@ declare namespace API {
     objectId?: number;
     /** 举报的内容 */
     content?: string;
-  };
-
-  type FBShelves = {
-    /** 商品Id集 */
-    ids?: number[];
-    /** 上下架 */
-    isShelves?: boolean;
   };
 
   type FBShopSite = {
@@ -456,6 +458,10 @@ declare namespace API {
   };
 
   type FilterStateEnum = 0 | 1 | -1;
+
+  type getAIGetAIPromptWordByIdParams = {
+    id?: number;
+  };
 
   type getBrandGetBrandByIdParams = {
     id?: number;
@@ -752,6 +758,8 @@ declare namespace API {
   type getGoodGetGoodPartitionListParams = {
     /** 分区名称 */
     partitionName?: string;
+    /** 站点名称 */
+    webSiteName?: string;
     /** 通用对象Id */
     Id?: number;
     /** 站点Id */
@@ -925,6 +933,21 @@ declare namespace API {
     page?: number;
     /** 每页数量 */
     count?: number;
+  };
+
+  type QUBase = {
+    /** 通用对象Id */
+    id?: number;
+    /** 站点Id */
+    webSiteId?: number;
+    /** 用户Id */
+    loginUserId?: number;
+    /** 查询页数 */
+    page?: number;
+    /** 查询行数 */
+    count?: number;
+    /** 是否需要查询总行数 */
+    haveTotal?: boolean;
   };
 
   type REWebApiCallback = {

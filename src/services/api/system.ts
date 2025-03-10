@@ -26,11 +26,3 @@ export async function postSystemInsertReport(
     ...(options || {}),
   });
 }
-
-/** 此处后端没有提供注释 GET /api/System/Test */
-export async function getSystemTest(options?: { [key: string]: any }) {
-  return request<API.REWebApiCallback>('/api/System/Test', {
-    method: 'GET',
-    ...(options || {}),
-  });
-}

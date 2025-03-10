@@ -2,6 +2,7 @@
 /* eslint-disable */
 // API 更新时间：
 // API 唯一标识：
+import * as ai from './ai';
 import * as brand from './brand';
 import * as callback from './callback';
 import * as crawler from './crawler';
@@ -19,6 +20,7 @@ import * as system from './system';
 import * as user from './user';
 import * as webSite from './webSite';
 export default {
+  ai,
   brand,
   callback,
   crawler,

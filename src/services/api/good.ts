@@ -228,7 +228,7 @@ export async function getGoodGetGoodTagList(
 
 /** 商品上下热门 POST /api/Good/HotGood */
 export async function postGoodHotGood(
-  body: API.FBHot,
+  body: API.FBState,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/Good/HotGood', {
@@ -243,7 +243,7 @@ export async function postGoodHotGood(
 
 /** 商品分类上下热门 POST /api/Good/HotGoodCategory */
 export async function postGoodHotGoodCategory(
-  body: API.FBHot,
+  body: API.FBState,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/Good/HotGoodCategory', {
@@ -333,7 +333,7 @@ export async function postGoodSaveGoodTag(
 
 /** 商品上下架 POST /api/Good/ShelvesGood */
 export async function postGoodShelvesGood(
-  body: API.FBShelves,
+  body: API.FBState,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/Good/ShelvesGood', {

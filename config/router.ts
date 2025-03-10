@@ -181,6 +181,18 @@ const routes = [
     ],
   },
   {
+    name: '素材管理',
+    path: '/material',
+    icon: 'CalculatorFilled',
+    routes: [
+      {
+        path: '/material/aiPromptManage',
+        name: 'AI提示词管理',
+        component: '@/pages/material/aiPromptManage',
+      },
+    ],
+  },
+  {
     name: '友情链接',
     path: '/friend',
     icon: 'LinkOutlined',

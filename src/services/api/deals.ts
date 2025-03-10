@@ -111,7 +111,7 @@ export async function getDealsGetDealsTypeList(options?: {
 
 /** 优惠券上下热门 POST /api/Deals/HotDeals */
 export async function postDealsHotDeals(
-  body: API.FBHot,
+  body: API.FBState,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/Deals/HotDeals', {
@@ -156,7 +156,7 @@ export async function postDealsSaveDeals(
 
 /** 优惠券上下架 POST /api/Deals/ShelvesDeals */
 export async function postDealsShelvesDeals(
-  body: API.FBShelves,
+  body: API.FBState,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/Deals/ShelvesDeals', {

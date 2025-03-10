@@ -119,7 +119,7 @@ export default () => {
     const names = poster.map((item) => item.title).join(',');
     const ids = poster.map((item) => Number(item.goodId));
 
-    const params: API.FBShelves = {
+    const params = {
       ids,
       state: isShelves,
     };

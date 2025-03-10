@@ -93,7 +93,7 @@ export default () => {
     const params = {
       friendLinkId: Number(friendLinkId),
       ...values,
-      logoImageId: logoImage[0]?.imageId || '',
+      logoImageId: logoImage[0]?.imageId || 0,
     };
     try {
       await postFriendLinkSaveFriendLink(params);

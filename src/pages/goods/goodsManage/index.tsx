@@ -7,17 +7,21 @@ import {
   postGoodShelvesGood,
   postGoodUpdateGoodForAi,
 } from '@/services/api/good';
+import { getWebSiteGetWebSiteList } from '@/services/api/webSite';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
 import { history } from '@umijs/max';
 import { Button, Form, Input, message, Modal, Select, Space, Tag } from 'antd';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type TableItem = {
   goodId: string;
   shopSite: {
     shopSiteName: string;
+  };
+  webSite: {
+    name: string;
   };
   webSiteId: string;
   faceSrc: string;
@@ -67,6 +71,24 @@ export default () => {
       value: string;
     }[]
   >([]);
+
+  const getWebSiteList = async () => {
+    const { data } = await getWebSiteGetWebSiteList({
+      page: 1,
+      count: 100,
+    });
+    const { list } = data;
+    setWebSiteList(
+      list.map((item: any) => ({
+        label: item.name,
+        value: item.webSiteId,
+      })),
+    );
+  };
+
+  useEffect(() => {
+    getWebSiteList();
+  }, []);
 
   // 站点列表valueEnum
   const webSiteListValueEnum = () => {
@@ -176,8 +198,8 @@ export default () => {
       ellipsis: true,
     },
     {
-      title: '站群ID',
-      dataIndex: 'webSiteId',
+      title: '所属站点',
+      dataIndex: ['webSite', 'name'],
       search: true,
       valueEnum: webSiteListValueEnum(),
     },
@@ -494,13 +516,22 @@ export default () => {
           );
         }}
         request={async (params) => {
-          const { webSiteId, current, pageSize, isShelves, title } = params;
+          const { webSite, current, pageSize } = params;
           const searchParams = {
             page: current,
             count: pageSize,
-            isShelves: isShelves,
-            title: title,
-          };
+            ...params,
+          } as Record<string, any>;
+
+          if (webSite?.name) {
+            searchParams['webSiteId'] = webSite?.name;
+          }
+
+          // 删除不必要的参数
+          delete searchParams.webSite;
+          delete searchParams.current;
+          delete searchParams.pageSize;
+
           const { data } = await getGoodGetGoodList(
             searchParams as API.getGoodGetGoodListParams,
           );

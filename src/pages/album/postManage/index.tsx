@@ -60,13 +60,14 @@ export default () => {
     {
       title: '商品标题',
       dataIndex: 'goodTitle',
-      search: false,
+      search: true,
       width: 300,
       ellipsis: true,
     },
     {
       title: '商品价格',
       dataIndex: 'goodPrice',
+      search: false,
     },
     {
       title: '帖子图片',
@@ -81,7 +82,7 @@ export default () => {
     {
       title: '帖子描述',
       dataIndex: 'content',
-      search: false,
+      search: true,
       width: 600,
     },
     {
@@ -165,11 +166,16 @@ export default () => {
           );
         }}
         request={async (params) => {
-          const { data } = await getGoodAlbumGetGoodPostList({
+          const searchParams = {
             page: params.current,
             count: params.pageSize,
             ...params,
-          });
+          } as Record<string, any>;
+
+          delete searchParams.current;
+          delete searchParams.pageSize;
+
+          const { data } = await getGoodAlbumGetGoodPostList(searchParams);
           const { list, total } = data;
 
           return {
@@ -188,7 +194,7 @@ export default () => {
             actionRef.current?.clearSelected?.();
           },
         }}
-        search={false}
+        // search={false}
         dateFormatter="string"
       />
     </>

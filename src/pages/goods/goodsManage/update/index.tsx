@@ -2,7 +2,8 @@ import { ImageWall, PageFooter } from '@/components';
 import { getBrandGetBrandList } from '@/services/api/brand';
 import {
   getGoodGetGoodById,
-  getGoodGetGoodCategoryListParent,
+  getGoodGetGoodCategoryAllTree,
+  getGoodGetGoodCategoryById,
   postGoodSaveGood,
   postGoodSaveGoodTag,
 } from '@/services/api/good';
@@ -117,35 +118,31 @@ export default () => {
     );
   };
 
-  // 获取分类选项
-  const fetchCateOptList = async (
-    parentId: number = 0,
-    isLeaf: boolean = false,
-  ): Promise<CategoryOptionItem[]> => {
-    const { data } = await getGoodGetGoodCategoryListParent({
-      parentId,
+  // 格式化分类树
+  const formatData = (data: any) => {
+    return data.map((item: any) => {
+      const treeItem = {
+        value: item.goodCategoryId,
+        label: item.categoryName,
+        children: [],
+      };
+      if (item.childs && item.childs.length > 0) {
+        treeItem.children = formatData(item.childs);
+      }
+      return treeItem;
     });
-    return data.map((item: TableItem) => ({
-      value: item.goodCategoryId,
-      label: item.categoryName,
-      children: [],
-      isLeaf,
-    }));
+  };
+
+  // 获取分类选项
+  const fetchCateOptList = async (): Promise<CategoryOptionItem[]> => {
+    const { data } = await getGoodGetGoodCategoryAllTree();
+    return formatData(data);
   };
 
   // 初始化分类选项
   const initCategoryOption = async () => {
-    const data = await fetchCateOptList(0, false);
+    const data = await fetchCateOptList();
     setGoodCategoryList(data);
-  };
-
-  const loadCate = async (selOption: CategoryOptionItem[]) => {
-    const targetOption = selOption[selOption.length - 1];
-    const parentId = targetOption.value;
-    const data = await fetchCateOptList(Number(parentId), true);
-    targetOption.children = data;
-    targetOption.isLeaf = data.length === 0 || !data;
-    setGoodCategoryList([...goodCategoryList]);
   };
 
   // 获取商品分类列表
@@ -165,6 +162,20 @@ export default () => {
         value: item.brandId,
       })),
     );
+  };
+
+  const backShowCategory = async (id: number) => {
+    const ids: number[] = [];
+    const getCateById = async (id: number) => {
+      const { data } = await getGoodGetGoodCategoryById({ id });
+      ids.push(id);
+      const { parentId } = data;
+      if (parentId) {
+        await getCateById(parentId);
+      }
+    };
+    await getCateById(id);
+    return ids.reverse();
   };
 
   const getGoodId = async () => {
@@ -200,11 +211,15 @@ export default () => {
             })
           : [],
       };
+
       if (!attributes || attributes.length === 0) {
         formData.attributes = initAttributes;
       }
 
-      if (!isNull(data.brandId)) {
+      const goodCategoryId = await backShowCategory(formData.goodCategoryId);
+      formData.goodCategoryId = goodCategoryId;
+
+      if (isNull(data.brandId, true)) {
         delete formData.brandId;
       }
 
@@ -219,7 +234,6 @@ export default () => {
     if (!params.id) {
       await getShopSiteList();
     }
-
     await getGoodCategoryList();
     await getBrandList();
     await initCategoryOption();
@@ -292,6 +306,8 @@ export default () => {
       goodId,
       attributes: values.attributes.filter((item: any) => item.attributeValue),
       brandId: values.brandId || 0,
+      goodCategoryId:
+        values.goodCategoryId?.[values.goodCategoryId.length - 1] || 0,
     };
 
     try {
@@ -299,7 +315,7 @@ export default () => {
       messageApi.success('添加成功');
       footerBack();
     } catch (error) {
-      messageApi.error('添加失败');
+      // messageApi.error('添加失败');
     } finally {
       setLoading(false);
     }
@@ -507,7 +523,6 @@ export default () => {
                   allowClear
                   placeholder="请选择商品分类"
                   options={goodCategoryList}
-                  loadData={loadCate}
                 />
               </Form.Item>
             </Col>
@@ -748,7 +763,11 @@ export default () => {
               </Form.List>
             </Col>
             <Col xs={24} sm={24} md={12} lg={8} xl={6}>
-              <Form.Item<FieldType> label="轮播图" name="banners">
+              <Form.Item<FieldType>
+                label="轮播图"
+                name="banners"
+                rules={[{ required: true, message: '请上传轮播图' }]}
+              >
                 <ImageWall
                   maxCount={100}
                   fileList={banners}

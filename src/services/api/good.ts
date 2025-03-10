@@ -92,6 +92,16 @@ export async function getGoodGetGoodById(
   });
 }
 
+/** 查询所有分类并以树状结构返回 GET /api/Good/GetGoodCategoryAllTree */
+export async function getGoodGetGoodCategoryAllTree(options?: {
+  [key: string]: any;
+}) {
+  return request<API.REWebApiCallback>('/api/Good/GetGoodCategoryAllTree', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
 /** 根据ID查询单条商品分类 GET /api/Good/GetGoodCategoryById */
 export async function getGoodGetGoodCategoryById(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)

@@ -1,7 +1,7 @@
 import { Image, ImageWall } from '@/components';
 import {
+  getGoodGetGoodCategoryAllTree,
   getGoodGetGoodCategoryById,
-  getGoodGetGoodCategoryList,
   getGoodGetGoodCategoryListParent,
   postGoodDeleteGoodCategory,
   postGoodHotGoodCategory,
@@ -35,6 +35,7 @@ interface TableItem {
   goodCount: number;
   isAdult: boolean;
   createTime: string;
+  children: TableItem[];
 }
 
 type FileType = {
@@ -192,15 +193,18 @@ export default () => {
 
   const columns: ProColumns<TableItem>[] = [
     {
-      dataIndex: 'index',
-      valueType: 'indexBorder',
-      width: 48,
-    },
-    {
-      title: 'ID',
+      title: '展开/收起',
       dataIndex: 'goodCategoryId',
       search: false,
-      width: 100,
+      width: 80,
+      render: (_, record) => {
+        return '';
+      },
+    },
+    {
+      title: '分类名称',
+      dataIndex: 'categoryName',
+      search: true,
     },
     {
       title: '分类图片',
@@ -214,11 +218,7 @@ export default () => {
         );
       },
     },
-    {
-      title: '分类名称',
-      dataIndex: 'categoryName',
-      search: true,
-    },
+
     {
       title: '父级Id',
       dataIndex: 'parentId',
@@ -328,6 +328,17 @@ export default () => {
     }
   };
 
+  // 格式化数据
+  const formatData = (data: any, level: number = 1) => {
+    data.forEach((item: any) => {
+      if (item.childs && item.childs.length > 0) {
+        item.children = item.childs;
+        item.children = formatData(item.childs, level + 1);
+      }
+    });
+    return data;
+  };
+
   return (
     <>
       <ProTable<TableItem>
@@ -362,17 +373,18 @@ export default () => {
             count: params.pageSize,
             parentId: params.parentId,
           } as Record<string, any>;
-          const { data } = await getGoodGetGoodCategoryList(searchParams);
-          const { list = [], total } = data;
+          const { data } = await getGoodGetGoodCategoryAllTree(searchParams);
+          const listData = formatData(data);
+          console.log(listData);
           return {
-            data: list,
+            data: listData,
             success: true,
-            total,
+            total: listData.length,
           };
         }}
         rowKey="goodCategoryId"
         pagination={{
-          pageSize: 10,
+          pageSize: 50,
           showSizeChanger: true,
           showQuickJumper: true,
           pageSizeOptions: ['10', '20', '50', '100'],

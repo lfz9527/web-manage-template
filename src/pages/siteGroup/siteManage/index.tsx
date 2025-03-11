@@ -261,7 +261,7 @@ export default () => {
     setCreateLoading(true);
     const params = {
       ...values,
-      logoImageId: websiteLogo.imageId,
+      logoImageId: websiteLogo?.imageId || 0,
       webSiteId: websiteId,
     } as Record<string, any>;
 

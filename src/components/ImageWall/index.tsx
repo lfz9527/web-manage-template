@@ -28,12 +28,13 @@ const ImageWall: React.FC<ImageWallProps> = ({
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   useEffect(() => {
-    console.log('propFileList', propFileList);
     setFileList(
-      (propFileList as UploadFile[]).map((item) => ({
-        ...item,
-        url: formatImageUrl(item.url!),
-      })),
+      (propFileList as UploadFile[]).map((item) => {
+        if ('url' in item) {
+          item.url = formatImageUrl(item.url!);
+        }
+        return item;
+      }),
     );
   }, [propFileList]);
 
@@ -41,10 +42,12 @@ const ImageWall: React.FC<ImageWallProps> = ({
   useEffect(() => {
     if (typeof value === 'object') {
       setFileList(
-        value.map((item) => ({
-          ...item,
-          url: formatImageUrl(item.url!),
-        })),
+        value.map((item) => {
+          if ('url' in item) {
+            item.url = formatImageUrl(item.url!);
+          }
+          return item;
+        }),
       );
     }
   }, [value]);

@@ -1,17 +1,16 @@
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Button, Form, Image, Input, Modal, message } from 'antd';
+import { Button, Form, Input, Modal, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 
-import { ImageWall } from '@/components';
+import { Image, ImageWall } from '@/components';
 import {
   getFriendLinkGetFriendLinkById,
   getFriendLinkGetFriendLinkList,
   postFriendLinkDeleteFriendLink,
   postFriendLinkSaveFriendLink,
 } from '@/services/api/friendLink';
-
 import { useCallback } from 'react';
 
 interface TableItem {
@@ -72,6 +71,13 @@ export default () => {
     const { data } = await getFriendLinkGetFriendLinkById({
       id: Number(friendLinkId),
     });
+    console.log(data);
+    setLogoImage([
+      {
+        url: data.logoImage.imgSrc,
+        logoImageId: data.logoImageId,
+      },
+    ]);
     form.setFieldsValue({
       ...data,
     });
@@ -157,6 +163,12 @@ export default () => {
 
   const resetForm = () => {
     form.resetFields();
+    setLogoImage([
+      {
+        url: '',
+        logoImageId: '',
+      },
+    ]);
     setFriendLinkId('');
     setLoading(false);
     setOpenDialog(false);
@@ -180,7 +192,7 @@ export default () => {
             total,
           };
         }}
-        rowKey="fileName"
+        rowKey="friendLinkId"
         pagination={{
           pageSize: 10,
           showSizeChanger: true,

@@ -1,8 +1,10 @@
+import { formatImageUrl } from '@/utils';
 import { PlusOutlined } from '@ant-design/icons';
-import { Image, message, Upload } from 'antd';
+import { message, Upload } from 'antd';
 import type { RcFile, UploadProps } from 'antd/es/upload';
 import type { UploadFile } from 'antd/es/upload/interface';
 import React, { useEffect, useState } from 'react';
+import Image from '../Image';
 
 interface ImageWallProps {
   maxCount?: number; // 最大上传数量
@@ -26,14 +28,24 @@ const ImageWall: React.FC<ImageWallProps> = ({
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   useEffect(() => {
-    console.log(propFileList as UploadFile[]);
-    setFileList(propFileList as UploadFile[]);
+    console.log('propFileList', propFileList);
+    setFileList(
+      (propFileList as UploadFile[]).map((item) => ({
+        ...item,
+        url: formatImageUrl(item.url!),
+      })),
+    );
   }, [propFileList]);
 
   // 监听 value 变化
   useEffect(() => {
     if (typeof value === 'object') {
-      setFileList(value);
+      setFileList(
+        value.map((item) => ({
+          ...item,
+          url: formatImageUrl(item.url!),
+        })),
+      );
     }
   }, [value]);
 
@@ -83,7 +95,6 @@ const ImageWall: React.FC<ImageWallProps> = ({
       message.error('只能上传图片文件!');
       return false;
     }
-
     const isLtMaxSize = file.size / 1024 / 1024 < maxSize;
     if (!isLtMaxSize) {
       message.error(`图片大小必须小于 ${maxSize}MB!`);

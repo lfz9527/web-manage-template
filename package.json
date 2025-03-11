@@ -4,13 +4,13 @@
   "scripts": {
     "build": "max build",
     "clean:all": "rimraf node_modules && rimraf pnpm-lock.lock && rimraf package-lock.json ",
-    "dev": "max dev",
+    "dev": "max dev --mode development",
     "format": "prettier --cache --write .",
     "postinstall": "max setup",
     "openapi": "ts-node openapi.config.ts",
     "prepare": "husky",
     "setup": "max setup",
-    "start": "npm run dev"
+    "start": " npm run dev"
   },
   "dependencies": {
     "@ant-design/icons": "^5.0.1",

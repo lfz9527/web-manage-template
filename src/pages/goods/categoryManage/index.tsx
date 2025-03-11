@@ -21,7 +21,7 @@ import {
   Space,
   Tag,
 } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 interface TableItem {
   goodCategoryId: number;
@@ -106,10 +106,6 @@ export default () => {
     return data;
   };
 
-  useEffect(() => {
-    initCategoryOption();
-  }, []);
-
   // 上热门
   const handleHotGoodCategory = async (
     category: TableItem[],
@@ -155,6 +151,7 @@ export default () => {
   };
 
   const editCategory = async (category: TableItem) => {
+    initCategoryOption();
     setCategory([category]);
     setDialog(true);
 
@@ -222,7 +219,7 @@ export default () => {
     {
       title: '父级Id',
       dataIndex: 'parentId',
-      search: true,
+      search: false,
     },
     {
       title: '是否成人用品',
@@ -397,7 +394,10 @@ export default () => {
           <Button
             key="button"
             icon={<PlusOutlined />}
-            onClick={() => setDialog(true)}
+            onClick={() => {
+              initCategoryOption();
+              setDialog(true);
+            }}
             type="primary"
           >
             新增
@@ -440,6 +440,7 @@ export default () => {
               allowClear
               placeholder="请选择父级分类"
               options={cateOptList}
+              changeOnSelect
               loadData={loadCateOption}
             />
           </Form.Item>

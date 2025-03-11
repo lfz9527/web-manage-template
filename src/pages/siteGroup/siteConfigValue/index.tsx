@@ -337,11 +337,11 @@ export default () => {
           labelAlign="left"
         >
           <Form.Item<FieldType>
-            label="站点 ID"
+            label="站点"
             name="webSiteId"
-            rules={[{ required: true, message: '请输入站点 ID' }]}
+            rules={[{ required: true, message: '请输入站点' }]}
           >
-            <Input placeholder="请输入站点 ID" />
+            <Select placeholder="请选择站点" options={webSiteList} />
           </Form.Item>
           <Form.Item<FieldType>
             label="属性 ID"

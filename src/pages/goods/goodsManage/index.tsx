@@ -422,13 +422,7 @@ export default () => {
         actionRef={actionRef}
         cardBordered
         rowSelection={{}}
-        tableAlertRender={({
-          selectedRowKeys,
-          selectedRows,
-          onCleanSelected,
-        }) => {
-          setSelectedRows(selectedRows);
-
+        tableAlertRender={({ selectedRowKeys, onCleanSelected }) => {
           return (
             <Space size={24}>
               <span>
@@ -440,7 +434,7 @@ export default () => {
             </Space>
           );
         }}
-        tableAlertOptionRender={() => {
+        tableAlertOptionRender={({ selectedRows }) => {
           return (
             <Space size={16}>
               <a

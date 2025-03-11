@@ -1,3 +1,4 @@
+import { formatImageUrl } from '@/utils';
 import { Image as AntImage, type ImageProps as AntImageProps } from 'antd';
 import React from 'react';
 
@@ -5,6 +6,7 @@ export interface CustomImageProps extends Omit<AntImageProps, 'preview'> {
   showToolbar?: boolean;
   preview?: boolean | AntImageProps['preview'];
   objectFit?: 'cover' | 'contain' | 'fill' | 'none';
+  src: string;
 }
 
 const defaultFallback =
@@ -18,19 +20,23 @@ const Image: React.FC<CustomImageProps> = ({
   preview = true,
   objectFit = 'cover',
   style,
+  src,
   ...props
-}) => (
-  <AntImage
-    fallback={fallback}
-    preview={{
-      ...(typeof preview === 'object' ? preview : {}),
-      toolbarRender: showToolbar ? undefined : () => null,
-    }}
-    width={width}
-    height={height}
-    style={{ objectFit: objectFit, ...style }} // 添加默认的 object-fit 样式
-    {...props}
-  />
-);
+}) => {
+  return (
+    <AntImage
+      fallback={fallback}
+      preview={{
+        ...(typeof preview === 'object' ? preview : {}),
+        toolbarRender: showToolbar ? undefined : () => null,
+      }}
+      src={formatImageUrl(src)}
+      width={width}
+      height={height}
+      style={{ objectFit: objectFit, ...style }} // 添加默认的 object-fit 样式
+      {...props}
+    />
+  );
+};
 
 export default Image;

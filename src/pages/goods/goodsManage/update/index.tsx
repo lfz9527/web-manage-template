@@ -169,7 +169,7 @@ export default () => {
     const getCateById = async (id: number) => {
       const { data } = await getGoodGetGoodCategoryById({ id });
       ids.push(id);
-      const { parentId } = data;
+      const { parentId = '' } = data || {};
       if (parentId) {
         await getCateById(parentId);
       }
@@ -215,9 +215,13 @@ export default () => {
       if (!attributes || attributes.length === 0) {
         formData.attributes = initAttributes;
       }
-
-      const goodCategoryId = await backShowCategory(formData.goodCategoryId);
-      formData.goodCategoryId = goodCategoryId;
+      console.log(123, formData.goodCategoryId);
+      if (formData.goodCategoryId !== 0) {
+        const goodCategoryId = await backShowCategory(formData.goodCategoryId);
+        formData.goodCategoryId = goodCategoryId;
+      } else {
+        delete formData.goodCategoryId;
+      }
 
       if (isNull(data.brandId, true)) {
         delete formData.brandId;

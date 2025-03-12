@@ -1,7 +1,7 @@
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { Modal, message } from 'antd';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import { getLogGetTextLogList, postLogDeleteTextLog } from '@/services/api/log';
 
@@ -13,6 +13,10 @@ interface TableItem {
 export default () => {
   const actionRef = useRef<ActionType>();
   const [messageApi, messageContextHolder] = message.useMessage();
+
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewContent, setPreviewContent] = useState('');
+  const [previewTitle, setPreviewTitle] = useState('');
 
   const handleDeleteLog = async (record: TableItem) => {
     Modal.confirm({
@@ -34,6 +38,20 @@ export default () => {
     a.click();
   };
 
+  const handlePreviewLog = async (record: TableItem) => {
+    try {
+      const response = await fetch(
+        `/api/Log/GetTextLogDetails?filename=${record.fileName}`,
+      );
+      const text = await response.text();
+      setPreviewContent(text);
+      setPreviewTitle(record.fileName);
+      setPreviewVisible(true);
+    } catch (error) {
+      messageApi.error('获取日志内容失败');
+    }
+  };
+
   const columns: ProColumns<TableItem>[] = [
     {
       dataIndex: 'index',
@@ -51,7 +69,10 @@ export default () => {
       key: 'option',
       render: (_, record) =>
         [
-          <a key="detail" onClick={() => handleDownloadLog(record)}>
+          <a key="preview" onClick={() => handlePreviewLog(record)}>
+            预览
+          </a>,
+          <a key="download" onClick={() => handleDownloadLog(record)}>
             下载
           </a>,
           <a
@@ -99,6 +120,28 @@ export default () => {
         }}
         dateFormatter="string"
       />
+      <Modal
+        title={previewTitle}
+        open={previewVisible}
+        onCancel={() => setPreviewVisible(false)}
+        footer={null}
+        width={800}
+        centered
+      >
+        <pre
+          style={{
+            whiteSpace: 'pre-wrap',
+            wordWrap: 'break-word',
+            fontFamily: 'monospace',
+            fontSize: '14px',
+            padding: '16px',
+            backgroundColor: '#f5f5f5',
+            borderRadius: '4px',
+          }}
+        >
+          {previewContent}
+        </pre>
+      </Modal>
       {messageContextHolder}
     </>
   );

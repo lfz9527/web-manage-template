@@ -161,6 +161,12 @@ const routes = [
         name: '帖子管理',
         component: '@/pages/album/postManage',
       },
+      {
+        path: '/album/commentManage',
+        name: '评论管理',
+        component: '@/pages/album/commentManage',
+        access: 'isDev',
+      },
     ],
   },
   {
@@ -184,6 +190,7 @@ const routes = [
     name: '素材管理',
     path: '/material',
     icon: 'CalculatorFilled',
+    access: 'isDev',
     routes: [
       {
         path: '/material/aiPromptManage',

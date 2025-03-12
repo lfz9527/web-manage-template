@@ -158,15 +158,16 @@ export default () => {
   };
 
   // 删除
-  const handleDelete = async (poster: TableItem) => {
-    const names = poster.title;
-    const id = Number(poster.goodId);
+  const handleDelete = async (poster: TableItem[]) => {
+    const names = poster.map((item) => item.title).join(',');
+    const ids = poster.map((item) => Number(item.goodId));
 
     modal.confirm({
-      title: `确定删除名字：${names} 的商品吗？`,
+      title: ids.length > 1 ? `批量删除` : `删除`,
+      content: `确定删除名字：${names} 的商品吗？`,
       centered: true,
       onOk: async () => {
-        await postGoodDeleteGood({ ids: [id] });
+        await postGoodDeleteGood({ ids });
         messageApi.success(`删除成功`);
         actionRef.current?.reload();
       },
@@ -293,7 +294,7 @@ export default () => {
         0: { text: '否' },
       },
       render: (_, record) => {
-        return record.goodCategory.isAdult ? (
+        return record.goodCategory?.isAdult ? (
           <Tag color="red">是</Tag>
         ) : (
           <Tag>否</Tag>
@@ -378,7 +379,7 @@ export default () => {
             {
               key: 'delete',
               name: '删除',
-              onClick: () => handleDelete(record),
+              onClick: () => handleDelete([record]),
             },
           ]}
         />,
@@ -437,6 +438,7 @@ export default () => {
         tableAlertOptionRender={({ selectedRows }) => {
           return (
             <Space size={16}>
+              <a onClick={() => handleDelete(selectedRows)}>批量删除</a>
               <a
                 onClick={() => {
                   setCopyGood(selectedRows);
@@ -524,8 +526,6 @@ export default () => {
           );
         }}
         request={async (params) => {
-          console.log(222, params);
-
           const { webSite, current, pageSize, goodCategory } = params;
           const searchParams = {
             page: current,

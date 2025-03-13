@@ -34,15 +34,15 @@ export async function getAiGetAiPromptWordById(
 
 /** 查询AI提示词列表 GET /api/AI/GetAIPromptWordList */
 export async function getAiGetAiPromptWordList(
-  body: API.QUPub,
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getAIGetAIPromptWordListParams,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/AI/GetAIPromptWordList', {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
+    params: {
+      ...params,
     },
-    data: body,
     ...(options || {}),
   });
 }

@@ -185,7 +185,7 @@ declare namespace API {
     /** 商品分类Id */
     goodCategoryId?: number;
     /** 商品分类名称 */
-    categoryname?: string;
+    categoryName?: string;
     /** 图片id */
     imageId?: number;
     /** 分类父级id */
@@ -489,6 +489,19 @@ declare namespace API {
     id?: number;
   };
 
+  type getAIGetAIPromptWordListParams = {
+    /** 通用对象Id */
+    Id?: number;
+    /** 站点Id */
+    webSiteId?: number;
+    /** 用户Id */
+    loginUserId?: number;
+    /** 查询页数 */
+    page?: number;
+    /** 查询行数 */
+    count?: number;
+  };
+
   type getBrandGetBrandByIdParams = {
     id?: number;
   };
@@ -537,16 +550,16 @@ declare namespace API {
   };
 
   type getCrawlerGetRepliteGoodListParams = {
-    /** 查询页数 */
-    page?: number;
-    /** 查询行数 */
-    count?: number;
     /** 通用对象Id */
     Id?: number;
     /** 站点Id */
     webSiteId?: number;
     /** 用户Id */
     loginUserId?: number;
+    /** 查询页数 */
+    page?: number;
+    /** 查询行数 */
+    count?: number;
   };
 
   type getDataStatisticsGetDomainParams = {
@@ -1020,19 +1033,6 @@ declare namespace API {
     page?: number;
     /** 每页数量 */
     count?: number;
-  };
-
-  type QUPub = {
-    /** 查询页数 */
-    page?: number;
-    /** 查询行数 */
-    count?: number;
-    /** 通用对象Id */
-    id?: number;
-    /** 站点Id */
-    webSiteId?: number;
-    /** 用户Id */
-    loginUserId?: number;
   };
 
   type REWebApiCallback = {

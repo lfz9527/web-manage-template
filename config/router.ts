@@ -196,6 +196,16 @@ const routes = [
         name: 'AI提示词管理',
         component: '@/pages/material/aiPromptManage',
       },
+      {
+        path: '/material/imageManage',
+        name: '图片管理',
+        component: '@/pages/material/imageManage',
+      },
+      {
+        path: '/material/distributorGoodsManage',
+        name: '分销商品管理',
+        component: '@/pages/material/distributorGoodsManage',
+      },
     ],
   },
   {
@@ -233,7 +243,7 @@ const routes = [
     access: 'isDev',
     routes: [
       {
-        path: '/system/confMange',
+        path: '/system/confManage',
         name: '系统参数配置管理',
         component: '@/pages/system/confManage',
       },

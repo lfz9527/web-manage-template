@@ -3,7 +3,7 @@ import {
   getUserGetUserForPublic,
   postUserLoginByUserPwd,
 } from '@/services/api/user';
-import { removeToken } from '@/utils';
+import { removeToken, setToken } from '@/utils';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import {
   LoginForm,
@@ -42,11 +42,11 @@ export default () => {
   }, []);
 
   const onFinish = async (values: LoginFormValues) => {
-    await postUserLoginByUserPwd({
+    const { data: token } = await postUserLoginByUserPwd({
       username: values.username,
       password: values.password,
     });
-
+    setToken(token);
     if (values.autoLogin) {
       localStorage.setItem(AUTO_LOGIN_KEY, JSON.stringify(values));
     } else {

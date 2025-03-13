@@ -201,7 +201,7 @@ export default () => {
     {
       title: '分类名称',
       dataIndex: 'categoryName',
-      search: true,
+      search: false,
     },
     {
       title: '分类图片',
@@ -389,6 +389,7 @@ export default () => {
             actionRef.current?.clearSelected?.();
           },
         }}
+        search={false}
         dateFormatter="string"
         toolBarRender={() => [
           <Button

@@ -530,12 +530,15 @@ export default () => {
           const searchParams = {
             page: current,
             count: pageSize,
-            aiOverState: Number(params.isShelves) || -1,
             ...params,
           } as Record<string, any>;
 
+          if (params.isShelves) {
+            searchParams['shelvesState'] = Number(params.isShelves) ?? -1;
+          }
+
           if ('webSite' in searchParams) {
-            searchParams['webSiteId'] = webSite?.name || -1;
+            searchParams['webSiteId'] = webSite?.name ?? 0;
             delete searchParams.webSite;
           }
 

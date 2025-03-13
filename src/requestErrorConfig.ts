@@ -1,3 +1,4 @@
+import { LOGIN_PATH } from '@/enum';
 import {
   getCurrentSiteId,
   getToken,
@@ -91,7 +92,9 @@ export const errorConfig: RequestConfig = {
       if (token) {
         headers['Authorization'] = 'Bearer ' + token;
       } else {
-        logoutFn();
+        if (location.pathname !== LOGIN_PATH) {
+          logoutFn();
+        }
       }
       return config;
     },

@@ -4,6 +4,7 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { message, Modal, Tag } from 'antd';
 import { useRef } from 'react';
+import styles from './index.less';
 
 interface TableItem {
   id: string;
@@ -54,9 +55,7 @@ export default () => {
       width: 300,
       render: (_, record) => (
         <a
-          style={{
-            color: 'blue',
-          }}
+          className={styles['dif-a']}
           href={record.baseLink}
           target="_blank"
           rel="noreferrer"

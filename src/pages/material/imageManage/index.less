@@ -1,0 +1,80 @@
+@hove-bg-color: rgba(0, 0, 0, 0.5);
+
+.image {
+  &-container {
+    position: relative;
+  }
+
+  &-content {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+
+    .img {
+      &-wrap {
+        width: 100%;
+        height: 300px;
+        position: relative;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        border-radius: 12px;
+        overflow: hidden;
+
+        &:hover {
+          .point-container {
+            display: flex;
+          }
+        }
+
+        .point {
+          &-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            top: 0;
+            z-index: 1;
+            background-color: @hove-bg-color;
+            display: none;
+            align-items: center;
+            justify-content: center;
+          }
+
+          &-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            font-size: 16px;
+          }
+        }
+      }
+
+      &-item {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      &-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 2;
+
+        &-content {
+          margin-top: auto;
+          margin-bottom: 0;
+          color: #fff;
+          padding: 12px;
+          background-color: @hove-bg-color;
+          font-size: 14px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+      }
+    }
+  }
+}

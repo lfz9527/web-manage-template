@@ -7,6 +7,7 @@ import {
   postGoodShelvesGood,
   postGoodUpdateGoodForAi,
 } from '@/services/api/good';
+import { getShopSiteGetShopSiteList } from '@/services/api/shopSite';
 import { getWebSiteGetWebSiteList } from '@/services/api/webSite';
 import { allowAllSiteId } from '@/utils';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
@@ -20,6 +21,7 @@ type TableItem = {
   goodId: string;
   shopSite: {
     shopSiteName: string;
+    shopSiteId: string;
   };
   webSite: {
     name: string;
@@ -54,6 +56,12 @@ type CopyFieldType = {
   title: string;
 };
 
+// select 选项类型
+type OptionType = {
+  label: string;
+  value: string;
+};
+
 export default () => {
   const [messageApi, messageContextHolder] = message.useMessage();
   const [modal, contextHolder] = Modal.useModal();
@@ -68,13 +76,26 @@ export default () => {
   // AI处理loading
   const [aiLoading, setAiLoading] = useState<string[]>([]);
 
+  const [shopSiteList, setShopSiteList] = useState<OptionType[]>([]);
+
   // 站点列表
-  const [webSiteList, setWebSiteList] = useState<
-    {
-      label: string;
-      value: string;
-    }[]
-  >([]);
+  const [webSiteList, setWebSiteList] = useState<OptionType[]>([]);
+
+  // 获取店铺列表
+  const getShopSiteList = async (shopSiteName: string = '') => {
+    const { data } = await getShopSiteGetShopSiteList({
+      shopSiteName,
+      page: 1,
+      count: 100,
+    });
+    const { list } = data;
+    setShopSiteList(
+      list.map((item: TableItem['shopSite']) => ({
+        label: item.shopSiteName,
+        value: item.shopSiteId,
+      })),
+    );
+  };
 
   const getWebSiteList = async () => {
     const { data } = await getWebSiteGetWebSiteList({
@@ -91,6 +112,7 @@ export default () => {
   };
 
   useEffect(() => {
+    getShopSiteList();
     getWebSiteList();
   }, []);
 
@@ -203,8 +225,23 @@ export default () => {
     {
       title: '店铺名称',
       dataIndex: ['shopSite', 'shopSiteName'],
-      search: false,
+      search: true,
       ellipsis: true,
+      tooltip: '支持模糊搜索店铺名称',
+      renderFormItem: (_, { type, defaultRender, ...rest }, form) => {
+        if (type === 'form') return null;
+        return (
+          <Select
+            showSearch
+            allowClear
+            onSearch={(name) => getShopSiteList(name)}
+            filterOption={false}
+            options={shopSiteList}
+            placeholder="请输入店铺名称搜索"
+            {...rest}
+          />
+        );
+      },
     },
     {
       title: '所属站点',
@@ -526,7 +563,7 @@ export default () => {
           );
         }}
         request={async (params) => {
-          const { webSite, current, pageSize, goodCategory } = params;
+          const { webSite, current, pageSize, goodCategory, shopSite } = params;
           const searchParams = {
             page: current,
             count: pageSize,
@@ -547,6 +584,11 @@ export default () => {
               ? Number(goodCategory?.isAdult)
               : -1;
             delete searchParams.goodCategory;
+          }
+
+          if ('shopSite' in searchParams) {
+            searchParams['shopSiteId'] = shopSite?.shopSiteName ?? 0;
+            delete searchParams.shopSite;
           }
 
           // 删除不必要的参数

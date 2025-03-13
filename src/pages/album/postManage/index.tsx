@@ -3,6 +3,8 @@ import {
   getGoodAlbumGetGoodPostList,
   postGoodAlbumHotGoodPost,
 } from '@/services/api/goodAlbum';
+import { getWebSiteGetWebSiteById } from '@/services/api/webSite';
+import { isProduction } from '@/utils';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { message, Space, Tag } from 'antd';
@@ -13,6 +15,12 @@ interface TableItem {
   user: {
     nickName: string;
   };
+  goodAlbum: {
+    albumName: string;
+    webSiteId: number;
+    goodAlbumId: number;
+  };
+  postLink: string;
   goodTitle: string;
   goodPrice: string;
   goodPostImages: {
@@ -46,44 +54,93 @@ export default () => {
     }
   };
 
+  // 获取帖子链接host
+  const getPostUrlHost = async (post: TableItem) => {
+    const { goodAlbum } = post;
+    const { webSiteId } = goodAlbum;
+    if (webSiteId === 0 || !webSiteId) return '';
+
+    const { data } = await getWebSiteGetWebSiteById({ id: webSiteId });
+    const { domain } = data;
+    const link = isProduction
+      ? `http://${domain}`
+      : `https://localhost:${domain}`;
+    return link;
+  };
+
   const columns: ProColumns<TableItem>[] = [
     {
       dataIndex: 'index',
       valueType: 'indexBorder',
       width: 48,
+      fixed: 'left',
+    },
+    {
+      title: '帖子ID',
+      dataIndex: 'goodPostId',
+      fixed: 'left',
+      width: 100,
+    },
+    {
+      title: '商品标题',
+      dataIndex: 'goodTitle',
+      search: true,
+      width: 200,
+      ellipsis: true,
     },
     {
       title: '用户名',
       dataIndex: ['user', 'nickName'],
       search: false,
     },
-    {
-      title: '商品标题',
-      dataIndex: 'goodTitle',
-      search: true,
-      width: 300,
-      ellipsis: true,
-    },
+
     {
       title: '商品价格',
       dataIndex: 'goodPrice',
       search: false,
     },
+
+    {
+      title: '帖子链接',
+      dataIndex: 'postLink',
+      search: false,
+      width: 300,
+      render: (_, record) => {
+        if (!record.postLink) return _;
+        return (
+          <a href={record.postLink} target="_blank" rel="noreferrer">
+            {record.postLink}
+          </a>
+        );
+      },
+    },
+    {
+      title: '所属专辑',
+      dataIndex: ['goodAlbum', 'albumName'],
+      search: true,
+      width: 150,
+      ellipsis: true,
+    },
     {
       title: '帖子图片',
       dataIndex: 'goodPostImages',
       search: false,
+      width: 100,
       render: (_, record) => {
-        return record.goodPostImages.map((item) => {
-          return <Image src={item.image.imgSrc} key={item.image.imgSrc} />;
-        });
+        return record?.goodPostImages
+          ? record?.goodPostImages?.map((item) => {
+              return (
+                <Image src={item?.image?.imgSrc} key={item?.image?.imgSrc} />
+              );
+            })
+          : '-';
       },
     },
     {
       title: '帖子描述',
       dataIndex: 'content',
       search: true,
-      width: 600,
+      width: 450,
     },
     {
       title: '是否热门',
@@ -126,6 +183,8 @@ export default () => {
       title: '操作',
       valueType: 'option',
       key: 'option',
+      fixed: 'right',
+      width: 100,
       render: (_, record) =>
         [
           <a key="public" onClick={() => handleHot([record], !record.isHot)}>
@@ -144,6 +203,7 @@ export default () => {
         columns={columns}
         actionRef={actionRef}
         cardBordered
+        scroll={{ x: 2300 }}
         rowSelection={{}}
         tableAlertOptionRender={({ selectedRows }) => {
           return (
@@ -178,8 +238,19 @@ export default () => {
           const { data } = await getGoodAlbumGetGoodPostList(searchParams);
           const { list, total } = data;
 
+          const listData = await Promise.all(
+            list.map(async (item: TableItem) => {
+              const host = await getPostUrlHost(item);
+              const postLink = `/post/${item.goodPostId}?postId=${item.goodPostId}`;
+              return {
+                ...item,
+                postLink: host ? host + postLink : '',
+              };
+            }),
+          );
+
           return {
-            data: list,
+            data: listData,
             success: true,
             total,
           };

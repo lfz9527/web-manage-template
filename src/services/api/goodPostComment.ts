@@ -49,10 +49,30 @@ export async function getGoodPostCommentGetGoodPostCommentList(
     {
       method: 'GET',
       params: {
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+}
+
+/** 查询评论列表并带子评论 GET /api/GoodPostComment/GetGoodPostCommentListAndChild */
+export async function getGoodPostCommentGetGoodPostCommentListAndChild(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getGoodPostCommentGetGoodPostCommentListAndChildParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>(
+    '/api/GoodPostComment/GetGoodPostCommentListAndChild',
+    {
+      method: 'GET',
+      params: {
         // page has a default value: 1
         page: '1',
-        // count has a default value: 40
-        count: '40',
+        // count has a default value: 10
+        count: '10',
+        // childCount has a default value: 3
+        childCount: '3',
         ...params,
       },
       ...(options || {}),

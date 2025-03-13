@@ -5,6 +5,7 @@ import {
   getWebSiteGetWebSiteList, // 假设存在保存网站信息的服务
   postWebSiteDeleteWebSite, // 假设存在删除网站信息的服务
   postWebSiteSaveWebSite,
+  postWebSiteUploadWebSiteSettingSender,
 } from '@/services/api/webSite';
 import { isProduction } from '@/utils';
 import { isNull } from '@/utils/is';
@@ -138,6 +139,22 @@ export default () => {
     setOpenCreateDialog(true);
   };
 
+  const syncSettingValue = async (record: TableItem) => {
+    const { webSiteId: id, name } = record;
+    Modal.confirm({
+      title: `确定同步站点:${name} 的配置值吗？`,
+      centered: true,
+      onOk: async () => {
+        try {
+          await postWebSiteUploadWebSiteSettingSender({
+            id: id,
+          });
+          messageApi.success('同步成功');
+        } catch (error) {}
+      },
+    });
+  };
+
   const columns: ProColumns<TableItem>[] = [
     {
       dataIndex: 'webSiteId',
@@ -221,7 +238,12 @@ export default () => {
       title: '操作',
       valueType: 'option',
       key: 'option',
+      fixed: 'right',
+      width: 250,
       render: (text, record, _, _action) => [
+        <a key="sync" onClick={() => syncSettingValue(record)}>
+          同步站点配置值
+        </a>,
         <a
           key="edit"
           type="link"
@@ -252,7 +274,6 @@ export default () => {
           删除
         </a>,
       ],
-      width: 120,
     },
   ];
 
@@ -300,6 +321,7 @@ export default () => {
       <ProTable<TableItem>
         columns={columns}
         actionRef={actionRef}
+        scroll={{ x: 2000 }}
         cardBordered
         request={async (params, sort, filter) => {
           console.log(sort, filter, params);

@@ -227,3 +227,39 @@ export async function postWebSiteSaveWebSiteSettingValue(
     ...(options || {}),
   });
 }
+
+/** 上传本地的站点配置到生产环境 POST /api/WebSite/UploadWebSiteSettingReceiver */
+export async function postWebSiteUploadWebSiteSettingReceiver(
+  body: API.FBWebSiteSettingReceiver,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>(
+    '/api/WebSite/UploadWebSiteSettingReceiver',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: body,
+      ...(options || {}),
+    },
+  );
+}
+
+/** 上传本地的站点配置到生产环境 POST /api/WebSite/UploadWebSiteSettingSender */
+export async function postWebSiteUploadWebSiteSettingSender(
+  body: API.FBId,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>(
+    '/api/WebSite/UploadWebSiteSettingSender',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: body,
+      ...(options || {}),
+    },
+  );
+}

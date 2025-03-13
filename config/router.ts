@@ -165,7 +165,6 @@ const routes = [
         path: '/album/commentManage',
         name: '评论管理',
         component: '@/pages/album/commentManage',
-        access: 'isDev',
       },
     ],
   },
@@ -189,7 +188,7 @@ const routes = [
   {
     name: '素材管理',
     path: '/material',
-    icon: 'CalculatorFilled',
+    icon: 'SlidersFilled',
     access: 'isDev',
     routes: [
       {
@@ -224,6 +223,19 @@ const routes = [
         path: '/logs/textLog',
         name: '文本日志',
         component: '@/pages/logs/textLog',
+      },
+    ],
+  },
+  {
+    name: '系统管理',
+    path: '/system',
+    icon: 'SettingFilled',
+    access: 'isDev',
+    routes: [
+      {
+        path: '/system/confMange',
+        name: '系统参数配置管理',
+        component: '@/pages/system/confManage',
       },
     ],
   },

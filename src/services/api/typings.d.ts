@@ -225,8 +225,6 @@ declare namespace API {
   type FBGoodPostComment = {
     /** 评论Id */
     goodPostId?: number;
-    /** 顶级父评论 */
-    parentCommentId?: number;
     /** 回复的评论 */
     replyCommentId?: number;
     /** 评论内容 */
@@ -388,6 +386,29 @@ declare namespace API {
     state?: boolean;
   };
 
+  type FBSystemTool = {
+    /** Id */
+    systemToolId?: number;
+    /** 系统配置项标识 */
+    systemToolCode?: string;
+    /** 系统配置项名称 */
+    systemToolName?: string;
+    /** 系统配置项值 */
+    systemToolValue?: string;
+  };
+
+  type FBTask = {
+    taskId?: number;
+    /** 任务名称 */
+    taskName?: string;
+    /** 任务唯一标识 */
+    taskCode?: string;
+    /** 每天执行次数 */
+    executionCount?: number;
+    /** 每次处理数据量 */
+    processingCount?: number;
+  };
+
   type FBUserLogin = {
     /** 用户账号 */
     username?: string;
@@ -447,6 +468,11 @@ declare namespace API {
     settingDescribe?: string;
   };
 
+  type FBWebSiteSettingReceiver = {
+    webSiteId?: number;
+    webSiteSettingValues?: TBWebSiteSettingValue[];
+  };
+
   type FBWebSiteSettingValue = {
     webSiteSettingValueId?: number;
     /** 站点设置属性Id */
@@ -491,6 +517,36 @@ declare namespace API {
   type getCrawlerGetCrawlerLogListParams = {
     page?: number;
     count?: number;
+  };
+
+  type getCrawlerGetDistributionGoodListParams = {
+    /** 关键词 */
+    keyWord?: string;
+    /** 是否已入过库 */
+    loadState?: FilterStateEnum;
+    /** 通用对象Id */
+    Id?: number;
+    /** 站点Id */
+    webSiteId?: number;
+    /** 用户Id */
+    loginUserId?: number;
+    /** 查询页数 */
+    page?: number;
+    /** 查询行数 */
+    count?: number;
+  };
+
+  type getCrawlerGetRepliteGoodListParams = {
+    /** 查询页数 */
+    page?: number;
+    /** 查询行数 */
+    count?: number;
+    /** 通用对象Id */
+    Id?: number;
+    /** 站点Id */
+    webSiteId?: number;
+    /** 用户Id */
+    loginUserId?: number;
   };
 
   type getDataStatisticsGetDomainParams = {
@@ -712,8 +768,6 @@ declare namespace API {
     page?: number;
     /** 查询行数 */
     count?: number;
-    /** 是否需要查询总行数 */
-    haveTotal?: boolean;
     /** 排序 */
     orderBy?: string;
   };
@@ -747,8 +801,6 @@ declare namespace API {
     page?: number;
     /** 查询行数 */
     count?: number;
-    /** 是否需要查询总行数 */
-    haveTotal?: boolean;
   };
 
   type getGoodGetGoodPartitionByIdParams = {
@@ -770,8 +822,6 @@ declare namespace API {
     page?: number;
     /** 查询行数 */
     count?: number;
-    /** 是否需要查询总行数 */
-    haveTotal?: boolean;
     /** 排序 */
     orderBy?: string;
   };
@@ -785,16 +835,35 @@ declare namespace API {
     id?: number;
   };
 
-  type getGoodPostCommentGetGoodPostCommentListParams = {
+  type getGoodPostCommentGetGoodPostCommentListAndChildParams = {
     /** 帖子Id */
     goodPostId?: number;
-    /** 用户Id */
-    userId?: number;
-    /** 帖子内容（模糊搜索） */
-    commentContent?: string;
     /** 页数 */
     page?: number;
     /** 行数 */
+    count?: number;
+    /** 每条父评论的子评论数量 */
+    childCount?: number;
+  };
+
+  type getGoodPostCommentGetGoodPostCommentListParams = {
+    /** 评论内容 */
+    CommentContent?: string;
+    /** 用户Id */
+    UserId?: number;
+    /** 帖子Id */
+    GoodPostId?: number;
+    /** 父评论Id */
+    ParentCommentId?: number;
+    /** 通用对象Id */
+    Id?: number;
+    /** 站点Id */
+    webSiteId?: number;
+    /** 用户Id */
+    loginUserId?: number;
+    /** 查询页数 */
+    page?: number;
+    /** 查询行数 */
     count?: number;
   };
 
@@ -841,6 +910,26 @@ declare namespace API {
     /** 关键词 */
     keyword?: string;
     page?: number;
+    count?: number;
+  };
+
+  type getSystemGetSystemToolByIdParams = {
+    id?: number;
+  };
+
+  type getSystemGetSystemToolListParams = {
+    page?: number;
+    count?: number;
+  };
+
+  type getSystemGetTaskByIdParams = {
+    id?: number;
+  };
+
+  type getSystemGetTaskListParams = {
+    /** 查询页数 */
+    page?: number;
+    /** 查询行数 */
     count?: number;
   };
 
@@ -915,8 +1004,6 @@ declare namespace API {
     page?: number;
     /** 查询行数 */
     count?: number;
-    /** 是否需要查询总行数 */
-    haveTotal?: boolean;
   };
 
   type getWebSiteGetWebSiteSettingValueParams = {
@@ -935,19 +1022,17 @@ declare namespace API {
     count?: number;
   };
 
-  type QUBase = {
+  type QUPub = {
+    /** 查询页数 */
+    page?: number;
+    /** 查询行数 */
+    count?: number;
     /** 通用对象Id */
     id?: number;
     /** 站点Id */
     webSiteId?: number;
     /** 用户Id */
     loginUserId?: number;
-    /** 查询页数 */
-    page?: number;
-    /** 查询行数 */
-    count?: number;
-    /** 是否需要查询总行数 */
-    haveTotal?: boolean;
   };
 
   type REWebApiCallback = {
@@ -956,5 +1041,103 @@ declare namespace API {
     data?: any;
     /** 额外备用参数 */
     remark?: Record<string, any>;
+  };
+
+  type TBGoodCategory = {
+    /** 创建时间 */
+    createTime?: string;
+    /** 分类Id */
+    goodCategoryId: number;
+    /** 属性名称 */
+    categoryName: string;
+    /** 父类属性Id */
+    parentId?: number;
+    /** 分类图标 */
+    imageId?: number;
+    image?: TBImage;
+    /** 商品数量 */
+    goodCount?: number;
+    /** 是否热门 */
+    isHot?: boolean;
+    /** 是否成人用品 */
+    isAdult?: boolean;
+    /** 上热门时间 */
+    hotTime?: string;
+    /** 子分类集合 */
+    childs?: TBGoodCategory[];
+  };
+
+  type TBImage = {
+    /** 创建时间 */
+    createTime?: string;
+    /** 商品轮播Id */
+    imageId?: number;
+    /** 图片链接 */
+    imgSrc?: string;
+    /** 图片宽 */
+    width?: number;
+    /** 图片高 */
+    height?: number;
+    /** 图片大小 */
+    size?: number;
+    /** 图片Hash值 */
+    hash?: string;
+  };
+
+  type TBWebSite = {
+    /** 创建时间 */
+    createTime?: string;
+    /** 站点Id */
+    webSiteId?: number;
+    /** 站点名 */
+    name?: string;
+    /** slogan */
+    slogan?: string;
+    /** seo标题 */
+    seoTitle?: string;
+    /** seo关键词 */
+    seoKeyword?: string;
+    /** seo描述 */
+    seoDescription?: string;
+    /** 域名 */
+    domain?: string;
+    /** 描述 */
+    describe?: string;
+    /** 图片Id */
+    logoImageId?: number;
+    logoImage?: TBImage;
+    /** 类目Id【用于垂直网站】 */
+    goodCategoryId?: number;
+    goodCategory?: TBGoodCategory;
+    /** 状态 */
+    state?: number;
+    /** 最后更新时间 */
+    updateTime?: string;
+  };
+
+  type TBWebSiteSetting = {
+    /** 创建时间 */
+    createTime?: string;
+    /** 站点设置ID */
+    webSiteSettingId?: number;
+    /** 属性名称 */
+    settingName?: string;
+    /** 属性说明 */
+    settingDescribe?: string;
+  };
+
+  type TBWebSiteSettingValue = {
+    /** 创建时间 */
+    createTime?: string;
+    /** 站点设置值ID */
+    webSiteSettingValueId?: number;
+    /** 站点设置表ID */
+    webSiteSettingId?: number;
+    webSiteSetting?: TBWebSiteSetting;
+    /** 站点设置表ID */
+    webSiteId?: number;
+    webSite?: TBWebSite;
+    /** 站点设置值 */
+    settingValue?: string;
   };
 }

@@ -1,3 +1,4 @@
+import { getLogGetTextLogDetails } from '@/services/api/log';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { Modal, message } from 'antd';
@@ -40,11 +41,26 @@ export default () => {
 
   const handlePreviewLog = async (record: TableItem) => {
     try {
-      const response = await fetch(
-        `/api/Log/GetTextLogDetails?filename=${record.fileName}`,
-      );
-      const text = await response.text();
-      setPreviewContent(text);
+      const { data } = await getLogGetTextLogDetails({
+        filename: record.fileName,
+      });
+      // 提取并格式化日志内容
+      const logContent = data
+        .split('\n')
+        .map((line: string) => {
+          // 匹配时间戳部分
+          const timeMatch = line.match(/\[(.*?)\]/);
+          if (timeMatch) {
+            return line.replace(
+              timeMatch[0],
+              `<span style="color: #1677ff">${timeMatch[0]}</span>`,
+            );
+          }
+          return line;
+        })
+        .join('<br/>');
+
+      setPreviewContent(logContent);
       setPreviewTitle(record.fileName);
       setPreviewVisible(true);
     } catch (error) {
@@ -128,7 +144,8 @@ export default () => {
         width={800}
         centered
       >
-        <pre
+        <div
+          dangerouslySetInnerHTML={{ __html: previewContent }}
           style={{
             whiteSpace: 'pre-wrap',
             wordWrap: 'break-word',
@@ -137,10 +154,11 @@ export default () => {
             padding: '16px',
             backgroundColor: '#f5f5f5',
             borderRadius: '4px',
+            maxHeight: '70vh',
+            overflow: 'auto',
+            lineHeight: '1.6',
           }}
-        >
-          {previewContent}
-        </pre>
+        />
       </Modal>
       {messageContextHolder}
     </>

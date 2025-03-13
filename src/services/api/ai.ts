@@ -34,7 +34,7 @@ export async function getAiGetAiPromptWordById(
 
 /** 查询AI提示词列表 GET /api/AI/GetAIPromptWordList */
 export async function getAiGetAiPromptWordList(
-  body: API.QUBase,
+  body: API.QUPub,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/AI/GetAIPromptWordList', {

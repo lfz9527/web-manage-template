@@ -342,9 +342,26 @@ export default () => {
         columns={columns}
         actionRef={actionRef}
         cardBordered
-        rowSelection={{}}
-        tableAlertOptionRender={({ selectedRows, onCleanSelected }) => {
-          setSelectedRows(selectedRows);
+        rowSelection={{
+          onChange: (_, selectedRows) => {
+            console.log(selectedRows);
+
+            setSelectedRows(selectedRows);
+          },
+        }}
+        tableAlertRender={({ selectedRowKeys, onCleanSelected }) => {
+          return (
+            <Space size={24}>
+              <span>
+                已选 {selectedRowKeys.length} 项
+                <a style={{ marginInlineStart: 8 }} onClick={onCleanSelected}>
+                  取消选择
+                </a>
+              </span>
+            </Space>
+          );
+        }}
+        tableAlertOptionRender={() => {
           return (
             <Space size={16}>
               <a

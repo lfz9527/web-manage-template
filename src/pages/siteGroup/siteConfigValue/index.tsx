@@ -173,6 +173,25 @@ export default () => {
       title: '属性值',
       dataIndex: 'settingValue',
       search: false,
+      render: (_, record) => (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          <div
+            style={{
+              border: '1px solid #000',
+              width: 50,
+              height: 22,
+              backgroundColor: record.settingValue,
+            }}
+          />
+          {record.settingValue}
+        </div>
+      ),
     },
     {
       title: '创建时间',

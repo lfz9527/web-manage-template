@@ -335,7 +335,7 @@ const SiteManagementPage = () => {
         }}
         rowKey="shopSiteId"
         pagination={{
-          pageSize: 20,
+          defaultPageSize: 20,
           showSizeChanger: true,
           showQuickJumper: true,
           pageSizeOptions: ['10', '20', '50', '100'],

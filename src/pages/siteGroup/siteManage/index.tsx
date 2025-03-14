@@ -345,7 +345,7 @@ export default () => {
         search={false}
         rowKey="webSiteId"
         pagination={{
-          pageSize: 20,
+          defaultPageSize: 20,
           showSizeChanger: true,
           showQuickJumper: true,
           pageSizeOptions: ['10', '20', '50', '100'],

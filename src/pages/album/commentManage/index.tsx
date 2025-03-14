@@ -132,7 +132,7 @@ export default () => {
         }}
         rowKey="goodPostCommentId"
         pagination={{
-          pageSize: 10,
+          defaultPageSize: 10,
           showSizeChanger: true,
           showQuickJumper: true,
         }}

@@ -398,7 +398,7 @@ export default () => {
         }}
         rowKey="goodCategoryId"
         pagination={{
-          pageSize: 50,
+          defaultPageSize: 50,
           showSizeChanger: true,
           showQuickJumper: true,
           pageSizeOptions: ['10', '20', '50', '100'],

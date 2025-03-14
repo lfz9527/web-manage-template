@@ -179,7 +179,7 @@ export default () => {
         }}
         rowKey="goodTagId"
         pagination={{
-          pageSize: 10,
+          defaultPageSize: 10,
           showSizeChanger: true,
           showQuickJumper: true,
           pageSizeOptions: ['10', '20', '50', '100'],

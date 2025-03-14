@@ -163,6 +163,7 @@ export default () => {
       title: '属性名称',
       dataIndex: ['webSiteSetting', 'settingName'],
       search: false,
+      copyable: true,
     },
     {
       title: '属性说明',
@@ -171,6 +172,7 @@ export default () => {
     },
     {
       title: '属性值',
+      copyable: true,
       dataIndex: 'settingValue',
       search: false,
       render: (_, record) => (
@@ -189,7 +191,7 @@ export default () => {
               backgroundColor: record.settingValue,
             }}
           />
-          {record.settingValue}
+          {_}
         </div>
       ),
     },

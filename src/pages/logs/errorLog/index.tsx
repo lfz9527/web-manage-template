@@ -43,6 +43,7 @@ export default () => {
       title: 'ID',
       dataIndex: 'logId',
       search: false,
+      width: 100,
     },
     {
       title: '日志类型',
@@ -54,12 +55,32 @@ export default () => {
       title: '日志内容',
       dataIndex: 'logData',
       search: false,
+      render: (_) => (
+        <pre
+          style={{
+            whiteSpace: 'pre-wrap',
+            wordWrap: 'break-word',
+            fontFamily: 'monospace',
+            fontSize: '14px',
+            padding: '16px',
+            backgroundColor: '#f5f5f5',
+            borderRadius: '4px',
+            maxHeight: '70vh',
+            overflow: 'auto',
+            lineHeight: '1.6',
+            maxWidth: 1800,
+          }}
+        >
+          {_}
+        </pre>
+      ),
     },
     {
       title: '创建时间',
       dataIndex: 'createTime',
       valueType: 'dateTime',
       search: false,
+      fixed: 'right',
       width: 150,
     },
   ];
@@ -69,6 +90,7 @@ export default () => {
       <ProTable<TableItem>
         columns={columns}
         actionRef={actionRef}
+        scroll={{ x: 1600 }}
         cardBordered
         request={async (params) => {
           const { data } = await getLogGetLogList({

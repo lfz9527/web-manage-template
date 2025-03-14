@@ -189,12 +189,12 @@ const routes = [
     name: '素材管理',
     path: '/material',
     icon: 'SlidersFilled',
-    access: 'isDev',
     routes: [
       {
         path: '/material/aiPromptManage',
         name: 'AI提示词管理',
         component: '@/pages/material/aiPromptManage',
+        access: 'isDev',
       },
       {
         path: '/material/imageManage',

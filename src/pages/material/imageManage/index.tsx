@@ -1,6 +1,6 @@
 import { Image, InfiniteScroll, OnTop, PageLoad } from '@/components';
 import { getImageGetImageList } from '@/services/api/image';
-import { convertFileSize, formatTime } from '@/utils';
+import { convertFileSize, formatImageUrl, formatTime } from '@/utils';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { message, Modal } from 'antd';
 import { useEffect, useState } from 'react';
@@ -134,8 +134,8 @@ export default () => {
                 </div>
 
                 <img
-                  alt={item.imgSrc}
-                  src={item.imgSrc}
+                  alt={formatImageUrl(item.imgSrc)}
+                  src={formatImageUrl(item.imgSrc)}
                   className={styles['img-item']}
                 />
               </div>
@@ -152,7 +152,7 @@ export default () => {
             onVisibleChange: (visible) => setPreviewOpen(visible),
             afterOpenChange: (visible) => !visible && setPreviewImage(''),
           }}
-          src={previewImage}
+          src={formatImageUrl(previewImage)}
         />
       )}
 

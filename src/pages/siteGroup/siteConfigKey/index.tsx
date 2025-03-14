@@ -78,6 +78,7 @@ export default () => {
       title: '属性名称',
       dataIndex: 'settingName',
       search: false,
+      copyable: true,
     },
     {
       title: '属性说明',

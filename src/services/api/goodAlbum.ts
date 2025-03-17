@@ -206,6 +206,21 @@ export async function postGoodAlbumHotGoodPost(
   });
 }
 
+/** 发布商品帖子，游客可用 POST /api/GoodAlbum/InsertGoodPost */
+export async function postGoodAlbumInsertGoodPost(
+  body: API.FBGoodPost,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/GoodAlbum/InsertGoodPost', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 新增商品帖子喜欢记录 POST /api/GoodAlbum/InsertGoodPostLike */
 export async function postGoodAlbumInsertGoodPostLike(
   body: API.FBId,

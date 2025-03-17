@@ -1,9 +1,13 @@
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { Button, message, Modal } from 'antd';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { getLogGetLogList, postLogTrueDeleteLog } from '@/services/api/log';
+import {
+  getLogGetLogList,
+  getLogGetLogTypeList,
+  postLogTrueDeleteLog,
+} from '@/services/api/log';
 
 interface TableItem {
   logId: string;
@@ -13,9 +17,33 @@ interface TableItem {
   createTime: string;
 }
 
+type LogTypeEnumType = {
+  [key: string]: {
+    text: string;
+  };
+};
+
 export default () => {
   const actionRef = useRef<ActionType>();
   const [messageApi, messageContextHolder] = message.useMessage();
+  const [logTypeList, setLogTypeList] = useState<LogTypeEnumType>({});
+
+  const getLogTypeList = async () => {
+    const { data } = await getLogGetLogTypeList();
+    const valueEnum = {} as LogTypeEnumType;
+    data.forEach((item: { key: string; value: string }) => {
+      valueEnum[item.value as keyof LogTypeEnumType] = {
+        text: item.key,
+      };
+    });
+
+    setLogTypeList(valueEnum);
+  };
+
+  useEffect(() => {
+    getLogTypeList();
+  }, []);
+
   const handleDeleteLog = async () => {
     Modal.confirm({
       title: '提示',
@@ -47,8 +75,8 @@ export default () => {
     },
     {
       title: '日志类型',
-      dataIndex: 'logTypeName',
-      search: false,
+      dataIndex: 'logType',
+      valueEnum: logTypeList,
       width: 100,
     },
     {
@@ -93,10 +121,16 @@ export default () => {
         scroll={{ x: 1600 }}
         cardBordered
         request={async (params) => {
-          const { data } = await getLogGetLogList({
+          const searchData = {
             page: params.current,
             count: params.pageSize,
-          });
+            ...params,
+          };
+          delete searchData.current;
+          delete searchData.pageSize;
+
+          const { data } = await getLogGetLogList(searchData);
+
           const { list, total } = data;
           return {
             data: list,

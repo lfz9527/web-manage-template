@@ -19,19 +19,15 @@ export async function postLogDeleteTextLog(
 
 /** 后台查询错误日志列表 GET /api/Log/GetLogList */
 export async function getLogGetLogList(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getLogGetLogListParams,
+  body: API.QULog,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/Log/GetLogList', {
     method: 'GET',
-    params: {
-      // page has a default value: 1
-      page: '1',
-      // count has a default value: 10
-      count: '10',
-      ...params,
+    headers: {
+      'Content-Type': 'application/json',
     },
+    data: body,
     ...(options || {}),
   });
 }

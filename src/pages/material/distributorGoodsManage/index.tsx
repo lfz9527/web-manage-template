@@ -124,6 +124,12 @@ export default () => {
         );
       },
     },
+    {
+      title: '创建时间',
+      dataIndex: 'createTime',
+      valueType: 'dateTime',
+      search: false,
+    },
   ];
 
   return (

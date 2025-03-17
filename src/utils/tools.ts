@@ -21,6 +21,7 @@ type FileSizeUnit = 'B' | 'KB' | 'MB' | 'GB';
  * @param size 文件大小，支持数字或字符串格式
  * @param fromUnit 原始单位，支持 B、KB、MB、GB
  * @param toUnit 目标单位，支持 B、KB、MB、GB
+ * @param decimalPlaces 保留的小数位数，默认为 2
  * @returns 转换后的文件大小数值
  * @example
  * convertFileSize(1024, 'B', 'KB') // 返回 1
@@ -30,10 +31,15 @@ const convertFileSize = (
   size: number | string,
   fromUnit: FileSizeUnit,
   toUnit: FileSizeUnit,
+  decimalPlaces = 2,
 ) => {
   if (!size) return 0;
   let numberSize = 0;
-  if (typeof size === 'string') numberSize = parseFloat(size);
+  if (typeof size === 'string') {
+    numberSize = parseFloat(size);
+  } else {
+    numberSize = size;
+  }
   const units = ['B', 'KB', 'MB', 'GB'];
   const fromIndex = units.indexOf(fromUnit);
   const toIndex = units.indexOf(toUnit);
@@ -43,14 +49,27 @@ const convertFileSize = (
   }
 
   const difference = toIndex - fromIndex; // 修改：计算方向改变
+  const unsetDecimalPlaces = decimalPlaces === -1;
 
   if (difference > 0) {
     // 如果目标单位大于源单位（例如 B -> KB），则除以 1024
-    return Number((numberSize / Math.pow(1024, difference)).toFixed(2));
+
+    if (unsetDecimalPlaces) {
+      return Number(numberSize / Math.pow(1024, difference));
+    }
+
+    return Number(
+      (numberSize / Math.pow(1024, difference)).toFixed(decimalPlaces),
+    );
   } else {
     // 如果目标单位小于源单位（例如 KB -> B），则乘以 1024
+    if (unsetDecimalPlaces) {
+      return Number(numberSize * Math.pow(1024, Math.abs(difference)));
+    }
     return Number(
-      (numberSize * Math.pow(1024, Math.abs(difference))).toFixed(2),
+      (numberSize * Math.pow(1024, Math.abs(difference))).toFixed(
+        decimalPlaces,
+      ),
     );
   }
 };

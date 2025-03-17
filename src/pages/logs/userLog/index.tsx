@@ -49,11 +49,31 @@ export default () => {
     {
       title: '事件',
       dataIndex: 'eventData',
+      width: 200,
     },
     {
       title: '描述',
       dataIndex: 'note',
       search: false,
+      render: (_) => (
+        <pre
+          style={{
+            whiteSpace: 'pre-wrap',
+            wordWrap: 'break-word',
+            fontFamily: 'monospace',
+            fontSize: '14px',
+            padding: '16px',
+            backgroundColor: '#f5f5f5',
+            borderRadius: '4px',
+            maxHeight: '70vh',
+            overflow: 'auto',
+            lineHeight: '1.6',
+            maxWidth: 1800,
+          }}
+        >
+          {_}
+        </pre>
+      ),
     },
     {
       title: '创建时间',

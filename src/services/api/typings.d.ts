@@ -38,18 +38,6 @@ declare namespace API {
     count?: number;
   };
 
-  type FBCrawlerKeyword = {
-    crawlerKeywordId?: number;
-    keywordName?: string;
-  };
-
-  type FBCrawlerLog = {
-    crawlerLogId?: number;
-    crawlerKeywordId?: number;
-    dataCount?: number;
-    shopSiteId?: number;
-  };
-
   type FBDealJoin = {
     /** 优惠提交Id */
     dealJoinId?: number;
@@ -490,12 +478,6 @@ declare namespace API {
   };
 
   type getAIGetAIPromptWordListParams = {
-    /** 通用对象Id */
-    Id?: number;
-    /** 站点Id */
-    webSiteId?: number;
-    /** 用户Id */
-    loginUserId?: number;
     /** 查询页数 */
     page?: number;
     /** 查询行数 */
@@ -508,26 +490,6 @@ declare namespace API {
 
   type getBrandGetBrandListParams = {
     brandname?: string;
-    page?: number;
-    count?: number;
-  };
-
-  type getCrawlerGetCrawlerKeywordByIdParams = {
-    id?: number;
-  };
-
-  type getCrawlerGetCrawlerKeywordListParams = {
-    keywordName?: string;
-    orderBy?: string;
-    page?: number;
-    count?: number;
-  };
-
-  type getCrawlerGetCrawlerLogByIdParams = {
-    id?: number;
-  };
-
-  type getCrawlerGetCrawlerLogListParams = {
     page?: number;
     count?: number;
   };
@@ -550,15 +512,20 @@ declare namespace API {
   };
 
   type getCrawlerGetRepliteGoodListParams = {
+    /** 查询页数 */
+    page?: number;
+    /** 查询行数 */
+    count?: number;
     /** 通用对象Id */
     Id?: number;
     /** 站点Id */
     webSiteId?: number;
     /** 用户Id */
     loginUserId?: number;
-    /** 查询页数 */
+  };
+
+  type getCrawlerGetRepliteKeywordParams = {
     page?: number;
-    /** 查询行数 */
     count?: number;
   };
 
@@ -885,11 +852,6 @@ declare namespace API {
     count?: number;
   };
 
-  type getLogGetLogListParams = {
-    page?: number;
-    count?: number;
-  };
-
   type getLogGetTextLogDetailsParams = {
     filename?: string;
   };
@@ -1028,11 +990,21 @@ declare namespace API {
     webSiteId?: number;
   };
 
+  type LogTypeEnum = 1 | 2 | 3;
+
   type postUserGetProviderListParams = {
     /** 页码 */
     page?: number;
     /** 每页数量 */
     count?: number;
+  };
+
+  type QULog = {
+    /** 查询页数 */
+    page?: number;
+    /** 查询行数 */
+    count?: number;
+    logType?: LogTypeEnum;
   };
 
   type REWebApiCallback = {

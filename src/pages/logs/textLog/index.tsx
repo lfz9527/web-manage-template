@@ -1,7 +1,7 @@
 import { getLogGetTextLogDetails } from '@/services/api/log';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Modal, message } from 'antd';
+import { Button, Modal, message } from 'antd';
 import { useRef, useState } from 'react';
 
 import { getLogGetTextLogList, postLogDeleteTextLog } from '@/services/api/log';
@@ -14,6 +14,7 @@ interface TableItem {
 export default () => {
   const actionRef = useRef<ActionType>();
   const [messageApi, messageContextHolder] = message.useMessage();
+  const [logItem, setLogItem] = useState<TableItem>({} as TableItem);
 
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewContent, setPreviewContent] = useState('');
@@ -40,6 +41,7 @@ export default () => {
   };
 
   const handlePreviewLog = async (record: TableItem) => {
+    setLogItem(record);
     try {
       const { data } = await getLogGetTextLogDetails({
         filename: record.fileName,
@@ -66,6 +68,10 @@ export default () => {
     } catch (error) {
       messageApi.error('获取日志内容失败');
     }
+  };
+
+  const refreshLog = () => {
+    handlePreviewLog(logItem);
   };
 
   const columns: ProColumns<TableItem>[] = [
@@ -141,7 +147,7 @@ export default () => {
         open={previewVisible}
         onCancel={() => setPreviewVisible(false)}
         footer={null}
-        width={800}
+        width={1200}
         centered
       >
         <div
@@ -159,6 +165,17 @@ export default () => {
             lineHeight: '1.6',
           }}
         />
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            paddingTop: 20,
+          }}
+        >
+          <Button type="primary" onClick={refreshLog}>
+            刷新日志
+          </Button>
+        </div>
       </Modal>
       {messageContextHolder}
     </>

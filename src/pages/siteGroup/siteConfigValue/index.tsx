@@ -162,18 +162,18 @@ export default () => {
     {
       title: '属性名称',
       dataIndex: ['webSiteSetting', 'settingName'],
-      search: false,
+      search: true,
       copyable: true,
     },
     {
       title: '属性说明',
       dataIndex: ['webSiteSetting', 'settingDescribe'],
-      search: false,
+      search: true,
     },
     {
       title: '属性值',
-      copyable: true,
       dataIndex: 'settingValue',
+      copyable: true,
       search: false,
       render: (_, record) => (
         <div
@@ -279,17 +279,20 @@ export default () => {
         columns={columns}
         actionRef={actionRef}
         cardBordered
-        request={async (params, sort, filter) => {
-          console.log(sort, filter, params);
+        request={async (params: Record<string, any>) => {
           const searchParams = {
             page: params.current,
             count: params.pageSize,
             webSiteId: params?.webSite?.name || 0,
             ...params,
-          };
+          } as Record<string, any>;
 
           if ('webSite' in searchParams) {
             delete searchParams.webSite;
+          }
+          if ('webSiteSetting' in searchParams) {
+            searchParams['webSiteSettingName'] =
+              params['webSiteSetting'].settingName;
           }
           delete searchParams.current;
           delete searchParams.pageSize;

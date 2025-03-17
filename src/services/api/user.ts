@@ -248,6 +248,21 @@ export async function postUserInsertUserFollow(
   });
 }
 
+/** 管理员登录 POST /api/User/LoginByAdmin */
+export async function postUserLoginByAdmin(
+  body: API.FBUserLogin,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/User/LoginByAdmin', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 账号密码登录 POST /api/User/LoginByUserPwd */
 export async function postUserLoginByUserPwd(
   body: API.FBUserLogin,

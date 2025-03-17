@@ -8,7 +8,7 @@ const getCurrentSiteId = () => {
 };
 
 const setCurrentSiteId = (siteId: number) => {
-  sessionStorage.setItem(CURRENT_SITE_ID, siteId.toString());
+  sessionStorage.setItem(CURRENT_SITE_ID, siteId?.toString());
 };
 
 const removeCurrentSiteId = () => {

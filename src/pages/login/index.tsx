@@ -1,7 +1,7 @@
 import { AUTO_LOGIN_KEY } from '@/enum';
 import {
   getUserGetUserForPublic,
-  postUserLoginByUserPwd,
+  postUserLoginByAdmin,
 } from '@/services/api/user';
 import { removeToken, setToken } from '@/utils';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
@@ -42,7 +42,7 @@ export default () => {
   }, []);
 
   const onFinish = async (values: LoginFormValues) => {
-    const { data: token } = await postUserLoginByUserPwd({
+    const { data: token } = await postUserLoginByAdmin({
       username: values.username,
       password: values.password,
     });

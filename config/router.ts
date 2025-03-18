@@ -194,7 +194,6 @@ const routes = [
         path: '/material/aiPromptManage',
         name: 'AI提示词管理',
         component: '@/pages/material/aiPromptManage',
-        access: 'isDev',
       },
       {
         path: '/material/imageManage',

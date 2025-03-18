@@ -1,4 +1,4 @@
-import { Image, ImageWall } from '@/components';
+import { ImageWall } from '@/components';
 import { getGoodGetGoodCategoryListParent } from '@/services/api/good';
 import {
   getWebSiteGetWebSiteById,
@@ -7,8 +7,7 @@ import {
   postWebSiteSaveWebSite,
   postWebSiteUploadWebSiteSettingSender,
 } from '@/services/api/webSite';
-import { isProduction } from '@/utils';
-import { isNull } from '@/utils/is';
+import { isNull, isProduction } from '@/utils';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
@@ -162,18 +161,6 @@ export default () => {
       width: 48,
     },
     {
-      title: 'Logo',
-      dataIndex: 'logoImage',
-      search: false,
-      render: (_, record) => {
-        return record?.logoImage?.imgSrc ? (
-          <Image src={record?.logoImage?.imgSrc} />
-        ) : (
-          '-'
-        );
-      },
-    },
-    {
       title: '站点名称',
       dataIndex: 'name',
       search: false,
@@ -240,40 +227,43 @@ export default () => {
       key: 'option',
       fixed: 'right',
       width: 250,
-      render: (text, record, _, _action) => [
-        <a key="sync" onClick={() => syncSettingValue(record)}>
-          同步站点配置值
-        </a>,
-        <a
-          key="edit"
-          type="link"
-          onClick={() => {
-            handleEditWebsite(record.webSiteId);
-          }}
-        >
-          编辑
-        </a>,
-        <a
-          key="delete"
-          style={{ color: '#f00' }}
-          type="link"
-          onClick={async () => {
-            await modal.confirm({
-              title: '确定删除该网站吗？',
-              centered: true,
-              onOk: async () => {
-                await postWebSiteDeleteWebSite({
-                  id: Number(record.webSiteId),
-                });
-                messageApi.success('删除成功');
-                actionRef.current?.reload();
-              },
-            });
-          }}
-        >
-          删除
-        </a>,
-      ],
+      render: (text, record, _, _action) =>
+        [
+          !isProduction && (
+            <a key="sync" onClick={() => syncSettingValue(record)}>
+              同步站点配置值
+            </a>
+          ),
+          <a
+            key="edit"
+            type="link"
+            onClick={() => {
+              handleEditWebsite(record.webSiteId);
+            }}
+          >
+            编辑
+          </a>,
+          <a
+            key="delete"
+            style={{ color: '#f00' }}
+            type="link"
+            onClick={async () => {
+              await modal.confirm({
+                title: '确定删除该网站吗？',
+                centered: true,
+                onOk: async () => {
+                  await postWebSiteDeleteWebSite({
+                    id: Number(record.webSiteId),
+                  });
+                  messageApi.success('删除成功');
+                  actionRef.current?.reload();
+                },
+              });
+            }}
+          >
+            删除
+          </a>,
+        ].filter(Boolean),
     },
   ];
 

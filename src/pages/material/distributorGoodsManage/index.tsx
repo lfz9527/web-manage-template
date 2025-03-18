@@ -143,11 +143,14 @@ export default () => {
             ...params,
             page: params.current,
             count: params.pageSize,
-          };
+            loadState: Number(params.isLoad || -1) as number,
+          } as Record<string, any>;
 
           delete searchData.current;
           delete searchData.pageSize;
-
+          if ('isLoad' in searchData) {
+            delete searchData.isLoad;
+          }
           const { data } = await getCrawlerGetDistributionGoodList(searchData);
           const { list, total } = data;
           return {

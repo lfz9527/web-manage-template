@@ -361,6 +361,21 @@ export async function postUserSendEmailCode(
   });
 }
 
+/** 修改用户信息 POST /api/User/UpdateUser */
+export async function postUserUpdateUser(
+  body: API.FBUpdateUser,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/User/UpdateUser', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 修改用户密码 POST /api/User/UpdateUserPwd */
 export async function postUserUpdateUserPwd(
   body: API.FBUserUpdatePwd,

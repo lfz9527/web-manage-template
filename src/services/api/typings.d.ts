@@ -397,6 +397,12 @@ declare namespace API {
     processingCount?: number;
   };
 
+  type FBUpdateUser = {
+    headImageId?: number;
+    nickName?: string;
+    describe?: string;
+  };
+
   type FBUserLogin = {
     /** 用户账号 */
     username?: string;
@@ -478,6 +484,7 @@ declare namespace API {
   };
 
   type getAIGetAIPromptWordListParams = {
+    promptWordCode?: string;
     /** 查询页数 */
     page?: number;
     /** 查询行数 */
@@ -490,6 +497,11 @@ declare namespace API {
 
   type getBrandGetBrandListParams = {
     brandname?: string;
+    page?: number;
+    count?: number;
+  };
+
+  type getCrawlerGetAMZNItemCommentsAsyncParams = {
     page?: number;
     count?: number;
   };
@@ -852,6 +864,15 @@ declare namespace API {
     count?: number;
   };
 
+  type getLogGetLogListParams = {
+    /** 日志类型，1=事务，2=警告，3=错误 */
+    logType?: LogTypeEnum;
+    /** 查询页数 */
+    page?: number;
+    /** 查询行数 */
+    count?: number;
+  };
+
   type getLogGetTextLogDetailsParams = {
     filename?: string;
   };
@@ -997,14 +1018,6 @@ declare namespace API {
     page?: number;
     /** 每页数量 */
     count?: number;
-  };
-
-  type QULog = {
-    /** 查询页数 */
-    page?: number;
-    /** 查询行数 */
-    count?: number;
-    logType?: LogTypeEnum;
   };
 
   type REWebApiCallback = {

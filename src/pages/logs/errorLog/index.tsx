@@ -122,14 +122,17 @@ export default () => {
         cardBordered
         request={async (params) => {
           const searchData = {
+            ...params,
             page: params.current,
             count: params.pageSize,
-            ...params,
-          };
+            ...(params.logType ? { logType: Number(params.logType) } : {}),
+          } as Record<string, any>;
           delete searchData.current;
           delete searchData.pageSize;
 
-          const { data } = await getLogGetLogList(searchData);
+          const { data } = await getLogGetLogList({
+            ...searchData,
+          });
 
           const { list, total } = data;
           return {

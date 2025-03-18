@@ -485,6 +485,7 @@ declare namespace API {
 
   type getAIGetAIPromptWordListParams = {
     promptWordCode?: string;
+    promptContent?: string;
     /** 查询页数 */
     page?: number;
     /** 查询行数 */
@@ -517,6 +518,10 @@ declare namespace API {
     webSiteId?: number;
     /** 用户Id */
     loginUserId?: number;
+    'loginUser.UserId'?: number;
+    'loginUser.Role'?: UserRoleEnum;
+    'loginUser.UserName'?: string;
+    'loginUser.VisotorId'?: string;
     /** 查询页数 */
     page?: number;
     /** 查询行数 */
@@ -534,6 +539,10 @@ declare namespace API {
     webSiteId?: number;
     /** 用户Id */
     loginUserId?: number;
+    'loginUser.UserId'?: number;
+    'loginUser.Role'?: UserRoleEnum;
+    'loginUser.UserName'?: string;
+    'loginUser.VisotorId'?: string;
   };
 
   type getCrawlerGetRepliteKeywordParams = {
@@ -756,6 +765,10 @@ declare namespace API {
     webSiteId?: number;
     /** 用户Id */
     loginUserId?: number;
+    'loginUser.UserId'?: number;
+    'loginUser.Role'?: UserRoleEnum;
+    'loginUser.UserName'?: string;
+    'loginUser.VisotorId'?: string;
     /** 查询页数 */
     page?: number;
     /** 查询行数 */
@@ -789,6 +802,10 @@ declare namespace API {
     webSiteId?: number;
     /** 用户Id */
     loginUserId?: number;
+    'loginUser.UserId'?: number;
+    'loginUser.Role'?: UserRoleEnum;
+    'loginUser.UserName'?: string;
+    'loginUser.VisotorId'?: string;
     /** 查询页数 */
     page?: number;
     /** 查询行数 */
@@ -810,6 +827,10 @@ declare namespace API {
     webSiteId?: number;
     /** 用户Id */
     loginUserId?: number;
+    'loginUser.UserId'?: number;
+    'loginUser.Role'?: UserRoleEnum;
+    'loginUser.UserName'?: string;
+    'loginUser.VisotorId'?: string;
     /** 查询页数 */
     page?: number;
     /** 查询行数 */
@@ -853,6 +874,10 @@ declare namespace API {
     webSiteId?: number;
     /** 用户Id */
     loginUserId?: number;
+    'loginUser.UserId'?: number;
+    'loginUser.Role'?: UserRoleEnum;
+    'loginUser.UserName'?: string;
+    'loginUser.VisotorId'?: string;
     /** 查询页数 */
     page?: number;
     /** 查询行数 */
@@ -996,6 +1021,10 @@ declare namespace API {
     webSiteId?: number;
     /** 用户Id */
     loginUserId?: number;
+    'loginUser.UserId'?: number;
+    'loginUser.Role'?: UserRoleEnum;
+    'loginUser.UserName'?: string;
+    'loginUser.VisotorId'?: string;
     /** 查询页数 */
     page?: number;
     /** 查询行数 */
@@ -1125,4 +1154,6 @@ declare namespace API {
     /** 站点设置值 */
     settingValue?: string;
   };
+
+  type UserRoleEnum = 1 | 2 | 3;
 }

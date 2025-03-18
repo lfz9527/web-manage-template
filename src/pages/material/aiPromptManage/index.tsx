@@ -167,6 +167,7 @@ export default () => {
             ...params,
             page: params.current,
             count: params.pageSize,
+            promptContent: params.promptWordContent?.trim(),
           };
 
           delete searchData.current;

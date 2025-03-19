@@ -239,7 +239,6 @@ const routes = [
     name: '系统管理',
     path: '/system',
     icon: 'SettingFilled',
-    access: 'isDev',
     routes: [
       {
         path: '/system/confManage',

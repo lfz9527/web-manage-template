@@ -47,6 +47,16 @@ export async function getAiGetAiPromptWordList(
   });
 }
 
+/** 查询提示词场景列表 GET /api/AI/GetAIPromptWordScencList */
+export async function getAiGetAiPromptWordScencList(options?: {
+  [key: string]: any;
+}) {
+  return request<API.REWebApiCallback>('/api/AI/GetAIPromptWordScencList', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
 /** 编辑AI提示词 POST /api/AI/SaveAIPromptWord */
 export async function postAiSaveAiPromptWord(
   body: API.FBAIPromptWord,

@@ -158,14 +158,14 @@ const AccessStatistics = () => {
     );
     setSearchData({
       ...searchData,
-      trackerId: list[0].trackerId,
+      trackerId: list[0]?.trackerId,
     });
 
     form.setFieldsValue({
-      trackerId: list[0].trackerId,
+      trackerId: list[0]?.trackerId,
     });
 
-    handleGetDomainList(list[0].trackerId);
+    handleGetDomainList(list[0]?.trackerId);
   };
 
   useEffect(() => {

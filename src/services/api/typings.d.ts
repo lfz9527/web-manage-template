@@ -1,10 +1,13 @@
 declare namespace API {
+  type AIPromptWordScencEnum = 1 | 2;
+
   type FBAIPromptWord = {
     aIPromptWordId?: number;
+    /** 设定的角色 */
+    promptRole?: string;
     /** 提示词内容 */
     promptWordContent?: string;
-    /** 提示词标识 */
-    promptWordCode?: string;
+    promptWordScenc?: AIPromptWordScencEnum;
   };
 
   type FBBrand = {
@@ -484,7 +487,9 @@ declare namespace API {
   };
 
   type getAIGetAIPromptWordListParams = {
-    promptWordCode?: string;
+    /** 场景 */
+    promptWordScenc?: AIPromptWordScencEnum;
+    /** 内容 */
     promptContent?: string;
     /** 查询页数 */
     page?: number;

@@ -1,20 +1,27 @@
 import {
   getAiGetAiPromptWordById,
   getAiGetAiPromptWordList,
+  getAiGetAiPromptWordScencList,
   postAiDeleteAiPromptWord,
   postAiSaveAiPromptWord,
 } from '@/services/api/ai';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Button, Form, Input, message, Modal, Space } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { Button, Form, Input, message, Modal, Select, Space } from 'antd';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface TableItem {
   aiPromptWordId: string;
   promptWordContent: string;
-  promptWordCode: string;
+  promptWordScenc: string;
+  promptWordScencName: string;
 }
+
+type SelectOpt = {
+  label: string;
+  value: string;
+};
 
 export default () => {
   const actionRef = useRef<ActionType>();
@@ -24,6 +31,22 @@ export default () => {
   const [createLoading, setCreateLoading] = useState(false);
   const [aiPromptWordId, setAiPromptWordId] = useState<number>(0);
   const [form] = Form.useForm();
+
+  const [scencList, setScencList] = useState<SelectOpt[]>([]);
+
+  const getScencList = async () => {
+    const { data } = await getAiGetAiPromptWordScencList();
+    setScencList(
+      data.map((v: any) => ({
+        label: v.key,
+        value: v.value,
+      })),
+    );
+  };
+
+  useEffect(() => {
+    getScencList();
+  }, []);
 
   const deletePromptWord = async (item: TableItem[]) => {
     const ids = item.map((v) => Number(v.aiPromptWordId));
@@ -53,6 +76,19 @@ export default () => {
     }
   }, [aiPromptWordId]);
 
+  // 格式化提示词场景回显
+  const formatScenc = useCallback(() => {
+    const option = scencList.reduce((pre: Record<string, any>, cur) => {
+      pre[cur.value] = {
+        text: cur.label,
+      };
+      return pre;
+    }, {});
+    return option;
+  }, [scencList]);
+
+  console.log(formatScenc());
+
   const columns: ProColumns<TableItem>[] = [
     {
       title: '序号',
@@ -64,13 +100,18 @@ export default () => {
       title: '提示词ID',
       dataIndex: 'aiPromptWordId',
       search: false,
+      width: 100,
     },
     {
-      title: '提示词标识',
-      dataIndex: 'promptWordCode',
+      title: '提示词场景',
+      dataIndex: 'promptWordScenc',
+      valueEnum: {
+        ...formatScenc(),
+      },
+      width: 100,
     },
     {
-      title: '提示词内容',
+      title: '用户提示词',
       dataIndex: 'promptWordContent',
     },
     {
@@ -78,11 +119,13 @@ export default () => {
       dataIndex: 'createTime',
       valueType: 'dateTime',
       search: false,
+      width: 150,
     },
     {
       title: '操作',
       valueType: 'option',
       key: 'option',
+      width: 150,
       render: (_, record) => [
         <a
           key="edit"
@@ -103,7 +146,6 @@ export default () => {
           删除
         </a>,
       ],
-      width: 180,
     },
   ];
 
@@ -120,7 +162,7 @@ export default () => {
     const params = {
       ...values,
       aiPromptWordId: Number(aiPromptWordId),
-    };
+    } as Record<string, any>;
     try {
       await postAiSaveAiPromptWord(params);
       setOpenCreateDialog(false);
@@ -222,28 +264,28 @@ export default () => {
           labelAlign="left"
         >
           <Form.Item<TableItem>
-            label="提示词标识"
-            name="promptWordCode"
+            label="提示词场景"
+            name="promptWordScenc"
             rules={[
               {
                 required: true,
-                message: '请输入提示词标识',
+                message: '请选择提示词场景',
               },
             ]}
           >
-            <Input placeholder="请输入提示词标识" />
+            <Select placeholder="请选择提示词场景" options={scencList} />
           </Form.Item>
           <Form.Item<TableItem>
-            label="提示词内容"
+            label="用户提示词"
             name="promptWordContent"
             rules={[
               {
                 required: true,
-                message: '请输入提示词内容',
+                message: '请输入用户提示词',
               },
             ]}
           >
-            <Input.TextArea placeholder="请输入提示词内容" rows={4} />
+            <Input.TextArea placeholder="请输入用户提示词" rows={4} />
           </Form.Item>
         </Form>
       </Modal>

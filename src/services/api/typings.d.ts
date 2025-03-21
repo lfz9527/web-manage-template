@@ -10,6 +10,11 @@ declare namespace API {
     promptWordScenc?: AIPromptWordScencEnum;
   };
 
+  type FBBatchAddUser = {
+    webSiteId?: number;
+    count?: number;
+  };
+
   type FBBrand = {
     /** 品牌的唯一标识符 */
     brandId?: number;
@@ -35,10 +40,6 @@ declare namespace API {
   type FBCopyGood = {
     ids?: number[];
     webSiteId?: number;
-  };
-
-  type FBCount = {
-    count?: number;
   };
 
   type FBDealJoin = {

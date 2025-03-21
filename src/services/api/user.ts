@@ -4,7 +4,7 @@ import { request } from '@umijs/max';
 
 /** 批量生成虚拟账号 POST /api/User/BatchAddUserOfVirtual */
 export async function postUserBatchAddUserOfVirtual(
-  body: API.FBCount,
+  body: API.FBBatchAddUser,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>('/api/User/BatchAddUserOfVirtual', {

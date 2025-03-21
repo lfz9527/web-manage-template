@@ -87,7 +87,11 @@ export default () => {
       dataIndex: 'providerLogoImage',
       search: false,
       render: (_, record) => {
-        return <Image src={record.providerLogoImage?.imgSrc} />;
+        return record.providerLogoImage?.imgSrc ? (
+          <Image src={record.providerLogoImage?.imgSrc} />
+        ) : (
+          _
+        );
       },
     },
     {

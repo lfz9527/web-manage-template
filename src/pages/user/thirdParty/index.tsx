@@ -1,7 +1,7 @@
+import { Image } from '@/components';
 import { getUserGetUserProviderList } from '@/services/api/user';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Avatar } from 'antd';
 import { useRef } from 'react';
 
 type GithubIssueItem = {
@@ -52,7 +52,11 @@ const columns: ProColumns<GithubIssueItem>[] = [
     dataIndex: 'providerPictureSrc',
     search: false,
     render: (_, record) => {
-      return <Avatar src={record.providerPictureSrc} />;
+      return record.providerPictureSrc ? (
+        <Image src={record.providerPictureSrc} />
+      ) : (
+        _
+      );
     },
   },
   {

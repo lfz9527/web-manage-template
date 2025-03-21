@@ -143,12 +143,13 @@ const SiteManagementPage = () => {
   // 表格列定义
   const columns: ProColumns<ShopSiteItem>[] = [
     {
+      title: '序号',
       dataIndex: 'index',
       valueType: 'indexBorder',
       width: 48,
     },
     {
-      title: 'ID',
+      title: '店铺ID',
       dataIndex: 'shopSiteId',
       width: 60,
       search: false,

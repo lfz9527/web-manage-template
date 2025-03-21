@@ -111,9 +111,9 @@ export default () => {
   // 表格列定义
   const columns: ProColumns<DealsItem>[] = [
     {
-      title: 'ID',
+      title: '优惠券ID',
       dataIndex: 'dealsId',
-      width: 60,
+      width: 100,
       search: false,
     },
     {

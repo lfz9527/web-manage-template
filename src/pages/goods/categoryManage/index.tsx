@@ -199,6 +199,12 @@ export default () => {
       },
     },
     {
+      title: '分类ID',
+      dataIndex: 'goodCategoryId',
+      search: false,
+      width: 100,
+    },
+    {
       title: '分类名称',
       dataIndex: 'categoryName',
       search: false,

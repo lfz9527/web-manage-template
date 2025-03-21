@@ -149,9 +149,15 @@ export default () => {
   // 表格列定义
   const columns: ProColumns<WebSiteSettingValue>[] = [
     {
-      dataIndex: 'webSiteSettingValueId',
+      title: '序号',
+      dataIndex: 'index',
       valueType: 'indexBorder',
       width: 48,
+    },
+    {
+      title: 'ID',
+      dataIndex: 'webSiteSettingValueId',
+      search: false,
     },
     {
       title: '站点名',

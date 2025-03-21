@@ -1,14 +1,17 @@
-import { getLogGetTextLogDetails } from '@/services/api/log';
+import {
+  getLogGetTextLogDetails,
+  getLogGetTextLogList,
+  postLogDeleteTextLog,
+} from '@/services/api/log';
+import { formatSize } from '@/utils';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { Button, Modal, message } from 'antd';
 import { useRef, useState } from 'react';
 
-import { getLogGetTextLogList, postLogDeleteTextLog } from '@/services/api/log';
-
 interface TableItem {
   fileName: string;
-  createTime: string;
+  size: string;
 }
 
 export default () => {
@@ -86,9 +89,16 @@ export default () => {
       search: false,
     },
     {
+      title: '日志文件大小',
+      dataIndex: 'size',
+      search: false,
+      render: (_, record) => formatSize(record.size),
+    },
+    {
       title: '操作',
       valueType: 'option',
       key: 'option',
+      width: 150,
       render: (_, record) =>
         [
           <a key="preview" onClick={() => handlePreviewLog(record)}>
@@ -122,8 +132,7 @@ export default () => {
           return {
             data: data.map((file: any) => {
               return {
-                fileName: file,
-                createTime: file,
+                ...file,
               };
             }),
             success: true,
@@ -140,6 +149,7 @@ export default () => {
             actionRef.current?.clearSelected?.();
           },
         }}
+        search={false}
         dateFormatter="string"
       />
       <Modal

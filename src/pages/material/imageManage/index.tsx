@@ -1,6 +1,6 @@
 import { Image, InfiniteScroll, OnTop, PageLoad } from '@/components';
 import { getImageGetImageList } from '@/services/api/image';
-import { convertFileSize, formatImageUrl, formatTime } from '@/utils';
+import { formatImageUrl, formatSize, formatTime } from '@/utils';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { message, Modal } from 'antd';
 import { useEffect, useState } from 'react';
@@ -120,11 +120,7 @@ export default () => {
                     </div>
                     <div className={styles['img-info-item']}>
                       <label>图片大小：</label>
-                      <span>{`${convertFileSize(
-                        item.size,
-                        'B',
-                        'MB',
-                      )}MB`}</span>
+                      <span>{formatSize(item.size)}</span>
                     </div>
                     <div className={styles['img-info-item']}>
                       <label>上传时间：</label>

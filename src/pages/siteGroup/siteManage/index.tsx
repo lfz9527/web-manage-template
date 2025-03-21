@@ -156,9 +156,15 @@ export default () => {
 
   const columns: ProColumns<TableItem>[] = [
     {
-      dataIndex: 'webSiteId',
+      title: '序号',
+      dataIndex: 'index',
       valueType: 'indexBorder',
       width: 48,
+    },
+    {
+      title: '站点ID',
+      dataIndex: 'webSiteId',
+      search: false,
     },
     {
       title: '站点名称',

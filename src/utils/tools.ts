@@ -14,7 +14,7 @@ const formatImageUrl = (link: string) => {
   }
 };
 
-type FileSizeUnit = 'B' | 'KB' | 'MB' | 'GB';
+export type FileSizeUnit = 'B' | 'KB' | 'MB' | 'GB';
 
 /**
  * 文件大小单位转换函数
@@ -33,13 +33,9 @@ const convertFileSize = (
   toUnit: FileSizeUnit,
   decimalPlaces = 2,
 ) => {
+  let numberSize = typeof size === 'string' ? Number(size) : size;
   if (!size) return 0;
-  let numberSize = 0;
-  if (typeof size === 'string') {
-    numberSize = parseFloat(size);
-  } else {
-    numberSize = size;
-  }
+
   const units = ['B', 'KB', 'MB', 'GB'];
   const fromIndex = units.indexOf(fromUnit);
   const toIndex = units.indexOf(toUnit);
@@ -75,6 +71,31 @@ const convertFileSize = (
 };
 
 /**
+ * 格式化文件大小
+ * @param size
+ * @param from
+ * @param to
+ * @returns
+ */
+const formatSize = (
+  size: number | string = 0,
+  from: FileSizeUnit = 'B',
+  to: FileSizeUnit = 'KB',
+) => {
+  let value = typeof size === 'string' ? Number(size) : size;
+  if (value <= 0) return 0 + from;
+  value = convertFileSize(size, from, to);
+
+  const units: FileSizeUnit[] = ['B', 'KB', 'MB', 'GB'];
+  let currentUnitIndex = units.indexOf(to);
+  while (value >= 1024 && currentUnitIndex < units.length - 1) {
+    currentUnitIndex++;
+    value = convertFileSize(size, from, units[currentUnitIndex]);
+  }
+  return `${value} ${units[currentUnitIndex]}`;
+};
+
+/**
  * 格式化时间
  * @param time 时间字符串，支持 ISO 格式
  * @param format 输出格式，默认 YYYY-MM-DD HH:mm:ss
@@ -101,4 +122,10 @@ const formatTime = (time: string, format: string = 'YYYY-MM-DD HH:mm:ss') => {
   });
 };
 
-export { convertFileSize, formatImageUrl, formatTime, isProduction };
+export {
+  convertFileSize,
+  formatImageUrl,
+  formatSize,
+  formatTime,
+  isProduction,
+};

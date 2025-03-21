@@ -70,9 +70,15 @@ export default () => {
   // 表格列定义
   const columns: ProColumns<GithubIssueItem>[] = [
     {
-      dataIndex: 'webSiteSettingId',
+      title: '序号',
+      dataIndex: 'index',
       valueType: 'indexBorder',
       width: 48,
+    },
+    {
+      title: 'ID',
+      dataIndex: 'webSiteSettingId',
+      search: false,
     },
     {
       title: '属性名称',

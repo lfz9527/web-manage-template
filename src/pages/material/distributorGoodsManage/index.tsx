@@ -143,7 +143,7 @@ export default () => {
             ...params,
             page: params.current,
             count: params.pageSize,
-            loadState: Number(params.isLoad || -1) as number,
+            loadState: Number(params.isLoad || -1) as API.FilterStateEnum,
           } as Record<string, any>;
 
           delete searchData.current;

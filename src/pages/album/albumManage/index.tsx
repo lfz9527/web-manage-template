@@ -101,6 +101,10 @@ export default () => {
       width: 48,
     },
     {
+      title: '专辑ID',
+      dataIndex: 'goodAlbumId',
+    },
+    {
       title: '用户',
       dataIndex: ['user', 'nickName'],
       search: true,

@@ -113,6 +113,24 @@ export default () => {
     {
       title: '用户提示词',
       dataIndex: 'promptWordContent',
+      render: (_) => (
+        <pre
+          style={{
+            whiteSpace: 'pre-wrap',
+            wordWrap: 'break-word',
+            fontFamily: 'monospace',
+            fontSize: '14px',
+            padding: '16px',
+            backgroundColor: '#f5f5f5',
+            borderRadius: '4px',
+            maxHeight: '70vh',
+            overflow: 'auto',
+            lineHeight: '1.6',
+          }}
+        >
+          {_}
+        </pre>
+      ),
     },
     {
       title: '创建时间',
@@ -285,7 +303,7 @@ export default () => {
               },
             ]}
           >
-            <Input.TextArea placeholder="请输入用户提示词" rows={4} />
+            <Input.TextArea placeholder="请输入用户提示词" rows={6} />
           </Form.Item>
         </Form>
       </Modal>

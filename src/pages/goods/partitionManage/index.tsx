@@ -204,6 +204,11 @@ export default () => {
       width: 48,
     },
     {
+      title: '分区ID',
+      dataIndex: 'goodPartitionId',
+      width: 100,
+    },
+    {
       title: '站点名称',
       dataIndex: ['webSite', 'name'],
       search: allowAllSiteId(),

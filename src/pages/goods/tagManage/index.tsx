@@ -71,6 +71,11 @@ export default () => {
       width: 48,
     },
     {
+      title: '标签ID',
+      dataIndex: 'goodTagId',
+      search: false,
+    },
+    {
       title: '名称',
       dataIndex: 'tagName',
       search: true,

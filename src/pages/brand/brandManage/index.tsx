@@ -151,12 +151,13 @@ const BrandManagementPage = () => {
   // 表格列定义
   const columns: ProColumns<BrandItem>[] = [
     {
+      title: '序号',
       dataIndex: 'index',
       valueType: 'indexBorder',
       width: 48,
     },
     {
-      title: 'ID',
+      title: '品牌ID',
       dataIndex: 'brandId',
       width: 60,
       search: false,

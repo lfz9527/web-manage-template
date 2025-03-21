@@ -17,12 +17,13 @@ type GithubIssueItem = {
 
 const columns: ProColumns<GithubIssueItem>[] = [
   {
+    title: '序号',
     dataIndex: 'index',
     valueType: 'indexBorder',
     width: 48,
   },
   {
-    title: 'ID',
+    title: '第三方账号ID',
     dataIndex: 'userProviderId',
     search: false,
   },

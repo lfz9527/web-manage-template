@@ -1,9 +1,13 @@
 import { Image } from '@/components';
-import { getCrawlerGetDistributionGoodList } from '@/services/api/crawler';
+import {
+  getCrawlerGetDistributionGoodList,
+  postCrawlerAddDistributionTaskForKeyword,
+} from '@/services/api/crawler';
+import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { message, Modal, Tag } from 'antd';
-import { useRef } from 'react';
+import { Button, Form, Input, message, Modal, Tag } from 'antd';
+import { useRef, useState } from 'react';
 import styles from './index.less';
 
 interface TableItem {
@@ -30,11 +34,18 @@ interface TableItem {
   createTime: string;
 }
 
+type FileType = {
+  keyword: string;
+};
+
 export default () => {
   const actionRef = useRef<ActionType>();
   const [modal, contextHolder] = Modal.useModal();
   const [messageApi, messageContextHolder] = message.useMessage();
 
+  const [openDialog, setOpenDialog] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
+  const [form] = Form.useForm();
   const columns: ProColumns<TableItem>[] = [
     {
       title: '序号',
@@ -132,6 +143,31 @@ export default () => {
     },
   ];
 
+  const handleCreate = async (values: FileType) => {
+    if (createLoading) return;
+    setCreateLoading(true);
+
+    const params = {
+      ...values,
+    } as API.QUKeyWord;
+
+    try {
+      await postCrawlerAddDistributionTaskForKeyword(params);
+      setOpenDialog(false);
+      messageApi.success('生成成功');
+      actionRef.current?.reload();
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
+  // 关闭模态框时重置表单
+  const resetForm = () => {
+    form.resetFields();
+    setCreateLoading(false);
+    setOpenDialog(false);
+  };
+
   return (
     <>
       <ProTable<TableItem>
@@ -173,7 +209,46 @@ export default () => {
           },
         }}
         dateFormatter="string"
+        toolBarRender={() => [
+          <Button
+            key="button"
+            icon={<PlusOutlined />}
+            onClick={() => setOpenDialog(true)}
+            variant="solid"
+            color="danger"
+          >
+            添加指定关键词商品入库
+          </Button>,
+        ]}
       />
+
+      <Modal
+        title="添加指定关键词商品入库"
+        centered
+        open={openDialog}
+        onOk={() => form.submit()}
+        okButtonProps={{
+          loading: createLoading,
+        }}
+        afterClose={resetForm}
+        onCancel={() => setOpenDialog(false)}
+      >
+        <Form
+          onFinish={handleCreate}
+          form={form}
+          layout="vertical" // 设置表单布局为垂直
+          labelAlign="left"
+        >
+          <Form.Item<FileType>
+            label="关键字"
+            name="keyword"
+            rules={[{ required: true, message: '请输入关键字' }]}
+          >
+            <Input.TextArea rows={6}></Input.TextArea>
+          </Form.Item>
+        </Form>
+      </Modal>
+
       {messageContextHolder}
       {contextHolder}
     </>

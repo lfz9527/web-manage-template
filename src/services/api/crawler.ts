@@ -2,6 +2,24 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
+/** 手动指定关键词入库任务 POST /api/Crawler/AddDistributionTaskForKeyword */
+export async function postCrawlerAddDistributionTaskForKeyword(
+  body: API.QUKeyWord,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>(
+    '/api/Crawler/AddDistributionTaskForKeyword',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: body,
+      ...(options || {}),
+    },
+  );
+}
+
 /** 此处后端没有提供注释 GET /api/Crawler/GetAMZNItemCommentsAsync */
 export async function getCrawlerGetAmznItemCommentsAsync(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)

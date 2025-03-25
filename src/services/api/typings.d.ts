@@ -1055,6 +1055,10 @@ declare namespace API {
     count?: number;
   };
 
+  type QUKeyWord = {
+    keyWord?: string;
+  };
+
   type REWebApiCallback = {
     msg?: string;
     code?: number;

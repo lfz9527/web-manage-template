@@ -140,14 +140,28 @@ export async function getGoodAlbumGetGoodPostList(
   return request<API.REWebApiCallback>('/api/GoodAlbum/GetGoodPostList', {
     method: 'GET',
     params: {
-      // page has a default value: 1
-      page: '1',
-      // count has a default value: 50
-      count: '50',
       ...params,
     },
     ...(options || {}),
   });
+}
+
+/** 查询推荐帖子 GET /api/GoodAlbum/GetGoodPostListByDiscover */
+export async function getGoodAlbumGetGoodPostListByDiscover(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getGoodAlbumGetGoodPostListByDiscoverParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>(
+    '/api/GoodAlbum/GetGoodPostListByDiscover',
+    {
+      method: 'GET',
+      params: {
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
 }
 
 /** 查询当前登录用户关注的用户帖子列表 GET /api/GoodAlbum/GetGoodPostListByFollow */

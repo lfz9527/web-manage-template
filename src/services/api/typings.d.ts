@@ -680,6 +680,13 @@ declare namespace API {
     id?: number;
   };
 
+  type getGoodAlbumGetGoodPostListByDiscoverParams = {
+    /** 查询页数 */
+    page?: number;
+    /** 查询行数 */
+    count?: number;
+  };
+
   type getGoodAlbumGetGoodPostListByFollowParams = {
     page?: number;
     count?: number;
@@ -692,19 +699,27 @@ declare namespace API {
   };
 
   type getGoodAlbumGetGoodPostListParams = {
-    /** 关键词 */
-    keyWord?: string;
-    /** 商品标题 */
-    goodTitle?: string;
-    /** 商品描述 */
-    goodDescribe?: string;
-    /** 内容 */
-    content?: string;
-    /** 专辑Id */
     goodAlbumId?: number;
-    /** 用户Id */
+    goodTitle?: string;
+    goodDescribe?: string;
+    content?: string;
+    keyWord?: string;
+    isHot?: boolean;
     userId?: number;
+    privateState?: FilterStateEnum;
+    /** 通用对象Id */
+    Id?: number;
+    /** 站点Id */
+    webSiteId?: number;
+    /** 用户Id */
+    loginUserId?: number;
+    'loginUser.UserId'?: number;
+    'loginUser.Role'?: UserRoleEnum;
+    'loginUser.UserName'?: string;
+    'loginUser.VisotorId'?: string;
+    /** 查询页数 */
     page?: number;
+    /** 查询行数 */
     count?: number;
   };
 

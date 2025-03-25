@@ -125,7 +125,7 @@ export default () => {
       title: '帖子图片',
       dataIndex: 'goodPostImages',
       search: false,
-      width: 100,
+      width: 300,
       render: (_, record) => {
         return record?.goodPostImages
           ? record?.goodPostImages?.map((item) => {
@@ -140,7 +140,7 @@ export default () => {
       title: '帖子描述',
       dataIndex: 'content',
       search: true,
-      width: 450,
+      width: 650,
     },
     {
       title: '是否热门',
@@ -203,7 +203,7 @@ export default () => {
         columns={columns}
         actionRef={actionRef}
         cardBordered
-        scroll={{ x: 2300 }}
+        scroll={{ x: 2800 }}
         rowSelection={{}}
         tableAlertOptionRender={({ selectedRows }) => {
           return (

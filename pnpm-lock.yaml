@@ -29,6 +29,9 @@ importers:
       antd:
         specifier: ^5.4.0
         version: 5.24.2(date-fns@2.30.0)(moment@2.30.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      clean-css:
+        specifier: ^5.3.3
+        version: 5.3.3
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13

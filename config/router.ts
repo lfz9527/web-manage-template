@@ -247,6 +247,19 @@ const routes = [
       },
     ],
   },
+  {
+    name: '实用工具（仅开发环境）',
+    path: '/tools',
+    icon: 'ToolFilled',
+    access: 'isDev',
+    routes: [
+      {
+        path: '/tools/clearComments',
+        name: '清除代码注释',
+        component: '@/pages/tools/clearComments',
+      },
+    ],
+  },
 
   { path: '*', component: '404' },
 ];

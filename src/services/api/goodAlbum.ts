@@ -205,6 +205,56 @@ export async function getGoodAlbumGetGoodPostListByLike(
   });
 }
 
+/** 查询指定专辑Id的帖子 GET /api/GoodAlbum/GetGoodPostListForAlbumId */
+export async function getGoodAlbumGetGoodPostListForAlbumId(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getGoodAlbumGetGoodPostListForAlbumIdParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>(
+    '/api/GoodAlbum/GetGoodPostListForAlbumId',
+    {
+      method: 'GET',
+      params: {
+        // count has a default value: 10
+        count: '10',
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+}
+
+/** 根据id查询下一个帖子 GET /api/GoodAlbum/GetGoodPostNextById */
+export async function getGoodAlbumGetGoodPostNextById(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getGoodAlbumGetGoodPostNextByIdParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/GoodAlbum/GetGoodPostNextById', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 根据id查询上一个帖子 GET /api/GoodAlbum/GetGoodPostUpById */
+export async function getGoodAlbumGetGoodPostUpById(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getGoodAlbumGetGoodPostUpByIdParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>('/api/GoodAlbum/GetGoodPostUpById', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
 /** 上下热门 POST /api/GoodAlbum/HotGoodPost */
 export async function postGoodAlbumHotGoodPost(
   body: API.FBState,

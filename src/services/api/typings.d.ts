@@ -1,5 +1,5 @@
 declare namespace API {
-  type AIPromptWordScencEnum = 1 | 2;
+  type AIPromptWordScencEnum = 1 | 2 | 3;
 
   type FBAIPromptWord = {
     aIPromptWordId?: number;
@@ -514,10 +514,11 @@ declare namespace API {
   };
 
   type getCrawlerGetDistributionGoodListParams = {
-    /** 关键词 */
-    keyWord?: string;
+    goodKeyword?: string;
     /** 是否已入过库 */
     loadState?: FilterStateEnum;
+    /** 是否成人 */
+    isAdult?: FilterStateEnum;
     /** 通用对象Id */
     Id?: number;
     /** 站点Id */
@@ -698,6 +699,12 @@ declare namespace API {
     count?: number;
   };
 
+  type getGoodAlbumGetGoodPostListForAlbumIdParams = {
+    goodAlbumId?: number;
+    page?: number;
+    count?: number;
+  };
+
   type getGoodAlbumGetGoodPostListParams = {
     goodAlbumId?: number;
     goodTitle?: string;
@@ -721,6 +728,14 @@ declare namespace API {
     page?: number;
     /** 查询行数 */
     count?: number;
+  };
+
+  type getGoodAlbumGetGoodPostNextByIdParams = {
+    id?: number;
+  };
+
+  type getGoodAlbumGetGoodPostUpByIdParams = {
+    id?: number;
   };
 
   type getGoodGetGoodByIdParams = {
@@ -999,7 +1014,20 @@ declare namespace API {
 
   type getUserGetUserListParams = {
     nickName?: string;
+    userName?: string;
+    /** 通用对象Id */
+    Id?: number;
+    /** 站点Id */
+    webSiteId?: number;
+    /** 用户Id */
+    loginUserId?: number;
+    'loginUser.UserId'?: number;
+    'loginUser.Role'?: UserRoleEnum;
+    'loginUser.UserName'?: string;
+    'loginUser.VisotorId'?: string;
+    /** 查询页数 */
     page?: number;
+    /** 查询行数 */
     count?: number;
   };
 

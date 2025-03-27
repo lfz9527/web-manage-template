@@ -189,10 +189,6 @@ export async function getUserGetUserList(
   return request<API.REWebApiCallback>('/api/User/GetUserList', {
     method: 'GET',
     params: {
-      // page has a default value: 1
-      page: '1',
-      // count has a default value: 20
-      count: '20',
       ...params,
     },
     ...(options || {}),

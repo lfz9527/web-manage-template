@@ -157,6 +157,11 @@ export default () => {
 
   const handleSubmit = (values: conditionsType) => {
     const { codeType } = values;
+    if (!code) {
+      message.error('请输入要清除注释的代码');
+
+      return;
+    }
     setLoading(true);
     let result = code;
     if (codeType === 'javascript') {
@@ -172,6 +177,11 @@ export default () => {
   // 拷贝成功回调
   const onCopySuc = () => {
     messageApi.success('复制成功');
+  };
+
+  const clearCode = () => {
+    setCode('');
+    setResultCode('');
   };
 
   return (
@@ -206,19 +216,25 @@ export default () => {
               </Form.Item>
             </Form>
 
-            <Button
-              key="submit"
-              type="primary"
-              onClick={() => form.submit()}
-              loading={loading}
-            >
-              清除注释
-            </Button>
+            <Space>
+              <Button key="submit" onClick={clearCode}>
+                清除代码
+              </Button>
+
+              <Button
+                key="clear"
+                type="primary"
+                onClick={() => form.submit()}
+                loading={loading}
+              >
+                清除注释
+              </Button>
+            </Space>
           </Space>
         </Card>
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <Card style={{ flex: 1 }} title="请输入要清除注释的代码">
+          <Card style={{ flex: 1 }} title="要清除注释的代码">
             <Input.TextArea
               rows={rows}
               value={code}

@@ -121,3 +121,21 @@ export async function getDataStatisticsGetTrackV2(
     ...(options || {}),
   });
 }
+
+/** 获取统计明细 GET /api/DataStatistics/GetVisitRecordsV2 */
+export async function getDataStatisticsGetVisitRecordsV2(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getDataStatisticsGetVisitRecordsV2Params,
+  options?: { [key: string]: any },
+) {
+  return request<API.REWebApiCallback>(
+    '/api/DataStatistics/GetVisitRecordsV2',
+    {
+      method: 'GET',
+      params: {
+        ...params,
+      },
+      ...(options || {}),
+    },
+  );
+}

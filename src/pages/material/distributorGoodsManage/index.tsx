@@ -35,7 +35,7 @@ interface TableItem {
 }
 
 type FileType = {
-  keyword: string;
+  keyWords: string;
 };
 
 export default () => {
@@ -148,8 +148,8 @@ export default () => {
     setCreateLoading(true);
 
     const params = {
-      ...values,
-    } as API.QUKeyWord;
+      keyWords: values.keyWords.split(','),
+    } as API.QUKeyWords;
 
     try {
       await postCrawlerAddDistributionTaskForKeyword(params);
@@ -240,8 +240,8 @@ export default () => {
           labelAlign="left"
         >
           <Form.Item<FileType>
-            label="关键字"
-            name="keyword"
+            label="关键字（多个关键字以逗号隔开）"
+            name="keyWords"
             rules={[{ required: true, message: '请输入关键字' }]}
           >
             <Input.TextArea rows={6}></Input.TextArea>

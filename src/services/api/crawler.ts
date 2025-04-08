@@ -4,7 +4,7 @@ import { request } from '@umijs/max';
 
 /** 手动指定关键词入库任务 POST /api/Crawler/AddDistributionTaskForKeyword */
 export async function postCrawlerAddDistributionTaskForKeyword(
-  body: API.QUKeyWord,
+  body: API.QUKeyWords,
   options?: { [key: string]: any },
 ) {
   return request<API.REWebApiCallback>(

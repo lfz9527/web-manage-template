@@ -1,11 +1,5 @@
 import { LOGIN_PATH } from '@/enum';
-import {
-  getCurrentSiteId,
-  getToken,
-  logger,
-  logoutFn,
-  setToken,
-} from '@/utils';
+import { getToken, logger, logoutFn, setToken } from '@/utils';
 import type { RequestConfig } from '@umijs/max';
 import { message } from 'antd';
 
@@ -58,24 +52,6 @@ const errorHandle = (response: ResponseData) => {
   }
 };
 
-// 站点鉴权
-const authorSite = (config: any) => {
-  const { method } = config;
-  if (method.toUpperCase() === 'POST') {
-    return;
-  }
-  let siteId = getCurrentSiteId();
-  if (!siteId || siteId === 'all') {
-    siteId = '';
-  }
-  if (!config.params) {
-    config.params = {};
-  }
-  if (siteId) {
-    config.params['webSiteId'] = siteId;
-  }
-};
-
 /**
  * @name 错误处理
  * pro 自带的错误处理， 可以在这里做自己的改动
@@ -88,7 +64,6 @@ export const errorConfig: RequestConfig = {
       const { url, headers } = config;
       const token = getToken();
       logger.info(`请求路径：${url}`);
-      authorSite(config);
       if (token) {
         headers['Authorization'] = 'Bearer ' + token;
       } else {

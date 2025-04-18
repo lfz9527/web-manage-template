@@ -2,7 +2,6 @@
 
 import { Header, PageContainer } from '@/components';
 import { LOGIN_PATH } from '@/enum';
-import { getUserGetUserForPublic } from '@/services/api/user';
 import { logoutFn } from '@/utils';
 import type { HeaderProps } from '@ant-design/pro-layout';
 import type { RunTimeLayoutConfig } from '@umijs/max';
@@ -21,8 +20,11 @@ type InitialStateType = {
 export async function getInitialState(): Promise<InitialStateType> {
   const fetchUserInfo = async () => {
     try {
-      const { data } = await getUserGetUserForPublic({});
-      return data;
+      return {
+        name: '管理员',
+        avatar: '',
+        id: '',
+      };
     } catch (error) {
       // 清除登录状态并跳转登录页
       logoutFn();

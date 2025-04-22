@@ -75,9 +75,3 @@ export const layout: RunTimeLayoutConfig = ({
     },
   };
 };
-
-export const request: RequestConfig = {
-  timeout: parseInt(TIMEOUT),
-  baseURL: BASE_URL,
-  ...errorConfig,
-};

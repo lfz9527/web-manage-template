@@ -1,6 +1,6 @@
-import { extend } from 'umi-request';
-import { message } from 'antd';
 import { logger } from '@/utils';
+import { message } from 'antd';
+import { extend } from 'umi-request';
 
 // 错误处理方案
 const codeMessage: Record<number, string> = {
@@ -19,23 +19,39 @@ const codeMessage: Record<number, string> = {
   504: '网关超时',
 };
 
-
-const systemCode = {
+const systemCode: Record<number, string> = {
   10402: '请重新登录',
   10500: '请求失败',
-}
+};
 
-// 错误处理
-const errorHandler = (error: { response: Response }): Response => {
+// 处理请求错误
+const errorHandler = async (error: { response: Response }): Promise<Response> => {
   const { response } = error;
-  if (response && response.status) {
-    const errorText = codeMessage[response.status] || response.statusText;
-    message.error(`请求错误 ${response.status}: ${errorText}`);
-  } else if (!response) {
-    message.error('您的网络发生异常，无法连接服务器');
+
+  try {
+    if (response && response.status) {
+      const data: API.REWebApiCallback = await response.clone().json();
+      const { code, msg } = data;
+      if (code && code !== 10000) {
+        const errorMsg = msg || systemCode[code] || codeMessage[response.status] || response.statusText || '请求失败';
+        message.error(errorMsg);
+        return response;
+      }
+      const errorText = codeMessage[response.status] || response.statusText;
+      message.error(`请求错误 ${response.status}: ${errorText}`);
+    } else {
+      message.error('您的网络发生异常，无法连接服务器');
+    }
+  } catch (error) {
+    message.error('请求处理失败');
+    console.error('Error in errorHandler:', error);
   }
+
+
+
   return response;
 };
+
 
 // 创建实例
 const request = extend({
@@ -52,7 +68,8 @@ request.interceptors.request.use((url, options) => {
   logger.info(`请求路径：${url}`);
 
   // 这里可以添加token等通用处理
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIxIiwiVXNlck5hbWUiOiJhZG1pbiIsIlJvbGUiOiIxIiwibmJmIjoxNzQ1MzAyMTQwLCJleHAiOjE3NDU1NjEzNDAsImlhdCI6MTc0NTMwMjE0MH0.FxAauLFgTVInBx-uEzFttll0ugsVD6oswUrv2VJGehQ'
+  const token =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIxIiwiVXNlck5hbWUiOiJhZG1pbiIsIlJvbGUiOiIxIiwibmJmIjoxNzQ1MzAyMTQwLCJleHAiOjE3NDU1NjEzNDAsImlhdCI6MTc0NTMwMjE0MH0.FxAauLFgTVInBx-uEzFttll0ugsVD6oswUrv2VJGehQ';
   const authHeader = { Authorization: `Bearer ${token}` };
   return {
     url,
@@ -61,21 +78,24 @@ request.interceptors.request.use((url, options) => {
 });
 
 // 响应拦截器
-request.interceptors.response.use(async (response) => {
-  const data = await response.clone().json();
-  if (data && data.code !== 10000) {
-    const message = data.msg || systemCode[data.code as keyof typeof systemCode] || '服务器错误';
-    message.error(message);
-  }
+request.interceptors.response.use(
+  async (response) => {
+    const { status } = response;
+    const data = await response.clone().json();
 
-  return response;
-});
+    // 如果不是成功状态码或业务码不正确，统一抛出到 errorHandler 处理
+    if (status !== 200 || data.code !== 10000) {
+      return Promise.reject({ response });
+    }
+
+    return response;
+  },
+);
 
 // 封装通用请求方法
 export interface RequestOptions {
   [key: string]: any;
 }
-
 
 /**
  * 封装的通用请求方法
@@ -85,7 +105,7 @@ export interface RequestOptions {
  */
 export async function createRequest<T = any>(
   url: string,
-  options?: RequestOptions
+  options?: RequestOptions,
 ): Promise<T> {
   try {
     return await request<T>(url, options);

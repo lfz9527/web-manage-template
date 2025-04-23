@@ -27,6 +27,7 @@ const systemCode: Record<number, string> = {
 // 处理请求错误
 const errorHandler = async (error: { response: Response }): Promise<Response> => {
   const { response } = error;
+  let messageText = '';
 
   try {
     if (response && response.status) {
@@ -34,22 +35,21 @@ const errorHandler = async (error: { response: Response }): Promise<Response> =>
       const { code, msg } = data;
       if (code && code !== 10000) {
         const errorMsg = msg || systemCode[code] || codeMessage[response.status] || response.statusText || '请求失败';
-        message.error(errorMsg);
-        return response;
+        messageText = errorMsg;
+      } else {
+        const errorText = codeMessage[response.status] || response.statusText;
+        messageText = errorText;
       }
-      const errorText = codeMessage[response.status] || response.statusText;
-      message.error(`请求错误 ${response.status}: ${errorText}`);
+
     } else {
-      message.error('您的网络发生异常，无法连接服务器');
+      messageText = '您的网络发生异常，无法连接服务器';
     }
   } catch (error) {
-    message.error('请求处理失败');
+    messageText = '请求处理失败';
     console.error('Error in errorHandler:', error);
   }
 
-
-
-  return response;
+  return Promise.reject(messageText);
 };
 
 
@@ -87,7 +87,6 @@ request.interceptors.response.use(
     if (status !== 200 || data.code !== 10000) {
       return Promise.reject({ response });
     }
-
     return response;
   },
 );
@@ -106,12 +105,15 @@ export interface RequestOptions {
 export async function createRequest<T = any>(
   url: string,
   options?: RequestOptions,
+  autoMessage = true,
 ): Promise<T> {
   try {
     return await request<T>(url, options);
   } catch (error) {
     logger.error(JSON.stringify(error));
-    console.error('Request Error:', error);
+    if (autoMessage) {
+      message.error(error as string);
+    }
     throw error;
   }
 }
